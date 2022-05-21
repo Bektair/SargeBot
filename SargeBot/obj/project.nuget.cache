@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "8k7nVO+VGdhuWT6ft+9BQ3ZnOVXc9BN8OIDJlLUfY38YTCwVONHThIHWxONo50Rvi8EEOs6tLGTxtoUOONu3kQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\ClassLibrary1\\ConsoleApp1.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\oyvin\\.nuget\\packages\\google.protobuf\\3.19.4\\google.protobuf.3.19.4.nupkg.sha512"
+  ],
+  "logs": []
+}

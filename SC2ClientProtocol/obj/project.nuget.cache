@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "7ho82yGm1JojPOzpYo5MHtnmdTE0ug2ls6ojNzqWOHXByvzygwrEBQishAkSm3P+/LjsW9pOHdbmYeRQ8ESJYw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SC2ClientProtocol\\SC2ClientProtocol.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\oyvin\\.nuget\\packages\\google.protobuf\\3.19.4\\google.protobuf.3.19.4.nupkg.sha512",
+    "C:\\Users\\oyvin\\.nuget\\packages\\grpc.tools\\2.43.0\\grpc.tools.2.43.0.nupkg.sha512"
+  ],
+  "logs": []
+}

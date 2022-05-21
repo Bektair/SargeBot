@@ -1,0 +1,2 @@
+obj\Debug\net6.0\s2clientprotocol/Spatial.cs: s2clientprotocol/common.proto\
+ s2clientprotocol/spatial.proto

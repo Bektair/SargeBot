@@ -1,0 +1,3 @@
+obj\Release\net6.0\s2clientprotocol/Query.cs: s2clientprotocol/common.proto\
+ s2clientprotocol/error.proto\
+ s2clientprotocol/query.proto

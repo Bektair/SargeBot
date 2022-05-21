@@ -1,0 +1,2 @@
+obj\Release\net6.0\s2clientprotocol/Data.cs: s2clientprotocol/common.proto\
+ s2clientprotocol/data.proto
