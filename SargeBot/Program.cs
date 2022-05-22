@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 using System.Net.WebSockets;
-using ConsoleApp1;
+using SargeBot;
 using SC2APIProtocol;
 
 Console.WriteLine("Hello, World!");

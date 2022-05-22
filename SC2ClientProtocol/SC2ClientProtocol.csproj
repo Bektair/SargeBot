@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+
+
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.19.4" />
     <PackageReference Include="Grpc.Tools" Version="2.43.0">
@@ -26,4 +28,9 @@
     <Protobuf Include="s2clientprotocol\spatial.proto" />
     <Protobuf Include="s2clientprotocol\ui.proto" />
   </ItemGroup>
+  
+  
+  
+  
+  
 </Project>

@@ -1,0 +1,132 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SargeBot\\SargeBot.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SargeBot\\SargeBot.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SargeBot\\SargeBot.csproj",
+        "projectName": "SargeBot",
+        "projectPath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SargeBot\\SargeBot.csproj",
+        "packagesPath": "C:\\Users\\oyvin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SargeBot\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\oyvin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SC2ClientProtocol\\SC2ClientProtocol.csproj": {
+                "projectPath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SC2ClientProtocol\\SC2ClientProtocol.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SC2ClientProtocol\\SC2ClientProtocol.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SC2ClientProtocol\\SC2ClientProtocol.csproj",
+        "projectName": "SC2ClientProtocol",
+        "projectPath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SC2ClientProtocol\\SC2ClientProtocol.csproj",
+        "packagesPath": "C:\\Users\\oyvin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SC2ClientProtocol\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\oyvin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Google.Protobuf": {
+              "target": "Package",
+              "version": "[3.19.4, )"
+            },
+            "Grpc.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.43.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

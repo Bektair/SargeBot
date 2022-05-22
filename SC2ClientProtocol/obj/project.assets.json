@@ -106,11 +106,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\oyvin\\Source\\Repos\\SargeBot\\SC2ClientProtocol\\SC2ClientProtocol.csproj",
+      "projectUniqueName": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SC2ClientProtocol\\SC2ClientProtocol.csproj",
       "projectName": "SC2ClientProtocol",
-      "projectPath": "C:\\Users\\oyvin\\Source\\Repos\\SargeBot\\SC2ClientProtocol\\SC2ClientProtocol.csproj",
+      "projectPath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SC2ClientProtocol\\SC2ClientProtocol.csproj",
       "packagesPath": "C:\\Users\\oyvin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\oyvin\\Source\\Repos\\SargeBot\\SC2ClientProtocol\\obj\\",
+      "outputPath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SC2ClientProtocol\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\oyvin\\AppData\\Roaming\\NuGet\\NuGet.Config",

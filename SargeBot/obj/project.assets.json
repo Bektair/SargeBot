@@ -67,11 +67,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\ClassLibrary1\\ConsoleApp1.csproj",
-      "projectName": "ConsoleApp1",
-      "projectPath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\ClassLibrary1\\ConsoleApp1.csproj",
+      "projectUniqueName": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SargeBot\\SargeBot.csproj",
+      "projectName": "SargeBot",
+      "projectPath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SargeBot\\SargeBot.csproj",
       "packagesPath": "C:\\Users\\oyvin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\ClassLibrary1\\obj\\",
+      "outputPath": "C:\\Users\\oyvin\\source\\repos\\SargeBot\\SargeBot\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\oyvin\\AppData\\Roaming\\NuGet\\NuGet.Config",

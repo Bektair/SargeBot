@@ -2,7 +2,7 @@
 using Google.Protobuf;
 using SC2APIProtocol;
 
-namespace ConsoleApp1;
+namespace SargeBot;
 
 public class ProxyClient
 {

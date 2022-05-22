@@ -1,0 +1,12 @@
+C:\Users\oyvin\source\repos\SargeBot\SC2ClientProtocol\bin\Debug\net6.0\SC2ClientProtocol.deps.json
+C:\Users\oyvin\source\repos\SargeBot\SC2ClientProtocol\bin\Debug\net6.0\SC2ClientProtocol.dll
+C:\Users\oyvin\source\repos\SargeBot\SC2ClientProtocol\bin\Debug\net6.0\SC2ClientProtocol.pdb
+C:\Users\oyvin\source\repos\SargeBot\SC2ClientProtocol\obj\Debug\net6.0\SC2ClientProtocol.csproj.AssemblyReference.cache
+C:\Users\oyvin\source\repos\SargeBot\SC2ClientProtocol\obj\Debug\net6.0\SC2ClientProtocol.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\oyvin\source\repos\SargeBot\SC2ClientProtocol\obj\Debug\net6.0\SC2ClientProtocol.AssemblyInfoInputs.cache
+C:\Users\oyvin\source\repos\SargeBot\SC2ClientProtocol\obj\Debug\net6.0\SC2ClientProtocol.AssemblyInfo.cs
+C:\Users\oyvin\source\repos\SargeBot\SC2ClientProtocol\obj\Debug\net6.0\SC2ClientProtocol.csproj.CoreCompileInputs.cache
+C:\Users\oyvin\source\repos\SargeBot\SC2ClientProtocol\obj\Debug\net6.0\SC2ClientProtocol.dll
+C:\Users\oyvin\source\repos\SargeBot\SC2ClientProtocol\obj\Debug\net6.0\refint\SC2ClientProtocol.dll
+C:\Users\oyvin\source\repos\SargeBot\SC2ClientProtocol\obj\Debug\net6.0\SC2ClientProtocol.pdb
+C:\Users\oyvin\source\repos\SargeBot\SC2ClientProtocol\obj\Debug\net6.0\ref\SC2ClientProtocol.dll
