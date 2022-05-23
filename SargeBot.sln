@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SargeBot", "SargeBot\SargeBot.csproj", "{4323F656-CA55-4E9A-8B2D-8827F562F687}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SargeBot", "SargeBot\SargeBot.csproj", "{4323F656-CA55-4E9A-8B2D-8827F562F687}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SC2ClientProtocol", "SC2ClientProtocol\SC2ClientProtocol.csproj", "{3976DDAB-08F6-4AC8-A003-E7E0289A117A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SC2ClientProtocol", "SC2ClientProtocol\SC2ClientProtocol.csproj", "{3976DDAB-08F6-4AC8-A003-E7E0289A117A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SargeBotTest", "SargeBotTest\SargeBotTest.csproj", "{E7D51543-564C-479A-81B7-09C70C9283B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{3976DDAB-08F6-4AC8-A003-E7E0289A117A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3976DDAB-08F6-4AC8-A003-E7E0289A117A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3976DDAB-08F6-4AC8-A003-E7E0289A117A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7D51543-564C-479A-81B7-09C70C9283B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7D51543-564C-479A-81B7-09C70C9283B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7D51543-564C-479A-81B7-09C70C9283B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7D51543-564C-479A-81B7-09C70C9283B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
