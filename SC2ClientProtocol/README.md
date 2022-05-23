@@ -1,0 +1,1 @@
+[Blizzards proto-files](https://github.com/Blizzard/s2client-proto) compiled to CSharp to communicate with the Starcraft II client locally
