@@ -1,4 +1,5 @@
-﻿using SC2APIProtocol;
+﻿using Microsoft.Extensions.Hosting;
+using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,15 +15,13 @@ namespace SargeBot.GameClient;
 /// 
 /// </summary>
 
-public class SC2Process
+public class SC2Process 
 {
     
     private Process? process;
     private IGameConnection gameConnection;
-    private string starcraftExe;
-    private string starcraftDir;
-
-
+    private string starcraftExe="";
+    private string starcraftDir="";
 
     public SC2Process(IGameConnection gameConnection)
     {
@@ -43,10 +42,12 @@ public class SC2Process
                 if (line.Trim().StartsWith("executable"))
                 {
                     starcraftExe = argument;
-                    starcraftDir = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(starcraftExe)));
+                    var nullableStr = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(starcraftExe)));
+                    if (nullableStr != null) starcraftDir = nullableStr;
                 }
             }
         }
+
 
         var processStartInfo = new ProcessStartInfo(starcraftExe);
         processStartInfo.Arguments = String.Format("-listen {0} -port {1} -displayMode 0", gameConnection.getAddress(), gameConnection.getPort());
@@ -64,9 +65,17 @@ public class SC2Process
         return mapPath;
     }
 
+    public IGameConnection GetGameConnection()
+    {
+        return gameConnection;
+    }
+
     public Process? GetProcess()
     {
         return process;
     }
+
+    
+
 }
 
