@@ -11,6 +11,12 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
   </ItemGroup>
 
+    <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>  
+  
   <ItemGroup>
     <ProjectReference Include="..\SC2ClientProtocol\SC2ClientProtocol.csproj" />
   </ItemGroup>

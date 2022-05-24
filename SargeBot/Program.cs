@@ -7,24 +7,44 @@ using SC2APIProtocol;
 using SargeBot.GameClient;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using SargeBot.Options;
+using Microsoft.Extensions.Options;
 
 Console.WriteLine("Hello, World!");
 
 
+using IHost host = CreateHostBuilder(args)
+    .Build();
 
-
-string address = "127.0.0.1";
-int port = 5678;
-
-using IHost host = CreateHostBuilder(args, address, port).Build();
-
-static IHostBuilder CreateHostBuilder(string[] args, string address, int port) =>
+static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
-            .ConfigureServices((_, services) => 
-                services.AddTransient<IGameConnection>(sp => new GameConnection(address, port))
-                .AddTransient<SC2Process>());
-            
- _ = host.Services.GetService<SC2Process>();
+            .ConfigureAppConfiguration((hostingcontext, configuration) =>
+            {
+                configuration.Sources.Clear();
+                IHostEnvironment env = hostingcontext.HostingEnvironment;
+                configuration
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true);
+
+                IConfigurationRoot configurationRoot = configuration.Build();
+                GameConnectionOptions options = new();
+                configurationRoot.GetSection(GameConnectionOptions.GameConnection)
+                                 .Bind(options);
+            })
+            .ConfigureServices((context, services) =>
+            {
+
+                var configurationRoot = context.Configuration;
+                GameConnectionOptions options = new();
+                configurationRoot.GetSection(GameConnectionOptions.GameConnection)
+                                 .Bind(options);
+                services
+                .AddTransient<IGameConnection>(sp => new GameConnection(options.address, options.port))
+                .AddTransient<SC2Process>();
+            });
+
+
 
 var process = ActivatorUtilities.CreateInstance<SC2Process>(host.Services);
 IGameConnection connection = process.GetGameConnection();
