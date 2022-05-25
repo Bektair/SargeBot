@@ -13,9 +13,15 @@ public interface IGameConnection
 
     Task CreateGame(String mapPath, Race opponentRace, Difficulty opponentDifficulty, AIBuild aIBuild, int randomSeed = -1);
 
-    Task<uint> JoinGame(Race race);
+    Task<Response> sendJoinGameRequest(Race race);
 
     Task Run(object bot, uint playerId, string opponentID);
+
+    Task<Response> sendStepRequest();
+
+    Task<Response> sendObservationRequest();
+
+    Task<Response> sendActionsRequest(List<SC2APIProtocol.Action> actions);
 
     int getPort();
 

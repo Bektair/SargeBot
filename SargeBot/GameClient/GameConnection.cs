@@ -1,6 +1,7 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -36,6 +37,7 @@ public class GameConnection : IGameConnection
         throw new Exception("Unable to make a connection.");
     }
 
+    //Should take a playersetup object
     public async Task CreateGame(string mapPath, Race opponentRace, Difficulty opponentDifficulty, AIBuild aIBuild, int randomSeed = -1)
     {
         var createGame = new RequestCreateGame();
@@ -66,11 +68,15 @@ public class GameConnection : IGameConnection
 
     }
 
-    public async Task<uint> JoinGame(Race race)
+    public Task<Response> sendJoinGameRequest(Race race)
+    {
+        return sC2Client.SendRequest(createJoinGameRequest(race));
+    }
+
+    private Request createJoinGameRequest(Race race)
     {
         var joinGame = new RequestJoinGame();
         joinGame.Race = race;
-
         joinGame.Options = new InterfaceOptions();
         joinGame.Options.FeatureLayer = new SpatialCameraSetup { CropToPlayableArea = true, AllowCheatingLayers = false, MinimapResolution = new Size2DI { X = 16, Y = 16 }, Resolution = new Size2DI { X = 128, Y = 128 }, Width = 10 };
         joinGame.Options.Raw = true;
@@ -82,62 +88,41 @@ public class GameConnection : IGameConnection
 
         var request = new Request();
         request.JoinGame = joinGame;
-        var response = await sC2Client.SendRequest(request);
-        return response.JoinGame.PlayerId;
+        return request;
     }
+
 
     public async Task Run(object bot, uint playerId, string opponentID)
     {
-
-        var gameInfoReq = new Request();
-        gameInfoReq.GameInfo = new RequestGameInfo();
-
+        //SC2 API has Data and GameInfo as seperate request types, so I cannot merge these.
+        var gameDataRequest = createGameDataRequest();
+        var dataResponse = await sC2Client.SendRequest(gameDataRequest);
+        var gameInfoReq = createGameInfoRequest();
         var gameInfoResponse = await sC2Client.SendRequest(gameInfoReq);
 
-        var gameDataRequest = new Request();
-        gameDataRequest.Data = new RequestData();
-        gameDataRequest.Data.UnitTypeId = true;
-        gameDataRequest.Data.AbilityId = true;
-        gameDataRequest.Data.BuffId = true;
-        gameDataRequest.Data.EffectId = true;
-        gameDataRequest.Data.UpgradeId = true;
+        var pingRequest = createPingRequest();
+        var pingResponse = await sC2Client.SendRequest(pingRequest);
 
-        var dataResponse = await sC2Client.SendRequest(gameDataRequest);
+        var observationRequest = createObservationRequest();
+        var stepRequest = createStepRequest();
 
-        var request = new Request();
-        request.Ping = new RequestPing();
-        var pingResponse = await sC2Client.SendRequest(request);
+
+
 
         var start = true;
-
-        var observationRequest = new Request
-        {
-            Observation = new RequestObservation()
-        };
-
-        var stepRequest = new Request
-        {
-            Step = new RequestStep { Count = 1 }
-        };
-
-        double totalTime = 0;
         int frames = 0;
-
-        double specificTime = 0;
         int actionCount = 0;
+
 
         while (true)
         {
-            var beginTotal = DateTime.UtcNow;
 
             if (!start)
             {
                 await sC2Client.SendRequest(stepRequest);
             }
-            var begin = DateTime.UtcNow;
             var response = await sC2Client.SendRequest(observationRequest);
-
-            specificTime += (DateTime.UtcNow - begin).TotalMilliseconds;
+            
 
             var observation = response.Observation;
 
@@ -201,12 +186,79 @@ public class GameConnection : IGameConnection
                 await sC2Client.SendRequest(actionRequest);
                 actionCount += actionRequest.Action.Actions.Count;
             }
-
-            var frameTotal = (DateTime.UtcNow - beginTotal).TotalMilliseconds;
-            totalTime += frameTotal;
             frames++;
         }
+        
+
+
     }
+    
+    private Request createStepRequest()
+    {
+        return new Request
+        {
+            Step = new RequestStep { Count = 1 }
+        };
+    }
+
+    private Request createObservationRequest()
+    {
+        return new Request
+        {
+            Observation = new RequestObservation()
+        };
+    }
+
+    private Request createActionsRequest(List<SC2APIProtocol.Action> actions)
+    {
+        var actionRequest = new Request();
+        actionRequest.Action = new RequestAction();
+        actionRequest.Action.Actions.AddRange(actions);
+        return actionRequest;
+    }
+
+    public  Task<Response> sendStepRequest()
+    {
+        return sC2Client.SendRequest(createStepRequest());
+    }
+    public Task<Response> sendObservationRequest()
+    {
+        return sC2Client.SendRequest(createObservationRequest());
+    }
+
+    public Task<Response> sendActionsRequest(List<SC2APIProtocol.Action> actions)
+    {
+        return sC2Client.SendRequest(createActionsRequest(actions));
+    }
+
+
+    private Request createGameDataRequest()
+    {
+        var gameDataRequest = new Request();
+        gameDataRequest.Data = new RequestData();
+        gameDataRequest.Data.UnitTypeId = true;
+        gameDataRequest.Data.AbilityId = true;
+        gameDataRequest.Data.BuffId = true;
+        gameDataRequest.Data.EffectId = true;
+        gameDataRequest.Data.UpgradeId = true;
+        return gameDataRequest;
+    }
+
+    private Request createGameInfoRequest()
+    {
+        var gameInfoReq = new Request();
+        gameInfoReq.GameInfo = new RequestGameInfo();
+        return gameInfoReq;
+    }
+
+    private Request createPingRequest() { 
+        var request = new Request();
+        request.Ping = new RequestPing();
+        return request;
+    }
+
+   
+
 
     public string getAddress()
     {
