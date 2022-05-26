@@ -15,13 +15,13 @@ namespace SargeBot.GameClient;
 /// 
 /// </summary>
 
-public class SC2Process 
+public class SC2Process : ISC2Process
 {
-    
+
     private Process? process;
     private IGameConnection gameConnection;
-    private string starcraftExe="";
-    private string starcraftDir="";
+    private string starcraftExe = "";
+    private string starcraftDir = "";
 
     public SC2Process(IGameConnection gameConnection)
     {
@@ -55,7 +55,7 @@ public class SC2Process
         process = Process.Start(processStartInfo);
     }
 
-    public string getMapPath (String mapName)
+    public string getMapPath(String mapName)
     {
         string mapPath = Path.Combine(starcraftDir, "Maps", mapName);
         if (!File.Exists(mapPath))
@@ -75,7 +75,7 @@ public class SC2Process
         return process;
     }
 
-    
+
 
 }
 

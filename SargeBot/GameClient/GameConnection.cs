@@ -40,7 +40,7 @@ public class GameConnection : IGameConnection
     }
 
     //Should take a playersetup object
-    public async Task CreateGame(string mapPath, Race opponentRace, Difficulty opponentDifficulty, AIBuild aIBuild, int randomSeed = -1)
+    public async Task CreateGame(string mapPath, PlayerSetup opponentPlayer, int randomSeed = -1)
     {
         var createGame = new RequestCreateGame();
         createGame.Realtime = false;
@@ -57,12 +57,8 @@ public class GameConnection : IGameConnection
         createGame.PlayerSetup.Add(player1);
         player1.Type = PlayerType.Participant;
 
-        var player2 = new PlayerSetup();
-        createGame.PlayerSetup.Add(player2);
-        player2.Race = opponentRace;
-        player2.Type = PlayerType.Computer;
-        player2.Difficulty = opponentDifficulty;
-        player2.AiBuild = aIBuild;
+        createGame.PlayerSetup.Add(opponentPlayer);
+   
 
         var request = new Request();
         request.CreateGame = createGame;

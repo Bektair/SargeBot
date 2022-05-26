@@ -11,7 +11,7 @@ public interface IGameConnection
 
     Task Connect();
 
-    Task CreateGame(String mapPath, Race opponentRace, Difficulty opponentDifficulty, AIBuild aIBuild, int randomSeed = -1);
+    Task CreateGame(String mapPath, PlayerSetup player, int randomSeed = -1);
 
     Task<Response> sendJoinGameRequest(Race race);
 

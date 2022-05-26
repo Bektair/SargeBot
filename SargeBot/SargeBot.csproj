@@ -20,6 +20,10 @@
   
   <ItemGroup>
     <ProjectReference Include="..\SC2ClientProtocol\SC2ClientProtocol.csproj" />
+  </ItemGroup>  
+  
+  <ItemGroup>
+    <Folder Include="Managers\" />
   </ItemGroup>
 
 

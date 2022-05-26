@@ -1,12 +1,13 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SargeBot.GameClient;
-public class GameEngine
+public class GameEngine : IGameEngine
 {
     IGameConnection gameConnection;
 
@@ -17,10 +18,10 @@ public class GameEngine
 
 
     //AI Difficulty and AI build should be settings
-    public async Task RunSinglePlayer(string mapPath, Race myRace, PlayerSetup opponentPlayer, int randomSeed=-1, string opponentID = "test")
+    public async Task RunSinglePlayer(string mapPath, Race myRace, PlayerSetup opponentPlayer, int randomSeed = -1, string opponentID = "test")
     {
         await gameConnection.Connect();
-        await gameConnection.CreateGame(mapPath, opponentPlayer.Race, opponentPlayer.Difficulty, opponentPlayer.AiBuild);
+        await gameConnection.CreateGame(mapPath, opponentPlayer);
         var response = await gameConnection.sendJoinGameRequest(myRace);
         await gameLoop(response.JoinGame.PlayerId, opponentID);
     }
@@ -32,8 +33,18 @@ public class GameEngine
         int frames = 0;
         int actionCount = 0;
 
+
+        #if DEBUG
+            Stopwatch totalTimeWatch = new Stopwatch();
+            totalTimeWatch.Start();
+            Stopwatch loopTimeWatch = new Stopwatch();
+        #endif
+
         while (true)
         {
+            #if DEBUG
+                loopTimeWatch.Restart();
+            #endif
 
             if (!start)
             {
@@ -101,6 +112,15 @@ public class GameEngine
                 await gameConnection.sendActionsRequest(filteredActions);
                 actionCount += filteredActions.Count;
             }
+            
+            #if DEBUG
+                if (frames==0) Console.WriteLine("First Loop " + loopTimeWatch.ElapsedMilliseconds);
+
+                if (frames % 100 == 0) {
+                    Console.WriteLine("Total time expired " + totalTimeWatch.Elapsed);
+                    Console.WriteLine("Time this loop " + loopTimeWatch.ElapsedMilliseconds + "ms");
+                }
+            #endif
             frames++;
         }
     }
