@@ -21,26 +21,16 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((hostingcontext, configuration) =>
             {
-                configuration.Sources.Clear();
                 IHostEnvironment env = hostingcontext.HostingEnvironment;
                 configuration
                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true);
-
-                IConfigurationRoot configurationRoot = configuration.Build();
-                GameConnectionOptions options = new();
-                configurationRoot.GetSection(GameConnectionOptions.GameConnection)
-                                 .Bind(options);
             })
             .ConfigureServices((context, services) =>
             {
-
-                var configurationRoot = context.Configuration;
-                GameConnectionOptions options = new();
-                configurationRoot.GetSection(GameConnectionOptions.GameConnection)
-                                 .Bind(options);
+                services.Configure<GameConnectionOptions>(context.Configuration.GetSection(GameConnectionOptions.GameConnection));
                 services
-                .AddSingleton<IGameConnection>(sp => new GameConnection(options.address, options.port))
+                .AddSingleton<IGameConnection, GameConnection>()
                 .AddSingleton<SC2Process>();
             });
 

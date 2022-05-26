@@ -6,20 +6,22 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using SargeBot.Options;
 
 namespace SargeBot;
 public class GameConnection : IGameConnection
 {
 
     private SC2Client sC2Client;
-    private string address;
-    private int port;
+    private readonly string address;
+    private readonly int port;
 
-    public GameConnection(string address, int port)
+    public GameConnection(IOptions<GameConnectionOptions> options)
     {
+        address = options.Value.address;
+        port = options.Value.port;
         sC2Client = new SC2Client();
-        this.address = address;
-        this.port = port;
     }
 
     public async Task Connect()
