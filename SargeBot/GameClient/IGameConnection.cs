@@ -26,7 +26,5 @@ public interface IGameConnection
     int GetPort();
 
     string GetAddress();
-
-
 }
 

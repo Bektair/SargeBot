@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SargeBot.Options;
-public class AIOpponentOptions
+public class OpponentPlayerOptions
 {
-    public AIOpponentOptions() { }
+    public OpponentPlayerOptions() { }
 
-    public const string AIOpponentSettings = "AIOpponentSettings";
+    public const string OpponentPlayerSettings = "OpponentPlayerSettings";
 
     public Race Race { get; set;} = Race.Protoss;
 

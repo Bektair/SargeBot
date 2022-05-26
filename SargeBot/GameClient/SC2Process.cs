@@ -12,6 +12,7 @@ namespace SargeBot.GameClient;
 /// <summary>
 /// 
 /// Starting point to open SC2.
+/// Contains a game engine abstraction to run the gameloop
 /// 
 /// </summary>
 
@@ -53,7 +54,7 @@ public class SC2Process
 
 
         var processStartInfo = new ProcessStartInfo(starcraftExe);
-        processStartInfo.Arguments = String.Format("-listen {0} -port {1} -displayMode 0", gameConnection.getAddress(), gameConnection.getPort());
+        processStartInfo.Arguments = String.Format("-listen {0} -port {1} -displayMode 0", gameConnection.GetAddress(), gameConnection.GetPort());
         processStartInfo.WorkingDirectory = Path.Combine(starcraftDir, "Support64");
         process = Process.Start(processStartInfo);
     }

@@ -29,7 +29,9 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
             .ConfigureServices((context, services) =>
             {
                 services.Configure<GameConnectionOptions>(context.Configuration.GetSection(GameConnectionOptions.GameConnection));
-                services.Configure<AIOpponentOptions>(context.Configuration.GetSection(AIOpponentOptions.AIOpponentSettings));
+                services.Configure<OpponentPlayerOptions>(context.Configuration.GetSection(OpponentPlayerOptions.OpponentPlayerSettings));
+                services.Configure<RequestOptions>(context.Configuration.GetSection(RequestOptions.RequestSettings));
+               
                 services
                 .AddSingleton<IGameConnection, GameConnection>()
                 .AddSingleton<SC2Process>()
@@ -38,12 +40,12 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
 
 var process = host.Services.GetRequiredService<SC2Process>();
 
-var aiOptions = host.Services.GetRequiredService<IOptions<AIOpponentOptions>>();
+var aiOptions = host.Services.GetRequiredService<IOptions<OpponentPlayerOptions>>();
 
 
 
 
-var mapPath = process.getMapPath("HardwireAIE.SC2Map");
+var mapPath = process.GetMapPath("HardwireAIE.SC2Map");
 
 var engine = process.gameEngine;
 

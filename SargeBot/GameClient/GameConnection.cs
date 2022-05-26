@@ -10,18 +10,25 @@ using Microsoft.Extensions.Options;
 using SargeBot.Options;
 
 namespace SargeBot;
+/// <summary>
+/// A type of template, creates request for 
+/// That it sends to the SC2Client which communicates directly with API.
+/// 
+/// </summary>
 public class GameConnection : IGameConnection
 {
 
     private SC2Client sC2Client;
     private readonly string address;
     private readonly int port;
+    private RequestOptions ReqOptions;
 
-    public GameConnection(IOptions<GameConnectionOptions> options)
+    public GameConnection(IOptions<GameConnectionOptions> ConnOptions, IOptions<RequestOptions> ReqOptions)
     {
-        address = options.Value.Address;
-        port = options.Value.Port;
-        sC2Client = new SC2Client();
+        address = ConnOptions.Value.Address;
+        port = ConnOptions.Value.Port;
+        sC2Client = new SC2Client(port, address);
+        this.ReqOptions = ReqOptions.Value;
     }
 
     public async Task Connect()
@@ -30,7 +37,7 @@ public class GameConnection : IGameConnection
         {
             try
             {
-                await sC2Client.Connect(address, port);
+                await sC2Client.Connect();
                 return;
             }
             catch (WebSocketException) { }
@@ -39,11 +46,10 @@ public class GameConnection : IGameConnection
         throw new Exception("Unable to make a connection.");
     }
 
-    //Should take a playersetup object
     public async Task CreateGame(string mapPath, PlayerSetup opponentPlayer, int randomSeed = -1)
     {
         var createGame = new RequestCreateGame();
-        createGame.Realtime = false;
+        createGame.Realtime = ReqOptions.Realtime;
 
         if (randomSeed >= 0)
         {
@@ -55,7 +61,7 @@ public class GameConnection : IGameConnection
 
         var player1 = new PlayerSetup();
         createGame.PlayerSetup.Add(player1);
-        player1.Type = PlayerType.Participant;
+        player1.Type = ReqOptions.Create.Host.PlayerType;
 
         createGame.PlayerSetup.Add(opponentPlayer);
    
@@ -68,7 +74,7 @@ public class GameConnection : IGameConnection
 
     public async Task<uint> SendJoinGameRequest(Race race)
     {
-        var response = await sC2Client.SendRequest(createJoinGameRequest(race));
+        var response = await sC2Client.SendRequest(CreateJoinGameRequest(race));
 
         return response.JoinGame.PlayerId;
     }
@@ -95,16 +101,16 @@ public class GameConnection : IGameConnection
     public async Task Run(object bot, uint playerId, string opponentID)
     {
         //SC2 API has Data and GameInfo as seperate request types, so I cannot merge these.
-        var gameDataRequest = createGameDataRequest();
+        var gameDataRequest = CreateGameDataRequest();
         var dataResponse = await sC2Client.SendRequest(gameDataRequest);
-        var gameInfoReq = createGameInfoRequest();
+        var gameInfoReq = CreateGameInfoRequest();
         var gameInfoResponse = await sC2Client.SendRequest(gameInfoReq);
 
-        var pingRequest = createPingRequest();
+        var pingRequest = CreatePingRequest();
         var pingResponse = await sC2Client.SendRequest(pingRequest);
 
-        var observationRequest = createObservationRequest();
-        var stepRequest = createStepRequest();
+        var observationRequest = CreateObservationRequest();
+        var stepRequest = CreateStepRequest();
 
 
 
@@ -219,16 +225,16 @@ public class GameConnection : IGameConnection
 
     public  Task<Response> SendStepRequest()
     {
-        return sC2Client.SendRequest(createStepRequest());
+        return sC2Client.SendRequest(CreateStepRequest());
     }
     public Task<Response> SendObservationRequest()
     {
-        return sC2Client.SendRequest(createObservationRequest());
+        return sC2Client.SendRequest(CreateObservationRequest());
     }
 
     public Task<Response> SendActionsRequest(List<SC2APIProtocol.Action> actions)
     {
-        return sC2Client.SendRequest(createActionsRequest(actions));
+        return sC2Client.SendRequest(CreateActionsRequest(actions));
     }
 
 

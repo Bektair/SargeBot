@@ -9,17 +9,24 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SargeBot.GameClient;
+/// <summary>
+///  
+/// </summary>
 public class GameEngine 
 {
     IGameConnection gameConnection;
     private readonly PlayerSetup aiOpponent;
 
-    public GameEngine(IGameConnection gameConnection, IOptions<AIOpponentOptions> options)
+    public GameEngine(IGameConnection gameConnection, IOptions<OpponentPlayerOptions> options)
     {
         this.gameConnection = gameConnection;
 
+        //Be agnostic to what type of player opponent is?
+
         aiOpponent =  new PlayerSetup {AiBuild = options.Value.AIBuild, Difficulty = options.Value.Difficulty, 
                                            Race = options.Value.Race, Type = options.Value.PlayerType };
+
+
 
     }
 
@@ -27,7 +34,7 @@ public class GameEngine
     {
         await gameConnection.Connect();
         await gameConnection.CreateGame(mapPath, aiOpponent);
-        var playerId = await gameConnection.sendJoinGameRequest(myRace);
+        var playerId = await gameConnection.SendJoinGameRequest(myRace);
         await GameLoop(playerId, opponentID);
     }
 
@@ -52,9 +59,9 @@ public class GameEngine
 
             if (!start)
             {
-                await gameConnection.sendStepRequest();
+                await gameConnection.SendStepRequest();
             }
-            var response = await gameConnection.sendObservationRequest();
+            var response = await gameConnection.SendObservationRequest();
 
 
             var observation = response.Observation;
@@ -113,7 +120,7 @@ public class GameEngine
 
             if (filteredActions.Count > 0)
             {
-                await gameConnection.sendActionsRequest(filteredActions);
+                await gameConnection.SendActionsRequest(filteredActions);
                 actionCount += filteredActions.Count;
             }
             

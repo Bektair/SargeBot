@@ -1,5 +1,7 @@
 ﻿using System.Net.WebSockets;
 using Google.Protobuf;
+using Microsoft.Extensions.Options;
+using SargeBot.Options;
 using SC2APIProtocol;
 
 namespace SargeBot;
@@ -7,22 +9,27 @@ namespace SargeBot;
 
 public class SC2Client
 {
-    private ClientWebSocket clientSocket;
-    private CancellationToken token = new CancellationTokenSource().Token;
+    private ClientWebSocket ClientSocket;
+    private readonly string Address;
+    private readonly int Port;
 
-    public async Task Connect(string address, int port)
+    private CancellationToken Token = new CancellationTokenSource().Token;
+
+
+    public SC2Client(int port, string address)
     {
-        clientSocket = new ClientWebSocket();
+        ClientSocket = new ClientWebSocket();
+        Address = address;
+        Port = port;
+    }
 
-        // Disable PING control frames (https://tools.ietf.org/html/rfc6455#section-5.5.2).
-        // It seems SC2 built in websocket server does not do PONG but tries to process ping as
-        // request and then sends empty response to client. 
-        clientSocket.Options.KeepAliveInterval = TimeSpan.FromDays(30);
-        string adr = string.Format("ws://{0}:{1}/sc2api", address, port);
-        Uri uri = new Uri(adr);
-        await clientSocket.ConnectAsync(uri, token);
+    public async Task Connect()
+    {
+        ClientSocket.Options.KeepAliveInterval = TimeSpan.FromDays(30);
+        string adr = string.Format("ws://{0}:{1}/sc2api", Address, Port);
+        Uri uri = new (adr);
 
-        await Ping();
+        await ClientSocket.ConnectAsync(uri, Token);
     }
 
     public async Task Ping()
@@ -50,7 +57,7 @@ public class SC2Client
         byte[] sendBuf = new byte[1024 * 1024];
         CodedOutputStream outStream = new CodedOutputStream(sendBuf);
         request.WriteTo(outStream);
-        await clientSocket.SendAsync(new ArraySegment<byte>(sendBuf, 0, (int)outStream.Position), WebSocketMessageType.Binary, true, token);
+        await ClientSocket.SendAsync(new ArraySegment<byte>(sendBuf, 0, (int)outStream.Position), WebSocketMessageType.Binary, true, Token);
     }
 
     private async Task<Response> ReadMessage()
@@ -69,7 +76,7 @@ public class SC2Client
                 receiveBuf = temp;
                 left = receiveBuf.Length - curPos;
             }
-            WebSocketReceiveResult result = await clientSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuf, curPos, left), token);
+            WebSocketReceiveResult result = await ClientSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuf, curPos, left), Token);
             if (result.MessageType != WebSocketMessageType.Binary)
             {
                 throw new Exception("Expected Binary message type.");
