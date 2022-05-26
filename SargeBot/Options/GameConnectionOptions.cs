@@ -11,9 +11,9 @@ public class GameConnectionOptions
 
     public const string GameConnection = "GameConnection";
 
-    public string address { get; set; } = String.Empty;
-    public int port { get; set; } = 5678;
-    
+    public string Address { get; set; } = String.Empty;
+    public int Port { get; set; } = 5678;
+     
 
 
 

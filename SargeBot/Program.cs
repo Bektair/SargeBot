@@ -29,19 +29,25 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
             .ConfigureServices((context, services) =>
             {
                 services.Configure<GameConnectionOptions>(context.Configuration.GetSection(GameConnectionOptions.GameConnection));
+                services.Configure<AIOpponentOptions>(context.Configuration.GetSection(AIOpponentOptions.AIOpponentSettings));
                 services
                 .AddSingleton<IGameConnection, GameConnection>()
-                .AddSingleton<SC2Process>();
+                .AddSingleton<SC2Process>()
+                .AddSingleton<GameEngine>();
             });
 
+var process = host.Services.GetRequiredService<SC2Process>();
+
+var aiOptions = host.Services.GetRequiredService<IOptions<AIOpponentOptions>>();
 
 
-var process = ActivatorUtilities.CreateInstance<SC2Process>(host.Services);
+
+
 var mapPath = process.getMapPath("HardwireAIE.SC2Map");
 
-PlayerSetup opponentPlayer = new() { Race = Race.Protoss, AiBuild = AIBuild.Rush, Difficulty = Difficulty.CheatInsane };
-var engine = ActivatorUtilities.CreateInstance<GameEngine>(host.Services);
-await engine.RunSinglePlayer(mapPath, Race.Protoss, opponentPlayer);
+var engine = process.gameEngine;
+
+await engine.RunSinglePlayer(mapPath, Race.Protoss);
 
 
 await host.RunAsync();

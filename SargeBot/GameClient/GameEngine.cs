@@ -1,4 +1,6 @@
-﻿using SC2APIProtocol;
+﻿using Microsoft.Extensions.Options;
+using SargeBot.Options;
+using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,27 +9,29 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SargeBot.GameClient;
-public class GameEngine : IGameEngine
+public class GameEngine 
 {
     IGameConnection gameConnection;
+    private readonly PlayerSetup aiOpponent;
 
-    public GameEngine(IGameConnection gameConnection)
+    public GameEngine(IGameConnection gameConnection, IOptions<AIOpponentOptions> options)
     {
         this.gameConnection = gameConnection;
+
+        aiOpponent =  new PlayerSetup {AiBuild = options.Value.AIBuild, Difficulty = options.Value.Difficulty, 
+                                           Race = options.Value.Race, Type = options.Value.PlayerType };
+
     }
 
-
-    //AI Difficulty and AI build should be settings
-    public async Task RunSinglePlayer(string mapPath, Race myRace, PlayerSetup opponentPlayer, int randomSeed = -1, string opponentID = "test")
+    public async Task RunSinglePlayer(string mapPath, Race myRace, int randomSeed = -1, string opponentID = "test")
     {
         await gameConnection.Connect();
-        await gameConnection.CreateGame(mapPath, opponentPlayer);
-        var response = await gameConnection.sendJoinGameRequest(myRace);
-        await gameLoop(response.JoinGame.PlayerId, opponentID);
+        await gameConnection.CreateGame(mapPath, aiOpponent);
+        var playerId = await gameConnection.sendJoinGameRequest(myRace);
+        await GameLoop(playerId, opponentID);
     }
 
-
-    public async Task gameLoop(uint playerId, string opponentID)
+    public async Task GameLoop(uint playerId, string opponentID)
     {
         var start = true;
         int frames = 0;
@@ -124,8 +128,5 @@ public class GameEngine : IGameEngine
             frames++;
         }
     }
-
-
-
 }
 

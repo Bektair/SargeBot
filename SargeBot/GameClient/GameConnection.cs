@@ -19,8 +19,8 @@ public class GameConnection : IGameConnection
 
     public GameConnection(IOptions<GameConnectionOptions> options)
     {
-        address = options.Value.address;
-        port = options.Value.port;
+        address = options.Value.Address;
+        port = options.Value.Port;
         sC2Client = new SC2Client();
     }
 
@@ -66,12 +66,14 @@ public class GameConnection : IGameConnection
 
     }
 
-    public Task<Response> sendJoinGameRequest(Race race)
+    public async Task<uint> SendJoinGameRequest(Race race)
     {
-        return sC2Client.SendRequest(createJoinGameRequest(race));
+        var response = await sC2Client.SendRequest(createJoinGameRequest(race));
+
+        return response.JoinGame.PlayerId;
     }
 
-    private Request createJoinGameRequest(Race race)
+    private Request CreateJoinGameRequest(Race race)
     {
         var joinGame = new RequestJoinGame();
         joinGame.Race = race;
@@ -191,7 +193,7 @@ public class GameConnection : IGameConnection
 
     }
     
-    private Request createStepRequest()
+    private Request CreateStepRequest()
     {
         return new Request
         {
@@ -199,7 +201,7 @@ public class GameConnection : IGameConnection
         };
     }
 
-    private Request createObservationRequest()
+    private Request CreateObservationRequest()
     {
         return new Request
         {
@@ -207,7 +209,7 @@ public class GameConnection : IGameConnection
         };
     }
 
-    private Request createActionsRequest(List<SC2APIProtocol.Action> actions)
+    private Request CreateActionsRequest(List<SC2APIProtocol.Action> actions)
     {
         var actionRequest = new Request();
         actionRequest.Action = new RequestAction();
@@ -215,22 +217,22 @@ public class GameConnection : IGameConnection
         return actionRequest;
     }
 
-    public  Task<Response> sendStepRequest()
+    public  Task<Response> SendStepRequest()
     {
         return sC2Client.SendRequest(createStepRequest());
     }
-    public Task<Response> sendObservationRequest()
+    public Task<Response> SendObservationRequest()
     {
         return sC2Client.SendRequest(createObservationRequest());
     }
 
-    public Task<Response> sendActionsRequest(List<SC2APIProtocol.Action> actions)
+    public Task<Response> SendActionsRequest(List<SC2APIProtocol.Action> actions)
     {
         return sC2Client.SendRequest(createActionsRequest(actions));
     }
 
 
-    private Request createGameDataRequest()
+    private Request CreateGameDataRequest()
     {
         var gameDataRequest = new Request();
         gameDataRequest.Data = new RequestData();
@@ -242,28 +244,25 @@ public class GameConnection : IGameConnection
         return gameDataRequest;
     }
 
-    private Request createGameInfoRequest()
+    private Request CreateGameInfoRequest()
     {
         var gameInfoReq = new Request();
         gameInfoReq.GameInfo = new RequestGameInfo();
         return gameInfoReq;
     }
 
-    private Request createPingRequest() { 
+    private Request CreatePingRequest() { 
         var request = new Request();
         request.Ping = new RequestPing();
         return request;
     }
 
-   
-
-
-    public string getAddress()
+    public string GetAddress()
     {
         return address;
     }
 
-    public int getPort()
+    public int GetPort()
     {
         return port;
     }

@@ -13,19 +13,19 @@ public interface IGameConnection
 
     Task CreateGame(String mapPath, PlayerSetup player, int randomSeed = -1);
 
-    Task<Response> sendJoinGameRequest(Race race);
+    Task<uint> SendJoinGameRequest(Race race);
 
     Task Run(object bot, uint playerId, string opponentID);
 
-    Task<Response> sendStepRequest();
+    Task<Response> SendStepRequest();
 
-    Task<Response> sendObservationRequest();
+    Task<Response> SendObservationRequest();
 
-    Task<Response> sendActionsRequest(List<SC2APIProtocol.Action> actions);
+    Task<Response> SendActionsRequest(List<SC2APIProtocol.Action> actions);
 
-    int getPort();
+    int GetPort();
 
-    string getAddress();
+    string GetAddress();
 
 
 }
