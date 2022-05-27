@@ -11,6 +11,7 @@ public class GameEngine
 {
     IGameConnection gameConnection;
     private readonly PlayerSetup aiOpponent;
+    private readonly PlayerSetup host;
     private string MapPath;
 
     public GameEngine(IGameConnection gameConnection, IOptions<RequestOptions> options, SC2Process process)
@@ -18,14 +19,15 @@ public class GameEngine
         this.gameConnection = gameConnection;
 
         MapPath = process.mapPath;
-        aiOpponent = options.Value.AIClient;
 
+        host = options.Value.Host;
+        aiOpponent = options.Value.AIClient;
     }
 
     public async Task RunSinglePlayer(int randomSeed = -1, string opponentID = "test")
     {
         await gameConnection.Connect();
-        await gameConnection.CreateGame(MapPath, aiOpponent);
+        await gameConnection.CreateGame(MapPath, host, aiOpponent);
         var playerId = await gameConnection.SendJoinGameRequest();
         await GameLoop(playerId, opponentID);
     }

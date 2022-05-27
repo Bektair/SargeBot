@@ -16,7 +16,8 @@ public class RequestOptions
 
     public CreateSettings Create { get; set; }
 
-  
+    public InterfaceOptions Join { get; set; }
+
     public RequestOptions() { }
 
   
@@ -28,12 +29,6 @@ public class RequestOptions
         public bool Realtime { get; set; } = false;
 
     }
-
-
-
-
-
-
 
 
 
