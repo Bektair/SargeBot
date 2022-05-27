@@ -9,7 +9,7 @@ namespace SargeBot;
 
 public class SC2Client
 {
-    private ClientWebSocket ClientSocket;
+    private ClientWebSocket? ClientSocket;
     private readonly string Address;
     private readonly int Port;
 
@@ -18,13 +18,14 @@ public class SC2Client
 
     public SC2Client(int port, string address)
     {
-        ClientSocket = new ClientWebSocket();
+        
         Address = address;
         Port = port;
     }
 
     public async Task Connect()
     {
+        ClientSocket = new ClientWebSocket();
         ClientSocket.Options.KeepAliveInterval = TimeSpan.FromDays(30);
         string adr = string.Format("ws://{0}:{1}/sc2api", Address, Port);
         Uri uri = new (adr);

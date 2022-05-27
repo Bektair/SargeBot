@@ -35,21 +35,13 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
                 services
                 .AddSingleton<IGameConnection, GameConnection>()
                 .AddSingleton<SC2Process>()
-                .AddSingleton<GameEngine>();
+                .AddSingleton<GameEngineFactory>();
             });
 
 var process = host.Services.GetRequiredService<SC2Process>();
 
-var aiOptions = host.Services.GetRequiredService<IOptions<OpponentPlayerOptions>>();
+await process.gameEngine.RunSinglePlayer();
 
-
-
-
-var mapPath = process.GetMapPath("HardwireAIE.SC2Map");
-
-var engine = process.gameEngine;
-
-await engine.RunSinglePlayer(mapPath, Race.Protoss);
 
 
 await host.RunAsync();

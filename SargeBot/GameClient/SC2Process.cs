@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using SargeBot.Options;
 using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
@@ -20,20 +22,21 @@ public class SC2Process
 {
 
     private Process? process;
-    private IGameConnection gameConnection;
     public GameEngine gameEngine { get; }
 
     private string starcraftExe = "";
     private string starcraftDir = "";
 
-    public SC2Process(IGameConnection gameConnection, GameEngine gameEngine)
+    public string mapPath { get; }
+
+    public SC2Process(IOptions<GameConnectionOptions> ConnOptions, GameEngineFactory gameEngineFactory, IOptions<RequestOptions> ReqOptions)
     {
-        this.gameConnection = gameConnection;
-        this.gameEngine = gameEngine;
-        Start();
+        Start(ConnOptions.Value.Address, ConnOptions.Value.Port);
+        mapPath = CreateMapPath(ReqOptions.Value.Create.MapName);
+        this.gameEngine = gameEngineFactory.MakeGameEngine(mapPath);
     }
 
-    public void Start()
+    public void Start(string address, int port)
     {
         var myDocuments = Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
         var executeInfo = Path.Combine(myDocuments, "Starcraft II", "ExecuteInfo.txt");
@@ -54,12 +57,12 @@ public class SC2Process
 
 
         var processStartInfo = new ProcessStartInfo(starcraftExe);
-        processStartInfo.Arguments = String.Format("-listen {0} -port {1} -displayMode 0", gameConnection.GetAddress(), gameConnection.GetPort());
+        processStartInfo.Arguments = String.Format("-listen {0} -port {1} -displayMode 0", address, port);
         processStartInfo.WorkingDirectory = Path.Combine(starcraftDir, "Support64");
         process = Process.Start(processStartInfo);
     }
-
-    public string GetMapPath(String mapName)
+    //GetMapPath() is temporally coupled with Start()
+    private string CreateMapPath(String mapName)
     {
         string mapPath = Path.Combine(starcraftDir, "Maps", mapName);
         if (!File.Exists(mapPath))
@@ -69,10 +72,6 @@ public class SC2Process
         return mapPath;
     }
 
-    public IGameConnection GetGameConnection()
-    {
-        return gameConnection;
-    }
 
     public Process? GetProcess()
     {

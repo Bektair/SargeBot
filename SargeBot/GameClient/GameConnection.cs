@@ -49,19 +49,27 @@ public class GameConnection : IGameConnection
     public async Task CreateGame(string mapPath, PlayerSetup opponentPlayer, int randomSeed = -1)
     {
         var createGame = new RequestCreateGame();
-        createGame.Realtime = ReqOptions.Realtime;
+        createGame.Realtime = ReqOptions.Create.Realtime;
 
         if (randomSeed >= 0)
         {
             createGame.RandomSeed = (uint)randomSeed;
         }
 
+        var mapRequest = new RequestAvailableMaps();
+        var actualMapRequest = new Request();
+        actualMapRequest.AvailableMaps = mapRequest;
+        var mapResponse = await sC2Client.SendRequest(actualMapRequest);
+        var defaultMap = mapResponse.AvailableMaps.LocalMapPaths.First();
+
+        
         createGame.LocalMap = new LocalMap();
         createGame.LocalMap.MapPath = mapPath;
 
-        var player1 = new PlayerSetup();
+        var player1 = ReqOptions.Host;
+        
         createGame.PlayerSetup.Add(player1);
-        player1.Type = ReqOptions.Create.Host.PlayerType;
+
 
         createGame.PlayerSetup.Add(opponentPlayer);
    
@@ -72,17 +80,17 @@ public class GameConnection : IGameConnection
 
     }
 
-    public async Task<uint> SendJoinGameRequest(Race race)
+    public async Task<uint> SendJoinGameRequest()
     {
-        var response = await sC2Client.SendRequest(CreateJoinGameRequest(race));
+        var response = await sC2Client.SendRequest(CreateJoinGameRequestHost());
 
         return response.JoinGame.PlayerId;
     }
 
-    private Request CreateJoinGameRequest(Race race)
+    private Request CreateJoinGameRequestHost()
     {
         var joinGame = new RequestJoinGame();
-        joinGame.Race = race;
+        joinGame.Race = ReqOptions.Host.Race;
         joinGame.Options = new InterfaceOptions();
         joinGame.Options.FeatureLayer = new SpatialCameraSetup { CropToPlayableArea = true, AllowCheatingLayers = false, MinimapResolution = new Size2DI { X = 16, Y = 16 }, Resolution = new Size2DI { X = 128, Y = 128 }, Width = 10 };
         joinGame.Options.Raw = true;

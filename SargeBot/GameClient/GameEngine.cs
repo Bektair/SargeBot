@@ -16,25 +16,23 @@ public class GameEngine
 {
     IGameConnection gameConnection;
     private readonly PlayerSetup aiOpponent;
+    private string MapPath;
 
-    public GameEngine(IGameConnection gameConnection, IOptions<OpponentPlayerOptions> options)
+    public GameEngine(IGameConnection gameConnection, IOptions<OpponentPlayerOptions> options, string MapPath)
     {
         this.gameConnection = gameConnection;
 
-        //Be agnostic to what type of player opponent is?
+        this.MapPath = MapPath;
 
         aiOpponent =  new PlayerSetup {AiBuild = options.Value.AIBuild, Difficulty = options.Value.Difficulty, 
                                            Race = options.Value.Race, Type = options.Value.PlayerType };
-
-
-
     }
 
-    public async Task RunSinglePlayer(string mapPath, Race myRace, int randomSeed = -1, string opponentID = "test")
+    public async Task RunSinglePlayer(int randomSeed = -1, string opponentID = "test")
     {
         await gameConnection.Connect();
-        await gameConnection.CreateGame(mapPath, aiOpponent);
-        var playerId = await gameConnection.SendJoinGameRequest(myRace);
+        await gameConnection.CreateGame(MapPath, aiOpponent);
+        var playerId = await gameConnection.SendJoinGameRequest();
         await GameLoop(playerId, opponentID);
     }
 

@@ -13,7 +13,7 @@ public interface IGameConnection
 
     Task CreateGame(String mapPath, PlayerSetup player, int randomSeed = -1);
 
-    Task<uint> SendJoinGameRequest(Race race);
+    Task<uint> SendJoinGameRequest();
 
     Task Run(object bot, uint playerId, string opponentID);
 

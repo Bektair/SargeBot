@@ -10,21 +10,21 @@ public class RequestOptions
 {
     public const string RequestSettings = "RequestSettings";
 
-    public CreateSettings Create { get; set; }
+    public PlayerSetup Host { get; set; }
+    public PlayerSetup Client { get; set; }
 
-    public bool Realtime { get; set; } = true;
+    public CreateSettings Create { get; set; }
 
 
     public RequestOptions() { }
 
-    public class CreateSettings {
-        public PlayerSettings Host { get; set; }
-        public PlayerSettings Client { get; set; }
+  
 
-        public class PlayerSettings
-        {
-            public PlayerType PlayerType { get; set; }
-        }
+    public class CreateSettings {
+
+        public string MapName { get; set; }    
+
+        public bool Realtime { get; set; } = false;
 
     }
 
