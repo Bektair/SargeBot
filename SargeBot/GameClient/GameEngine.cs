@@ -2,6 +2,7 @@
 using SargeBot.Options;
 using SC2APIProtocol;
 using System.Diagnostics;
+using SargeBot.Features.Debug;
 
 namespace SargeBot.GameClient;
 /// <summary>
@@ -10,12 +11,14 @@ namespace SargeBot.GameClient;
 public class GameEngine
 {
     IGameConnection gameConnection;
+    private readonly DebugService _debugService;
     private readonly PlayerSetup aiOpponent;
     private string MapPath;
 
-    public GameEngine(IGameConnection gameConnection, IOptions<RequestOptions> options, SC2Process process)
+    public GameEngine(IGameConnection gameConnection, IOptions<RequestOptions> options, SC2Process process, DebugService debugService)
     {
         this.gameConnection = gameConnection;
+        _debugService = debugService;
 
         MapPath = process.mapPath;
         aiOpponent = options.Value.AIClient;
@@ -47,6 +50,7 @@ public class GameEngine
         {
 #if DEBUG
             loopTimeWatch.Restart();
+            await _debugService.DrawText($"Elapsed time {totalTimeWatch.Elapsed:g}");
 #endif
 
             if (!start)

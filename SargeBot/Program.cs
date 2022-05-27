@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using SargeBot.Options;
 using Microsoft.Extensions.Options;
+using SargeBot.Features.Debug;
 
 Console.WriteLine("Hello, World!");
 
@@ -35,7 +36,10 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
                 services
                 .AddSingleton<IGameConnection, GameConnection>()
                 .AddSingleton<SC2Process>()
-                .AddSingleton<GameEngine>();
+                .AddSingleton<GameEngine>()
+                .AddSingleton<DebugService>()
+                .AddSingleton<SC2Client>()
+                ;
             });
 
 var gameEngine = host.Services.GetRequiredService<GameEngine>();

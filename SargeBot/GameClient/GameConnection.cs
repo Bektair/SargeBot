@@ -23,11 +23,11 @@ public class GameConnection : IGameConnection
     private readonly int port;
     private RequestOptions ReqOptions;
 
-    public GameConnection(IOptions<GameConnectionOptions> ConnOptions, IOptions<RequestOptions> ReqOptions)
+    public GameConnection(IOptions<GameConnectionOptions> ConnOptions, IOptions<RequestOptions> ReqOptions, SC2Client sC2Client)
     {
+        this.sC2Client = sC2Client;
         address = ConnOptions.Value.Address;
         port = ConnOptions.Value.Port;
-        sC2Client = new SC2Client(port, address);
         this.ReqOptions = ReqOptions.Value;
     }
 
