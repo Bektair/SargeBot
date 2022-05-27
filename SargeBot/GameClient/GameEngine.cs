@@ -1,31 +1,25 @@
 ﻿using Microsoft.Extensions.Options;
 using SargeBot.Options;
 using SC2APIProtocol;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SargeBot.GameClient;
 /// <summary>
 ///  
 /// </summary>
-public class GameEngine 
+public class GameEngine
 {
     IGameConnection gameConnection;
     private readonly PlayerSetup aiOpponent;
     private string MapPath;
 
-    public GameEngine(IGameConnection gameConnection, IOptions<OpponentPlayerOptions> options, string MapPath)
+    public GameEngine(IGameConnection gameConnection, IOptions<RequestOptions> options, SC2Process process)
     {
         this.gameConnection = gameConnection;
 
-        this.MapPath = MapPath;
+        MapPath = process.mapPath;
+        aiOpponent = options.Value.AIClient;
 
-        aiOpponent =  new PlayerSetup {AiBuild = options.Value.AIBuild, Difficulty = options.Value.Difficulty, 
-                                           Race = options.Value.Race, Type = options.Value.PlayerType };
     }
 
     public async Task RunSinglePlayer(int randomSeed = -1, string opponentID = "test")
@@ -43,17 +37,17 @@ public class GameEngine
         int actionCount = 0;
 
 
-        #if DEBUG
-            Stopwatch totalTimeWatch = new Stopwatch();
-            totalTimeWatch.Start();
-            Stopwatch loopTimeWatch = new Stopwatch();
-        #endif
+#if DEBUG
+        Stopwatch totalTimeWatch = new Stopwatch();
+        totalTimeWatch.Start();
+        Stopwatch loopTimeWatch = new Stopwatch();
+#endif
 
         while (true)
         {
-            #if DEBUG
-                loopTimeWatch.Restart();
-            #endif
+#if DEBUG
+            loopTimeWatch.Restart();
+#endif
 
             if (!start)
             {
@@ -121,15 +115,16 @@ public class GameEngine
                 await gameConnection.SendActionsRequest(filteredActions);
                 actionCount += filteredActions.Count;
             }
-            
-            #if DEBUG
-                if (frames==0) Console.WriteLine("First Loop " + loopTimeWatch.ElapsedMilliseconds);
 
-                if (frames % 100 == 0) {
-                    Console.WriteLine("Total time expired " + totalTimeWatch.Elapsed);
-                    Console.WriteLine("Time this loop " + loopTimeWatch.ElapsedMilliseconds + "ms");
-                }
-            #endif
+#if DEBUG
+            if (frames == 0) Console.WriteLine("First Loop " + loopTimeWatch.ElapsedMilliseconds);
+
+            if (frames % 100 == 0)
+            {
+                Console.WriteLine("Total time expired " + totalTimeWatch.Elapsed);
+                Console.WriteLine("Time this loop " + loopTimeWatch.ElapsedMilliseconds + "ms");
+            }
+#endif
             frames++;
         }
     }

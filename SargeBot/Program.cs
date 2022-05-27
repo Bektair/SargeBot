@@ -35,14 +35,12 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
                 services
                 .AddSingleton<IGameConnection, GameConnection>()
                 .AddSingleton<SC2Process>()
-                .AddSingleton<GameEngineFactory>();
+                .AddSingleton<GameEngine>();
             });
 
-var process = host.Services.GetRequiredService<SC2Process>();
+var gameEngine = host.Services.GetRequiredService<GameEngine>();
 
-await process.gameEngine.RunSinglePlayer();
-
-
+await gameEngine.RunSinglePlayer();
 
 await host.RunAsync();
 

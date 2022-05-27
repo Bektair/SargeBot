@@ -12,10 +12,11 @@ public class RequestOptions
 
     public PlayerSetup Host { get; set; }
     public PlayerSetup Client { get; set; }
+    public PlayerSetup AIClient { get; set; }
 
     public CreateSettings Create { get; set; }
 
-
+  
     public RequestOptions() { }
 
   

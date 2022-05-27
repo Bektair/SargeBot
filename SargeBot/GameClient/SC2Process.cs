@@ -29,11 +29,10 @@ public class SC2Process
 
     public string mapPath { get; }
 
-    public SC2Process(IOptions<GameConnectionOptions> ConnOptions, GameEngineFactory gameEngineFactory, IOptions<RequestOptions> ReqOptions)
+    public SC2Process(IOptions<GameConnectionOptions> ConnOptions, IOptions<RequestOptions> ReqOptions)
     {
         Start(ConnOptions.Value.Address, ConnOptions.Value.Port);
         mapPath = CreateMapPath(ReqOptions.Value.Create.MapName);
-        this.gameEngine = gameEngineFactory.MakeGameEngine(mapPath);
     }
 
     public void Start(string address, int port)
