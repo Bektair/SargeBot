@@ -16,11 +16,11 @@ public class SC2Client
     private CancellationToken Token = new CancellationTokenSource().Token;
 
 
-    public SC2Client(int port, string address)
+    public SC2Client(IOptions<GameConnectionOptions> options)
     {
         
-        Address = address;
-        Port = port;
+        Address = options.Value.Address;
+        Port = options.Value.Port;
     }
 
     public async Task Connect()
