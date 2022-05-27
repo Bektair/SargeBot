@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using SargeBot.Options;
 using Microsoft.Extensions.Options;
 using SargeBot.Features.Debug;
+using SargeBot.Features.Macro;
 
 Console.WriteLine("Hello, World!");
 
@@ -39,6 +40,7 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
                 .AddSingleton<GameEngine>()
                 .AddSingleton<DebugService>()
                 .AddSingleton<SC2Client>()
+                .AddSingleton<MacroManager>()
                 ;
             });
 

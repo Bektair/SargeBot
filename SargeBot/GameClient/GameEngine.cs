@@ -3,6 +3,7 @@ using SargeBot.Options;
 using SC2APIProtocol;
 using System.Diagnostics;
 using SargeBot.Features.Debug;
+using SargeBot.Features.Macro;
 
 namespace SargeBot.GameClient;
 /// <summary>
@@ -12,13 +13,15 @@ public class GameEngine
 {
     IGameConnection gameConnection;
     private readonly DebugService _debugService;
+    private readonly MacroManager _macroManager;
     private readonly PlayerSetup aiOpponent;
     private string MapPath;
 
-    public GameEngine(IGameConnection gameConnection, IOptions<RequestOptions> options, SC2Process process, DebugService debugService)
+    public GameEngine(IGameConnection gameConnection, IOptions<RequestOptions> options, SC2Process process, DebugService debugService, MacroManager macroManager)
     {
         this.gameConnection = gameConnection;
         _debugService = debugService;
+        _macroManager = macroManager;
 
         MapPath = process.mapPath;
         aiOpponent = options.Value.AIClient;
@@ -61,6 +64,8 @@ public class GameEngine
 
 
             var observation = response.Observation;
+            
+            await _macroManager.BuildProbe(observation);
 
             // if (observation == null)
             // {
