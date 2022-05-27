@@ -46,7 +46,7 @@ public class GameConnection : IGameConnection
         throw new Exception("Unable to make a connection.");
     }
 
-    public async Task CreateGame(string mapPath, PlayerSetup opponentPlayer, int randomSeed = -1)
+    public async Task CreateGame(string mapPath, PlayerSetup host, PlayerSetup opponentPlayer, int randomSeed = -1)
     {
         var createGame = new RequestCreateGame();
         createGame.Realtime = ReqOptions.Create.Realtime;
@@ -55,22 +55,10 @@ public class GameConnection : IGameConnection
         {
             createGame.RandomSeed = (uint)randomSeed;
         }
-
-        var mapRequest = new RequestAvailableMaps();
-        var actualMapRequest = new Request();
-        actualMapRequest.AvailableMaps = mapRequest;
-        var mapResponse = await sC2Client.SendRequest(actualMapRequest);
-        var defaultMap = mapResponse.AvailableMaps.LocalMapPaths.First();
-
-        
         createGame.LocalMap = new LocalMap();
         createGame.LocalMap.MapPath = mapPath;
 
-        var player1 = ReqOptions.Host;
-        
-        createGame.PlayerSetup.Add(player1);
-
-
+        createGame.PlayerSetup.Add(host);
         createGame.PlayerSetup.Add(opponentPlayer);
    
 
@@ -91,14 +79,7 @@ public class GameConnection : IGameConnection
     {
         var joinGame = new RequestJoinGame();
         joinGame.Race = ReqOptions.Host.Race;
-        joinGame.Options = new InterfaceOptions();
-        joinGame.Options.FeatureLayer = new SpatialCameraSetup { CropToPlayableArea = true, AllowCheatingLayers = false, MinimapResolution = new Size2DI { X = 16, Y = 16 }, Resolution = new Size2DI { X = 128, Y = 128 }, Width = 10 };
-        joinGame.Options.Raw = true;
-        joinGame.Options.Score = true;
-        joinGame.Options.ShowCloaked = true;
-        joinGame.Options.ShowBurrowedShadows = true;
-        joinGame.Options.RawCropToPlayableArea = true;
-        joinGame.Options.RawAffectsSelection = true;
+        joinGame.Options = ReqOptions.Join;
 
         var request = new Request();
         request.JoinGame = joinGame;
