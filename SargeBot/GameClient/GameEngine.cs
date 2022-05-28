@@ -1,54 +1,45 @@
-﻿using Microsoft.Extensions.Options;
-using SargeBot.Options;
-using SC2APIProtocol;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Options;
 using SargeBot.Features.Debug;
 using SargeBot.Features.Macro;
+using SargeBot.Options;
+using SC2ClientApi;
+using Action = SC2APIProtocol.Action;
 
 namespace SargeBot.GameClient;
-/// <summary>
-///  
-/// </summary>
+
 public class GameEngine
 {
-    IGameConnection gameConnection;
     private readonly DebugService _debugService;
+    private readonly SC2ClientApi.GameClient _gameClient;
     private readonly MacroManager _macroManager;
-    private readonly PlayerSetup aiOpponent;
-    private readonly PlayerSetup host;
-    private string MapPath;
 
-    public GameEngine(IGameConnection gameConnection, IOptions<RequestOptions> options, SC2Process process, DebugService debugService, MacroManager macroManager)
+    public GameEngine(SC2ClientApi.GameClient gameClient, IOptions<RequestOptions> options, DebugService debugService, MacroManager macroManager)
     {
-        this.gameConnection = gameConnection;
+        _gameClient = gameClient;
         _debugService = debugService;
         _macroManager = macroManager;
-
-        MapPath = process.mapPath;
-
-        host = options.Value.Host;
-        aiOpponent = options.Value.AIClient;
     }
 
-    public async Task RunSinglePlayer(int randomSeed = -1, string opponentID = "test")
+    public async Task RunSinglePlayer()
     {
-        await gameConnection.Connect();
-        await gameConnection.CreateGame(MapPath, host, aiOpponent);
-        var playerId = await gameConnection.SendJoinGameRequest();
-        await GameLoop(playerId, opponentID);
+        await _gameClient.Initialize(true);
+        await _gameClient.CreateGameRequest();
+        await _gameClient.JoinGameRequest();
+        await GameLoop();
     }
 
-    public async Task GameLoop(uint playerId, string opponentID)
+    public async Task GameLoop()
     {
         var start = true;
-        int frames = 0;
-        int actionCount = 0;
+        var frames = 0;
+        var actionCount = 0;
 
 
 #if DEBUG
-        Stopwatch totalTimeWatch = new Stopwatch();
+        var totalTimeWatch = new Stopwatch();
         totalTimeWatch.Start();
-        Stopwatch loopTimeWatch = new Stopwatch();
+        var loopTimeWatch = new Stopwatch();
 #endif
 
         while (true)
@@ -58,15 +49,12 @@ public class GameEngine
             await _debugService.DrawText($"Elapsed time {totalTimeWatch.Elapsed:g}");
 #endif
 
-            if (!start)
-            {
-                await gameConnection.SendStepRequest();
-            }
-            var response = await gameConnection.SendObservationRequest();
+            if (!start) await _gameClient.StepRequest();
 
+            var response = await _gameClient.SendAndReceive(ClientConstants.RequestObservation);
 
             var observation = response.Observation;
-            
+
             await _macroManager.BuildProbe(observation);
 
             // if (observation == null)
@@ -98,7 +86,7 @@ public class GameEngine
             //     // Console.WriteLine($"Removed {removedActions} actions for units that are not controllable");
             // }
 
-            var filteredActions = new List<SC2APIProtocol.Action>();
+            var filteredActions = new List<Action>();
             var tags = new List<ulong>();
             // foreach (var action in actions)
             // {
@@ -123,7 +111,7 @@ public class GameEngine
 
             if (filteredActions.Count > 0)
             {
-                await gameConnection.SendActionsRequest(filteredActions);
+                // await gameConnection.SendActionsRequest(filteredActions);
                 actionCount += filteredActions.Count;
             }
 
@@ -140,4 +128,3 @@ public class GameEngine
         }
     }
 }
-

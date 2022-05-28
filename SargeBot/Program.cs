@@ -1,54 +1,38 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using System.Diagnostics;
-using System.Net.WebSockets;
-using SargeBot;
-using SC2APIProtocol;
-using SargeBot.GameClient;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using SargeBot.Options;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Hosting;
 using SargeBot.Features.Debug;
 using SargeBot.Features.Macro;
+using SargeBot.GameClient;
+using SargeBot.Options;
+using SC2ClientApi;
 
-Console.WriteLine("Hello, World!");
+Console.WriteLine("Starting SargeBot");
 
-
-using IHost host = CreateHostBuilder(args)
-    .Build();
-
-static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((hostingcontext, configuration) =>
-            {
-                IHostEnvironment env = hostingcontext.HostingEnvironment;
-                configuration
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true);
-            })
-            .ConfigureServices((context, services) =>
-            {
-                services.Configure<GameConnectionOptions>(context.Configuration.GetSection(GameConnectionOptions.GameConnection));
-                services.Configure<OpponentPlayerOptions>(context.Configuration.GetSection(OpponentPlayerOptions.OpponentPlayerSettings));
-                services.Configure<RequestOptions>(context.Configuration.GetSection(RequestOptions.RequestSettings));
-               
-                services
-                .AddSingleton<IGameConnection, GameConnection>()
-                .AddSingleton<SC2Process>()
-                .AddSingleton<GameEngine>()
-                .AddSingleton<DebugService>()
-                .AddSingleton<SC2Client>()
-                .AddSingleton<MacroManager>()
-                ;
-            });
+using var host = Host.CreateDefaultBuilder(args)
+    .ConfigureAppConfiguration((context, configuration) =>
+    {
+        var env = context.HostingEnvironment;
+        configuration
+            .AddJsonFile("appsettings.json", true, true)
+            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true);
+    })
+    .ConfigureServices((context, services) =>
+    {
+        services.Configure<GameConnectionOptions>(context.Configuration.GetSection(GameConnectionOptions.GameConnection));
+        services.Configure<OpponentPlayerOptions>(context.Configuration.GetSection(OpponentPlayerOptions.OpponentPlayerSettings));
+        services.Configure<RequestOptions>(context.Configuration.GetSection(RequestOptions.RequestSettings));
+        services
+            .AddSingleton(x => new GameClient(x.CreateGameSettings()))
+            .AddSingleton<GameEngine>()
+            .AddSingleton<DebugService>()
+            .AddSingleton<MacroManager>()
+            ;
+    }).Build();
 
 var gameEngine = host.Services.GetRequiredService<GameEngine>();
 
+// if args.length > 0 run ladder
 await gameEngine.RunSinglePlayer();
 
 await host.RunAsync();
-
-
-Console.WriteLine("Hello, World!");

@@ -1,27 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace SargeBot.GameClient;
 
-namespace SargeBot.GameClient;
 public class Player
 {
+    private SC2ClientApi.GameClient _gameClient;
 
-    IGameConnection gameConnection;
-
-    public Player(IGameConnection gameConnection)
+    public Player(SC2ClientApi.GameClient gameClient)
     {
-        this.gameConnection = gameConnection;
+        _gameClient = gameClient;
     }
-
-
-
-
-
-
-
-
-
+    
+    
+    
 }
-

@@ -18,10 +18,6 @@ public class RequestOptions
 
     public InterfaceOptions Join { get; set; }
 
-    public RequestOptions() { }
-
-  
-
     public class CreateSettings {
 
         public string MapName { get; set; }    

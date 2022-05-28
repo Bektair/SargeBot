@@ -4,11 +4,11 @@ namespace SargeBot.Features.Debug;
 
 public class DebugService
 {
-    private readonly SC2Client _sc2Client;
+    private readonly SC2ClientApi.GameClient _gameClient;
 
-    public DebugService(SC2Client sc2Client)
+    public DebugService(SC2ClientApi.GameClient gameClient)
     {
-        _sc2Client = sc2Client;
+        _gameClient = gameClient;
     }
 
     public async Task DrawText(string text)
@@ -38,6 +38,6 @@ public class DebugService
             }
         };
 
-        await _sc2Client.SendRequest(request);
+        await _gameClient.SendRequest(request);
     }
 }
