@@ -27,6 +27,7 @@ using var host = Host.CreateDefaultBuilder(args)
             .AddSingleton<GameEngine>()
             .AddSingleton<DebugService>()
             .AddSingleton<MacroManager>()
+            .AddSingleton<SystemSettings>()
             ;
     }).Build();
 

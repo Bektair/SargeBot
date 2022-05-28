@@ -87,6 +87,8 @@ public static class GameSettingsExtensions
 
     public static string ExecutableClientPath(this GameSettings gs)
     {
+
+
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             return Directory.GetDirectories(gs.FolderPath + @"\Versions\", @"Base*")[0] + @"\SC2.app";
 

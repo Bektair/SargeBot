@@ -12,10 +12,11 @@ public static class GameSettingsMapper
     {
         var requestOptions = services.GetRequiredService<IOptions<RequestOptions>>();
         var gameConnectionOptions = services.GetRequiredService<IOptions<GameConnectionOptions>>();
+        var systemSettings = services.GetRequiredService<SystemSettings>();
 
         return new()
         {
-            FolderPath = @"C:\Program Files (x86)\StarCraft II",
+            FolderPath = systemSettings.FolderPath,
             ConnectionAddress = IPAddress.Loopback.ToString(),
             ConnectionServerPort = gameConnectionOptions.Value.ServerPort,
             ConnectionClientPort = gameConnectionOptions.Value.ClientPort,

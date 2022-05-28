@@ -24,7 +24,7 @@ public class GameClient
             Fullscreen = false,
             ClientWindowWidth = 1024,
             ClientWindowHeight = 768,
-            GameMap = "Cloud Kingdom LE",
+            GameMap = "HardwireAIE.SC2Map",
             Realtime = false,
             DisableFog = false,
             ParticipantRace = Race.Protoss,
