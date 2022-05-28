@@ -14,9 +14,8 @@ public class MacroManager
     }
 
 
-    public async Task BuildProbe(ResponseObservation? observation)
+    public async Task BuildProbe(ResponseObservation observation)
     {
-        if (observation == null) return;
 
         foreach (var unit in observation.Observation.RawData.Units)
         {
@@ -42,12 +41,123 @@ public class MacroManager
         }
     }
 
+    public async Task BuildPylon(ResponseObservation observation)
+    {
+        foreach (var unit in observation.Observation.RawData.Units)
+        {
+            if (unit.Alliance != Alliance.Self)
+                continue;
+
+            if (unit.UnitType != (uint)UnitTypes.PROTOSS_PROBE)
+                continue;
+
+            var command = new ActionRawUnitCommand();
+            command.UnitTags.Add(unit.Tag);
+            command.AbilityId = (int)Abilities.BUILD_PYLON;
+            command.TargetWorldSpacePos = new Point2D { X=20, Y=30 };
+
+
+            var action = new Action
+            {
+                ActionRaw = new()
+                {
+                    UnitCommand = command
+                }
+            };
+
+            await SendActionRequests(new() { action });
+        }
+
+    }
+    public async Task BuildGateWay(ResponseObservation observation)
+    {
+        foreach (var unit in observation.Observation.RawData.Units)
+        {
+            if (unit.Alliance != Alliance.Self)
+                continue;
+
+            if (unit.UnitType != (uint)UnitTypes.PROTOSS_PROBE)
+                continue;
+
+            var command = new ActionRawUnitCommand();
+            command.UnitTags.Add(unit.Tag);
+            command.AbilityId = (int)Abilities.BUILD_GATEWAY;
+            command.TargetWorldSpacePos = new Point2D { X = 22, Y = 32 };
+
+
+            var action = new Action
+            {
+                ActionRaw = new()
+                {
+                    UnitCommand = command
+                }
+            };
+
+            await SendActionRequests(new() { action });
+        }
+
+    }
+    public async Task BuildCyber(ResponseObservation observation)
+    {
+        foreach (var unit in observation.Observation.RawData.Units)
+        {
+            if (unit.Alliance != Alliance.Self)
+                continue;
+
+            if (unit.UnitType != (uint)UnitTypes.PROTOSS_PROBE)
+                continue;
+
+            var command = new ActionRawUnitCommand();
+            command.UnitTags.Add(unit.Tag);
+            command.AbilityId = (int)Abilities.BUILD_CYBERNETICSCORE;
+            command.TargetWorldSpacePos = new Point2D { X = 22, Y = 35 };
+
+
+            var action = new Action
+            {
+                ActionRaw = new()
+                {
+                    UnitCommand = command
+                }
+            };
+
+            await SendActionRequests(new() { action });
+        }
+
+    }
+    public async Task BuildStargate(ResponseObservation observation)
+    {
+        foreach (var unit in observation.Observation.RawData.Units)
+        {
+            if (unit.Alliance != Alliance.Self)
+                continue;
+
+            if (unit.UnitType != (uint)UnitTypes.PROTOSS_STARGATE)
+                continue;
+
+            var command = new ActionRawUnitCommand();
+            command.UnitTags.Add(unit.Tag);
+            command.AbilityId = (int)Abilities.BUILD_STARGATE;
+            command.TargetWorldSpacePos = new Point2D { X = 19, Y = 32 };
+
+
+            var action = new Action
+            {
+                ActionRaw = new()
+                {
+                    UnitCommand = command
+                }
+            };
+
+            await SendActionRequests(new() { action });
+        }
+
+    }
     private async Task SendActionRequests(List<Action> actions)
     {
         var actionRequest = new Request();
         actionRequest.Action = new();
         actionRequest.Action.Actions.AddRange(actions);
-
         await _gameClient.SendRequest(actionRequest);
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using SargeBot.Features.Debug;
 using SargeBot.Features.Macro;
 using SargeBot.Options;
+using SC2APIProtocol;
 using SC2ClientApi;
 using Action = SC2APIProtocol.Action;
 
@@ -25,11 +26,11 @@ public class GameEngine
     {
         await _gameClient.Initialize(true);
         await _gameClient.CreateGameRequest();
-        await _gameClient.JoinGameRequest();
-        await GameLoop();
+        var Response = await _gameClient.JoinGameRequest();
+        await GameLoop(Response);
     }
 
-    public async Task GameLoop()
+    public async Task GameLoop(Response joinResponse)
     {
         var start = true;
         var frames = 0;
@@ -41,8 +42,8 @@ public class GameEngine
         totalTimeWatch.Start();
         var loopTimeWatch = new Stopwatch();
 #endif
-
-        while (true)
+        var response = new Response();
+        do
         {
 #if DEBUG
             loopTimeWatch.Restart();
@@ -50,69 +51,71 @@ public class GameEngine
 #endif
 
             if (!start) await _gameClient.StepRequest();
-
-            var response = await _gameClient.SendAndReceive(ClientConstants.RequestObservation);
-
+            //Gets all GameState
+            response = await _gameClient.SendAndReceive(ClientConstants.RequestObservation);
             var observation = response.Observation;
 
-            await _macroManager.BuildProbe(observation);
-
-            // if (observation == null)
-            // {
-            //     bot.OnEnd(observation, Result.Undecided);
-            //     break;
-            // }
-            // if (response.Status == Status.Ended || response.Status == Status.Quit)
-            // {
-            //     bot.OnEnd(observation, observation.PlayerResult[(int)playerId - 1].Result);
-            //     break;
-            // }
-
-            if (start)
+            if (observation == null) //No gamestate
             {
-                start = false;
-                // bot.OnStart(gameInfoResponse.GameInfo, dataResponse.Data, pingResponse, observation, playerId, opponentID);
+                if (response.Status == Status.Ended || response.Status == Status.Quit)
+                {
+                    //     bot.OnEnd(observation, observation.PlayerResult[(int)playerId - 1].Result);
+                    break;
+                }
             }
+            else
+            { //Have gamestate
+                await _macroManager.BuildProbe(observation);
+                await _macroManager.BuildPylon(observation);
+                await _macroManager.BuildGateWay(observation);
+                await _macroManager.BuildCyber(observation);
+                await _macroManager.BuildStargate(observation);
+                if (start)
+                {
+                    start = false;
+                    // bot.OnStart(gameInfoResponse.GameInfo, dataResponse.Data, pingResponse, observation, playerId, opponentID);
+                }
 
-            // var actions = bot.OnFrame(observation);
+                // var actions = bot.OnFrame(observation);
 
-            // var generatedActions = actions.Count();
-            // actions = actions.Where(action => action?.ActionRaw?.UnitCommand?.UnitTags == null ||
-            //     (action?.ActionRaw?.UnitCommand?.UnitTags != null && 
-            //     !action.ActionRaw.UnitCommand.UnitTags.Any(tag => !observation.Observation.RawData.Units.Any(u => u.Tag == tag))));
-            // var removedActions = generatedActions - actions.Count();
-            // if (removedActions > 0)
-            // {
-            //     // Console.WriteLine($"Removed {removedActions} actions for units that are not controllable");
-            // }
+                // var generatedActions = actions.Count();
+                // actions = actions.Where(action => action?.ActionRaw?.UnitCommand?.UnitTags == null ||
+                //     (action?.ActionRaw?.UnitCommand?.UnitTags != null && 
+                //     !action.ActionRaw.UnitCommand.UnitTags.Any(tag => !observation.Observation.RawData.Units.Any(u => u.Tag == tag))));
+                // var removedActions = generatedActions - actions.Count();
+                // if (removedActions > 0)
+                // {
+                //     // Console.WriteLine($"Removed {removedActions} actions for units that are not controllable");
+                // }
 
-            var filteredActions = new List<Action>();
-            var tags = new List<ulong>();
-            // foreach (var action in actions)
-            // {
-            //     if (action?.ActionRaw?.UnitCommand?.UnitTags != null && !action.ActionRaw.UnitCommand.QueueCommand)
-            //     {
-            //         if (!tags.Any(tag => action.ActionRaw.UnitCommand.UnitTags.Any(t => t == tag)))
-            //         {
-            //             filteredActions.Add(action);
-            //             tags.AddRange(action.ActionRaw.UnitCommand.UnitTags);
-            //         }
-            //         else
-            //         {
-            //             // Console.WriteLine($"{observation.Observation.GameLoop} Removed conflicting order {action.ActionRaw.UnitCommand.AbilityId} for tags {string.Join(" ", action.ActionRaw.UnitCommand.UnitTags)}");
-            //         }
-            //     }
-            //     else
-            //     {
-            //         filteredActions.Add(action);
-            //     }
-            // }
+                var filteredActions = new List<Action>();
+                var tags = new List<ulong>();
+                // foreach (var action in actions)
+                // {
+                //     if (action?.ActionRaw?.UnitCommand?.UnitTags != null && !action.ActionRaw.UnitCommand.QueueCommand)
+                //     {
+                //         if (!tags.Any(tag => action.ActionRaw.UnitCommand.UnitTags.Any(t => t == tag)))
+                //         {
+                //             filteredActions.Add(action);
+                //             tags.AddRange(action.ActionRaw.UnitCommand.UnitTags);
+                //         }
+                //         else
+                //         {
+                //             // Console.WriteLine($"{observation.Observation.GameLoop} Removed conflicting order {action.ActionRaw.UnitCommand.AbilityId} for tags {string.Join(" ", action.ActionRaw.UnitCommand.UnitTags)}");
+                //         }
+                //     }
+                //     else
+                //     {
+                //         filteredActions.Add(action);
+                //     }
+                // }
 
 
-            if (filteredActions.Count > 0)
-            {
-                // await gameConnection.SendActionsRequest(filteredActions);
-                actionCount += filteredActions.Count;
+                if (filteredActions.Count > 0)
+                {
+                    // await gameConnection.SendActionsRequest(filteredActions);
+                    actionCount += filteredActions.Count;
+                }
             }
 
 #if DEBUG
@@ -125,6 +128,6 @@ public class GameEngine
             }
 #endif
             frames++;
-        }
+        } while (response.Status == Status.InGame);
     }
 }

@@ -17,10 +17,10 @@ public class ProcessOptions
 
     public ProcessOptions()
     {
-        FolderPath = readSettings();
+        FolderPath = ReadSettings();
     }
 
-    private string readSettings()
+    private string ReadSettings()
     {
         string starcraftExe;
         var myDocuments = Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
