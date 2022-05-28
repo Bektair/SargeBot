@@ -20,14 +20,14 @@ using var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
         services.Configure<GameConnectionOptions>(context.Configuration.GetSection(GameConnectionOptions.GameConnection));
-        services.Configure<OpponentPlayerOptions>(context.Configuration.GetSection(OpponentPlayerOptions.OpponentPlayerSettings));
         services.Configure<RequestOptions>(context.Configuration.GetSection(RequestOptions.RequestSettings));
+        services.Configure<ProcessOptions>(context.Configuration.GetSection(ProcessOptions.ProcessSettings));
         services
             .AddSingleton(x => new GameClient(x.CreateGameSettings()))
             .AddSingleton<GameEngine>()
             .AddSingleton<DebugService>()
             .AddSingleton<MacroManager>()
-            .AddSingleton<SystemSettings>()
+            .AddSingleton<ProcessOptions>()
             ;
     }).Build();
 

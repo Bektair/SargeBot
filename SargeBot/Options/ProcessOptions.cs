@@ -7,11 +7,15 @@ using System.Threading.Tasks;
 
 namespace SargeBot.Options;
 
-public class SystemSettings
+public class ProcessOptions
 {
+    public const string ProcessSettings = "ProcessSettings";
     public string FolderPath { get; }
+    public bool Fullsceen { get; set;  } 
+    public int ClientWindowWith { get; set; }
+    public int ClientWindowHeight { get; set; }
 
-    public SystemSettings()
+    public ProcessOptions()
     {
         FolderPath = readSettings();
     }

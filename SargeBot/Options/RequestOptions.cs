@@ -19,10 +19,9 @@ public class RequestOptions
     public InterfaceOptions Join { get; set; }
 
     public class CreateSettings {
-
         public string MapName { get; set; }    
-
         public bool Realtime { get; set; } = false;
+        public bool DisableFog { get; set; }
 
     }
 

@@ -12,22 +12,22 @@ public static class GameSettingsMapper
     {
         var requestOptions = services.GetRequiredService<IOptions<RequestOptions>>();
         var gameConnectionOptions = services.GetRequiredService<IOptions<GameConnectionOptions>>();
-        var systemSettings = services.GetRequiredService<SystemSettings>();
+        var processSettings = services.GetRequiredService<IOptions<ProcessOptions>>();
 
         return new()
         {
-            FolderPath = systemSettings.FolderPath,
+            FolderPath = processSettings.Value.FolderPath,
+            Fullscreen = processSettings.Value.Fullsceen,
+            ClientWindowWidth = processSettings.Value.ClientWindowWith,
+            ClientWindowHeight = processSettings.Value.ClientWindowHeight,
             ConnectionAddress = IPAddress.Loopback.ToString(),
             ConnectionServerPort = gameConnectionOptions.Value.ServerPort,
             ConnectionClientPort = gameConnectionOptions.Value.ClientPort,
             MultiplayerSharedPort = gameConnectionOptions.Value.SharedPort,
-            InterfaceOptions = new() {Raw = true, Score = true}, //requestOptions.Value.Join,
-            Fullscreen = false,
-            ClientWindowWidth = 1024,
-            ClientWindowHeight = 768,
+            InterfaceOptions = requestOptions.Value.Join,
             GameMap = requestOptions.Value.Create.MapName,
             Realtime = requestOptions.Value.Create.Realtime,
-            DisableFog = false,
+            DisableFog = requestOptions.Value.Create.DisableFog,
             ParticipantRace = requestOptions.Value.Host.Race,
             ParticipantName = requestOptions.Value.Host.PlayerName,
             Opponents = new() {requestOptions.Value.AIClient}

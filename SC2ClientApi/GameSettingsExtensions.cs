@@ -36,6 +36,7 @@ public static class GameSettingsExtensions
 
     public static Request JoinGameRequest(this GameSettings gs, bool isHost)
     {
+
         if (gs.IsMultiplayer())
         {
             return new()
@@ -56,6 +57,7 @@ public static class GameSettingsExtensions
             JoinGame = new()
             {
                 Race = gs.ParticipantRace,
+                PlayerName = gs.ParticipantName,
                 Options = gs.InterfaceOptions
             }
         };
@@ -87,8 +89,6 @@ public static class GameSettingsExtensions
 
     public static string ExecutableClientPath(this GameSettings gs)
     {
-
-
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             return Directory.GetDirectories(gs.FolderPath + @"\Versions\", @"Base*")[0] + @"\SC2.app";
 
