@@ -12,24 +12,24 @@ public class GameClient
 
     public GameClient()
     {
-        _connection = new();
-        _settings = new()
-        {
-            FolderPath = @"C:\Program Files (x86)\StarCraft II",
-            ConnectionAddress = IPAddress.Loopback.ToString(),
-            ConnectionServerPort = 8165,
-            ConnectionClientPort = 8170,
-            MultiplayerSharedPort = 8175,
-            InterfaceOptions = new() {Raw = true, Score = true},
-            Fullscreen = false,
-            ClientWindowWidth = 1024,
-            ClientWindowHeight = 768,
-            GameMap = "HardwireAIE.SC2Map",
-            Realtime = false,
-            DisableFog = false,
-            ParticipantRace = Race.Protoss,
-            Opponents = new() {new() {Type = PlayerType.Computer, Race = Race.Random, Difficulty = Difficulty.VeryEasy}}
-        };
+        //_connection = new();
+        //_settings = new()
+        //{
+        //    FolderPath = @"C:\Program Files (x86)\StarCraft II",
+        //    ConnectionAddress = IPAddress.Loopback.ToString(),
+        //    ConnectionServerPort = 8165,
+        //    ConnectionClientPort = 8170,
+        //    MultiplayerSharedPort = 8175,
+        //    InterfaceOptions = new() {Raw = true, Score = true},
+        //    Fullscreen = false,
+        //    ClientWindowWidth = 1024,
+        //    ClientWindowHeight = 768,
+        //    GameMap = "HardwireAIE.SC2Map",
+        //    Realtime = false,
+        //    DisableFog = false,
+        //    ParticipantRace = Race.Protoss,
+        //    Opponents = new() {new() {Type = PlayerType.Computer, Race = Race.Random, Difficulty = Difficulty.VeryEasy}}
+        //};
     }
 
     public GameClient(GameSettings settings)
@@ -45,8 +45,9 @@ public class GameClient
         _isHost = asHost;
         if (!await ConnectToActiveClient())
         {
-            LaunchClient(asHost);
+            var Launched = LaunchClient(asHost);
             await ConnectToClient();
+            
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using SC2APIProtocol;
+﻿using SargeBot.Features.GameInfo;
+using SC2APIProtocol;
 using SC2ClientApi.Constants;
 using Action = SC2APIProtocol.Action;
 
@@ -11,16 +12,18 @@ namespace SargeBot.Features.Macro;
 public class MacroManager
 {
     private readonly SC2ClientApi.GameClient _gameClient;
+    private readonly MapService MapService;
 
-    public MacroManager(SC2ClientApi.GameClient gameClient)
+    public MacroManager(SC2ClientApi.GameClient gameClient, MapService mapService)
     {
         _gameClient = gameClient;
+        MapService = mapService;
     }
 
 
     public async Task BuildProbe(ResponseObservation observation)
     {
-
+        
         foreach (var unit in observation.Observation.RawData.Units)
         {
             if (unit.Alliance != Alliance.Self)
@@ -47,6 +50,9 @@ public class MacroManager
 
     public async Task BuildPylon(ResponseObservation observation)
     {
+
+
+        //Console.WriteLine("Mapname is " + MapService.MapData.MapName);
         foreach (var unit in observation.Observation.RawData.Units)
         {
             if (unit.Alliance != Alliance.Self)

@@ -13,11 +13,11 @@ namespace SargeBot.GameClients;
 public class GameEngine
 {
     private readonly DebugService _debugService;
-    private readonly SC2ClientApi.GameClient _gameClient;
+    private readonly GameClient _gameClient;
     private readonly MacroManager _macroManager;
     private readonly MapService _mapService;
 
-    public GameEngine(SC2ClientApi.GameClient gameClient, IOptions<RequestOptions> options, DebugService debugService, MacroManager macroManager, MapService mapService)
+    public GameEngine(GameClient gameClient, IOptions<RequestOptions> options, DebugService debugService, MacroManager macroManager, MapService mapService)
     {
         _gameClient = gameClient;
         _debugService = debugService;

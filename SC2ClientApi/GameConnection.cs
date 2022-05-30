@@ -31,7 +31,9 @@ internal class GameConnection
             }
             catch (Exception)
             {
-                break;
+                await Task.Delay(TIMEOUT);
+                failCount++;
+                continue;
             }
         } while (_socket.State != WebSocketState.Open && failCount < maxAttempts);
 
@@ -67,7 +69,8 @@ internal class GameConnection
         return response;
     }
 
-    public async Task SendAsync(Request req) => await _socket.SendAsync(new(req.ToByteArray()), WebSocketMessageType.Binary, true, CancellationToken.None);
+    public async Task SendAsync(Request req) => await _socket.SendAsync
+        (new(req.ToByteArray()), WebSocketMessageType.Binary, true, CancellationToken.None);
 
     public async Task Disconnect()
     {
