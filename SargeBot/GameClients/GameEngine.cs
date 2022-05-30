@@ -8,7 +8,7 @@ using SC2APIProtocol;
 using SC2ClientApi;
 using Action = SC2APIProtocol.Action;
 
-namespace SargeBot.GameClient;
+namespace SargeBot.GameClients;
 
 public class GameEngine
 {
@@ -32,7 +32,7 @@ public class GameEngine
         await _gameClient.CreateGameRequest();
         var Response = await _gameClient.JoinGameRequest();
         var gameInfoResponse = await _gameClient.GameInfoRequest();
-        _mapService.PopulateMapData(gameInfoResponse.GameInfo);
+        _mapService.PopulateMapData(gameInfoResponse);
         await GameLoop(Response);
     }
 

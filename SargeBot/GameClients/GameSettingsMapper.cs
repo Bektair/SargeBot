@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using SargeBot.Options;
 using SC2ClientApi;
 
-namespace SargeBot.GameClient;
+namespace SargeBot.GameClients;
 
 public static class GameSettingsMapper
 {

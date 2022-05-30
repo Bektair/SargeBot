@@ -21,10 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SC2ClientApi\SC2ClientApi.csproj" />
     <ProjectReference Include="..\SC2ClientProtocol\SC2ClientProtocol.csproj" />
-  </ItemGroup>  
-  
-  <ItemGroup>
-    <Folder Include="Features\GameData\" />
   </ItemGroup>
 
 

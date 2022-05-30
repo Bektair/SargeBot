@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 using SargeBot.Features.Debug;
 using SargeBot.Features.GameInfo;
 using SargeBot.Features.Macro;
-using SargeBot.GameClient;
+using SargeBot.GameClients;
 using SargeBot.Options;
 using SC2ClientApi;
 

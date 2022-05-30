@@ -1,4 +1,4 @@
-﻿namespace SargeBot.GameClient;
+﻿namespace SargeBot.GameClients;
 
 public class Player
 {
