@@ -3,7 +3,11 @@ using SC2ClientApi.Constants;
 using Action = SC2APIProtocol.Action;
 
 namespace SargeBot.Features.Macro;
-
+/// <summary>
+/// Builds
+/// Trains
+/// Upgrades
+/// </summary>
 public class MacroManager
 {
     private readonly SC2ClientApi.GameClient _gameClient;

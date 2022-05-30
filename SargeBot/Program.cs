@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SargeBot.Features.Debug;
+using SargeBot.Features.GameInfo;
 using SargeBot.Features.Macro;
 using SargeBot.GameClient;
 using SargeBot.Options;
@@ -28,6 +29,8 @@ using var host = Host.CreateDefaultBuilder(args)
             .AddSingleton<DebugService>()
             .AddSingleton<MacroManager>()
             .AddSingleton<ProcessOptions>()
+            .AddSingleton<MapData>()
+            .AddSingleton<MapService>()
             ;
     }).Build();
 
