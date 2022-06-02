@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Net;
 using SC2APIProtocol;
 
 namespace SC2ClientApi;
@@ -7,60 +6,55 @@ namespace SC2ClientApi;
 public class GameClient
 {
     private readonly GameConnection _connection;
+    private readonly IGameEngine _gameEngine;
     private readonly GameSettings _settings;
-    private bool _isHost;
 
-    public GameClient()
-    {
-        _connection = new();
-        _settings = new()
-        {
-            FolderPath = @"C:\Program Files (x86)\StarCraft II",
-            ConnectionAddress = IPAddress.Loopback.ToString(),
-            ConnectionServerPort = 8165,
-            ConnectionClientPort = 8170,
-            MultiplayerSharedPort = 8175,
-            InterfaceOptions = new() {Raw = true, Score = true},
-            Fullscreen = false,
-            ClientWindowWidth = 1024,
-            ClientWindowHeight = 768,
-            GameMap = "HardwireAIE.SC2Map",
-            Realtime = false,
-            DisableFog = false,
-            ParticipantRace = Race.Protoss,
-            Opponents = new() {new() {Type = PlayerType.Computer, Race = Race.Random, Difficulty = Difficulty.VeryEasy}}
-        };
-    }
-
-    public GameClient(GameSettings settings)
+    public GameClient(GameSettings settings, IGameEngine gameEngine, bool asHost)
     {
         _connection = new();
         _settings = settings;
+        _gameEngine = gameEngine;
+        IsHost = asHost;
     }
+
+    public bool IsHost { get; private set; }
 
     public Status Status => _connection.Status;
 
-    public async Task Initialize(bool asHost)
+    public async Task Initialize()
     {
-        _isHost = asHost;
         if (!await ConnectToActiveClient())
         {
-            LaunchClient(asHost);
+            LaunchClient(IsHost);
+            await Task.Delay(1000);
             await ConnectToClient();
         }
     }
 
-    public Process? LaunchClient(bool asHost)
+    public async Task Run()
     {
-        _isHost = asHost;
+        var gameInfoResponse = await GameInfoRequest();
+        _gameEngine.OnStart(gameInfoResponse.GameInfo);
+
+        var observationResponse = await ObservationRequest();
+
+        var request = _gameEngine.OnFrame(observationResponse.Observation);
+
+        var response = await SendAndReceive(request);
+        var request2 = _gameEngine.OnFrame(response.Observation);
+    }
+
+    private Process? LaunchClient(bool asHost)
+    {
+        IsHost = asHost;
         return Process.Start(new ProcessStartInfo(_settings.ExecutableClientPath())
         {
-            Arguments = _settings.ToArguments(_isHost), WorkingDirectory = _settings.WorkingDirectory()
+            Arguments = _settings.ToArguments(IsHost), WorkingDirectory = _settings.WorkingDirectory()
         });
     }
 
-    public async Task<bool> ConnectToClient() => await _connection.Connect(_settings.GetUri(_isHost));
-    public async Task<bool> ConnectToActiveClient() => await _connection.Connect(_settings.GetUri(_isHost), 1);
+    public async Task<bool> ConnectToClient() => await _connection.Connect(_settings.GetUri(IsHost));
+    public async Task<bool> ConnectToActiveClient() => await _connection.Connect(_settings.GetUri(IsHost), 1);
     public async Task Disconnect() => await _connection.Disconnect();
 
     public async Task<Response> SendAndReceive(Request r) => await _connection.SendAndReceiveAsync(r);
@@ -68,7 +62,7 @@ public class GameClient
 
     public async Task<Response> StepRequest() => await SendAndReceive(ClientConstants.RequestStep);
     public async Task<Response> CreateGameRequest() => await SendAndReceive(_settings.CreateGameRequest());
-    public async Task<Response> JoinGameRequest() => await SendAndReceive(_settings.JoinGameRequest(_isHost));
+    public async Task<Response> JoinGameRequest() => await SendAndReceive(_settings.JoinGameRequest(IsHost));
     public async Task<Response> RestartGameRequest() => await SendAndReceive(ClientConstants.RequestRestartGame);
     public async Task<Response> LeaveGameRequest() => await SendAndReceive(ClientConstants.RequestLeaveGame);
     public async Task<Response> QuickSaveRequest() => await SendAndReceive(ClientConstants.RequestQuickSave);

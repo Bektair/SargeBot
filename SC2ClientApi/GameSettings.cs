@@ -21,7 +21,6 @@ public class GameSettings
     public string GameMap { get; set; }
     public bool DisableFog { get; set; }
     public bool Realtime { get; set; }
-    public Race ParticipantRace { get; set; }
-    public string ParticipantName { get; set; }
-    public List<PlayerSetup> Opponents { get; set; } = new();
+    public PlayerSetup PlayerOne { get; set; }
+    public PlayerSetup PlayerTwo { get; set; }
 }

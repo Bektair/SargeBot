@@ -28,7 +28,7 @@ public class GameEngine
 
     public async Task RunSinglePlayer()
     {
-        await _gameClient.Initialize(true);
+        await _gameClient.Initialize();
         await _gameClient.CreateGameRequest();
         var Response = await _gameClient.JoinGameRequest();
         var gameInfoResponse = await _gameClient.GameInfoRequest();

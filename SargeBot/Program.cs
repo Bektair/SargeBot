@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SargeBot;
 using SargeBot.Features.Debug;
 using SargeBot.Features.GameInfo;
 using SargeBot.Features.Macro;
 using SargeBot.GameClients;
 using SargeBot.Options;
+using SC2APIProtocol;
 using SC2ClientApi;
 
 Console.WriteLine("Starting SargeBot");
@@ -24,19 +26,35 @@ using var host = Host.CreateDefaultBuilder(args)
         services.Configure<RequestOptions>(context.Configuration.GetSection(RequestOptions.RequestSettings));
         services.Configure<ProcessOptions>(context.Configuration.GetSection(ProcessOptions.ProcessSettings));
         services
-            .AddSingleton(x => new GameClient(x.CreateGameSettings()))
-            .AddSingleton<GameEngine>()
-            .AddSingleton<DebugService>()
-            .AddSingleton<MacroManager>()
-            .AddSingleton<ProcessOptions>()
-            .AddSingleton<MapData>()
-            .AddSingleton<MapService>()
+            .AddScoped<IGameEngine, GameEngineTwo>()
+            .AddScoped<DebugService>()
+            .AddScoped<MacroManager>()
+            .AddScoped<ProcessOptions>()
+            .AddScoped<MapData>()
+            .AddScoped<MapService>()
             ;
     }).Build();
 
-var gameEngine = host.Services.GetRequiredService<GameEngine>();
+var gameSettings = host.Services.CreateGameSettings();
+
+var playerOne = CreatePlayerClient(host.Services, gameSettings.PlayerOne, true);
+
+var playerTwo = gameSettings.IsMultiplayer()
+    ? CreatePlayerClient(host.Services, gameSettings.PlayerTwo)
+    : null;
+
+var game = new Game(playerOne, playerTwo);
 
 // if args.length > 0 run ladder
-await gameEngine.RunSinglePlayer();
+await game.ExecuteMatch();
 
 await host.RunAsync();
+
+static GameClient CreatePlayerClient(IServiceProvider services, PlayerSetup playerSetup, bool asHost = false)
+{
+    Console.WriteLine($"Creating player {playerSetup.PlayerName}...");
+
+    var serviceScope = services.CreateScope();
+    var gameEngine = serviceScope.ServiceProvider.GetRequiredService<IGameEngine>();
+    return new(services.CreateGameSettings(), gameEngine, asHost);
+}
