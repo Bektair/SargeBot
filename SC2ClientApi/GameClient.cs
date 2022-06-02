@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using SC2APIProtocol;
+using SC2ClientApi.Constants;
+using Action = SC2APIProtocol.Action;
 
 namespace SC2ClientApi;
 
@@ -35,14 +37,22 @@ public class GameClient
     public async Task Run()
     {
         var gameInfoResponse = await GameInfoRequest();
+
+        // game data?
+
         _gameEngine.OnStart(gameInfoResponse.GameInfo);
 
-        var observationResponse = await ObservationRequest();
+        while (true)
+        {
+            // check in to progress the game
+            await StepRequest();
 
-        var request = _gameEngine.OnFrame(observationResponse.Observation);
+            var observationResponse = await ObservationRequest();
 
-        var response = await SendAndReceive(request);
-        var request2 = _gameEngine.OnFrame(response.Observation);
+            var actions = _gameEngine.OnFrame(observationResponse.Observation);
+
+            await ActionRequest(actions);
+        }
     }
 
     private Process? LaunchClient(bool asHost)
@@ -75,4 +85,11 @@ public class GameClient
     public async Task<Response> PingRequest() => await SendAndReceive(ClientConstants.RequestPing);
     public async Task<Response> ObservationRequest() => await SendAndReceive(ClientConstants.RequestObservation);
     public async Task<Response> DataRequest() => await SendAndReceive(ClientConstants.RequestData);
+
+    public async Task<Response> ActionRequest(List<Action> actions)
+    {
+        var actionRequest = new Request {Action = new()};
+        actionRequest.Action.Actions.AddRange(actions);
+        return await SendAndReceive(actionRequest);
+    }
 }

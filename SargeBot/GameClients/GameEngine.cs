@@ -7,6 +7,7 @@ using SargeBot.Features.Macro;
 using SargeBot.Options;
 using SC2APIProtocol;
 using SC2ClientApi;
+using SC2ClientApi.Constants;
 using Action = SC2APIProtocol.Action;
 
 namespace SargeBot.GameClients;

@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using SC2APIProtocol;
+using SC2ClientApi.Constants;
 
 namespace SC2ClientApi;
 

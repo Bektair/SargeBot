@@ -1,6 +1,7 @@
 ﻿using System.Net.WebSockets;
 using Google.Protobuf;
 using SC2APIProtocol;
+using SC2ClientApi.Constants;
 
 namespace SC2ClientApi;
 
@@ -9,12 +10,11 @@ internal class GameConnection
     private const int READ_BUFFER = 1024 * 1024;
     private const int MAX_CONNECTION_ATTEMPTS = 25;
     private const int TIMEOUT = 550; //ms
+    private readonly CancellationToken token = new CancellationTokenSource().Token;
 
     private ClientWebSocket? _socket;
-    private CancellationToken token = new CancellationTokenSource().Token;
 
     public Status Status { get; private set; }
-    public Response PingResponse { get; private set; }
 
     public async Task<bool> Connect(Uri uri, int maxAttempts = MAX_CONNECTION_ATTEMPTS)
     {
@@ -35,32 +35,31 @@ internal class GameConnection
             {
                 await Task.Delay(TIMEOUT);
                 failCount++;
-                continue;
             }
         } while (_socket.State != WebSocketState.Open && failCount < maxAttempts);
 
         if (_socket.State != WebSocketState.Open)
             return false;
 
-        PingResponse = await SendAndReceiveAsync(ClientConstants.RequestPing);
-        return PingResponse.Ping.HasGameVersion;
+        var pingResponse = await SendAndReceiveAsync(ClientConstants.RequestPing);
+        return pingResponse.Ping.HasGameVersion;
     }
 
     public async Task<Response> SendAndReceiveAsync(Request req)
     {
-
         await SendAsync(req);
 
-        Response debugMe = await ReceiveAsync();
+        var debugMe = await ReceiveAsync();
         return debugMe;
     }
+
     public async Task SendAsync(Request req) => await _socket.SendAsync
-     (new(req.ToByteArray()), WebSocketMessageType.Binary, true, token);
+        (new(req.ToByteArray()), WebSocketMessageType.Binary, true, token);
 
     private async Task<Response> ReceiveAsync()
     {
         var buffer = new ArraySegment<byte>(new byte[READ_BUFFER]);
-        WebSocketReceiveResult result = null;
+        WebSocketReceiveResult result;
         using var ms = new MemoryStream();
 
         do
@@ -73,7 +72,7 @@ internal class GameConnection
 
         var response = Response.Parser.ParseFrom(ms);
         Status = response.Status;
-        
+
         return response;
     }
 

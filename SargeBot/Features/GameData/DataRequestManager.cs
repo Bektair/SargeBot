@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using SargeBot.Options;
 using SC2APIProtocol;
 using SC2ClientApi;
+using SC2ClientApi.Constants;
 
 namespace SargeBot.Features.GameData;
 /// <summary>
@@ -87,7 +88,7 @@ public class DataRequestManager
 
     protected async Task<string> GetDataVersion()
     {
-        if(gameClient.PingResponse!=null) return gameClient.PingResponse.Ping.DataVersion;
+        // if(gameClient.PingResponse!=null) return gameClient.PingResponse.Ping.DataVersion;
         var response = await gameClient.SendAndReceive(ClientConstants.RequestPing);
         if (response != null ) 
             return response.Ping.DataVersion;
