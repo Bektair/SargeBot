@@ -11,8 +11,10 @@ internal class GameConnection
     private const int TIMEOUT = 550; //ms
 
     private ClientWebSocket? _socket;
+    private CancellationToken token = new CancellationTokenSource().Token;
 
     public Status Status { get; private set; }
+    public Response PingResponse { get; private set; }
 
     public async Task<bool> Connect(Uri uri, int maxAttempts = MAX_CONNECTION_ATTEMPTS)
     {
@@ -22,7 +24,7 @@ internal class GameConnection
             try
             {
                 _socket = new();
-                await _socket.ConnectAsync(uri, CancellationToken.None);
+                await _socket.ConnectAsync(uri, token);
             }
             catch (AggregateException)
             {
@@ -31,31 +33,39 @@ internal class GameConnection
             }
             catch (Exception)
             {
-                break;
+                await Task.Delay(TIMEOUT);
+                failCount++;
+                continue;
             }
         } while (_socket.State != WebSocketState.Open && failCount < maxAttempts);
 
         if (_socket.State != WebSocketState.Open)
             return false;
 
-        var pingResponse = await SendAndReceiveAsync(ClientConstants.RequestPing);
-        return pingResponse.Ping.HasGameVersion;
+        PingResponse = await SendAndReceiveAsync(ClientConstants.RequestPing);
+        return PingResponse.Ping.HasGameVersion;
     }
 
     public async Task<Response> SendAndReceiveAsync(Request req)
     {
+
         await SendAsync(req);
-        return await ReceiveAsync();
+
+        Response debugMe = await ReceiveAsync();
+        return debugMe;
     }
+    public async Task SendAsync(Request req) => await _socket.SendAsync
+     (new(req.ToByteArray()), WebSocketMessageType.Binary, true, token);
 
     private async Task<Response> ReceiveAsync()
     {
         var buffer = new ArraySegment<byte>(new byte[READ_BUFFER]);
-        var result = await _socket.ReceiveAsync(buffer, CancellationToken.None);
+        WebSocketReceiveResult result = null;
         using var ms = new MemoryStream();
 
         do
         {
+            result = await _socket.ReceiveAsync(buffer, token);
             ms.Write(buffer.Array, buffer.Offset, result.Count);
         } while (!result.EndOfMessage);
 
@@ -67,11 +77,9 @@ internal class GameConnection
         return response;
     }
 
-    public async Task SendAsync(Request req) => await _socket.SendAsync(new(req.ToByteArray()), WebSocketMessageType.Binary, true, CancellationToken.None);
-
     public async Task Disconnect()
     {
-        await _socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+        await _socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, token);
         _socket.Dispose();
     }
 }

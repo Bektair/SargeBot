@@ -34,7 +34,8 @@ public class ProcessOptions
                 if (line.Trim().StartsWith("executable"))
                 {
                     starcraftExe = argument;
-                    return Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(starcraftExe)));
+                    var starcraftFolder = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(starcraftExe)));
+                    return starcraftFolder;
                 }
             }
         }

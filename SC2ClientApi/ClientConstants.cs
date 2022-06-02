@@ -16,7 +16,7 @@ public static class ClientConstants
     public static readonly Request RequestQuickSave = new() {QuickSave = new()};
     public static readonly Request RequestQuickLoad = new() {QuickLoad = new()};
     public static readonly Request RequestQuit = new() {Quit = new()};
-    public static readonly Request RequestGameInfo = new() {GameInfo = new()};
+    public static readonly Request RequestGameInfo = new() {GameInfo = new RequestGameInfo()};
     public static readonly Request RequestSaveReplay = new() {SaveReplay = new()};
     public static readonly Request RequestAvailableMaps = new() {AvailableMaps = new()};
     public static readonly Request RequestPing = new() {Ping = new()};

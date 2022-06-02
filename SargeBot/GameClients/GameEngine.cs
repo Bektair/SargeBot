@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using SargeBot.Features.Debug;
+using SargeBot.Features.GameData;
 using SargeBot.Features.GameInfo;
 using SargeBot.Features.Macro;
 using SargeBot.Options;
@@ -13,17 +14,19 @@ namespace SargeBot.GameClients;
 public class GameEngine
 {
     private readonly DebugService _debugService;
-    private readonly SC2ClientApi.GameClient _gameClient;
+    private readonly GameClient _gameClient;
     private readonly MacroManager _macroManager;
     private readonly MapService _mapService;
+    private readonly DataRequestManager _dataRequestManager;
 
-    public GameEngine(SC2ClientApi.GameClient gameClient, IOptions<RequestOptions> options, DebugService debugService, MacroManager macroManager, MapService mapService)
+    public GameEngine(GameClient gameClient, IOptions<RequestOptions> options, DebugService debugService, 
+        MacroManager macroManager, MapService mapService, DataRequestManager dataRequestManager)
     {
         _gameClient = gameClient;
         _debugService = debugService;
         _macroManager = macroManager;
         _mapService = mapService;
-        
+        _dataRequestManager = dataRequestManager;
     }
 
     public async Task RunSinglePlayer()
@@ -32,7 +35,8 @@ public class GameEngine
         await _gameClient.CreateGameRequest();
         var Response = await _gameClient.JoinGameRequest();
         var gameInfoResponse = await _gameClient.GameInfoRequest();
-        _mapService.PopulateMapData(gameInfoResponse);
+        //if(gameInfoResponse != null && gameInfoResponse.GameInfo !=null) _mapService.PopulateMapData(gameInfoResponse);
+        //await _dataRequestManager.LoadData();
         await GameLoop(Response);
     }
 

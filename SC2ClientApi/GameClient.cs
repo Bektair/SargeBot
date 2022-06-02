@@ -8,6 +8,7 @@ public class GameClient
     private readonly GameConnection _connection;
     private readonly IGameEngine _gameEngine;
     private readonly GameSettings _settings;
+    private bool _isHost;
 
     public GameClient(GameSettings settings, IGameEngine gameEngine, bool asHost)
     {

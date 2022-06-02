@@ -2,39 +2,99 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Google.Protobuf.Collections;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SargeBot.Options;
+using SC2APIProtocol;
 using SC2ClientApi;
 
 namespace SargeBot.Features.GameData;
+/// <summary>
+/// Sends a dataRequest, caches the data for each version in file
+/// </summary>
 public class DataRequestManager
 {
-    GameClient GameClient;
+    private GameClient gameClient;
+    private GameData gameData;
+    private string gameVersion;
+    private string dataVersion;
 
-    public DataRequestManager(GameClient gameClient, IServiceProvider services)
+
+    public DataRequestManager(GameClient gameClient, IServiceProvider services, GameData gameData)
     {
-        GameClient = gameClient;
+        this.gameClient = gameClient;
+        this.gameData = gameData;
     }
 
-    public static void LoadData ()
+    public async Task LoadData ()
     {
-        string DataPath = @"data";
-        string DataFile = "data.json";
-        Console.WriteLine(Directory.GetCurrentDirectory);
-        Console.WriteLine(Path.Combine(DataPath, DataFile));
-        Console.WriteLine(Path.GetFullPath(Path.Combine(DataPath, DataFile)));
-        if (File.Exists(Path.Combine(DataPath, DataFile))){
-            Console.WriteLine("You have data file");
-        }
-        else
+        dataVersion = await GetDataVersion();
+        string DataFileName = "data_"+ dataVersion + ".json";
+        if (File.Exists(Path.Combine(@"data", DataFileName)))
         {
-            Console.WriteLine("Did not find data file");
+            Console.WriteLine("You have data file allready");
+            //Load
+        }else {
+            var filePath = CreateFileAndDirectory(DataFileName);
+            //GetData
+            var dataResponse = await gameClient.SendAndReceive(ClientConstants.RequestData);
+            //Write data
+            writeValuesToFile(filePath, dataResponse);
+            //Load
         }
+    }
+
+    private void writeValuesToFile(string filePath, Response dataResponse)
+    {
+        RepeatedField<AbilityData> abilities = dataResponse.Data.Abilities;
+        gameData.FillAbilities(abilities);
+        string jsonString = JsonSerializer.Serialize(gameData);
+        Console.WriteLine(jsonString);
+        //FileStream write = File.OpenWrite(filePath);
+        RepeatedField<UnitTypeData> units = dataResponse.Data.Units;
+        gameData.FillUnits(units);
+        RepeatedField<UpgradeData> upgrades = dataResponse.Data.Upgrades;
+        gameData.FillUpgrades(upgrades);
 
     }
 
+    public string CreateFileAndDirectory(string DataFileName)
+    {
+        Console.WriteLine("cwd:" + Directory.GetCurrentDirectory());
+        string DataFolderPath = CreateDirectory();
+        Console.WriteLine("FolderPathRelative:" + Path.Combine(DataFolderPath, DataFileName));
+        string fullPath = Path.GetFullPath(Path.Combine(DataFolderPath, DataFileName));
+        Console.WriteLine("FolderPathAbs:" + fullPath);
+        return CreateFile(fullPath);
+    }
+
+    private string CreateDirectory()
+    {
+        string DataFolderPath = @"data";
+        if (!Directory.Exists(DataFolderPath)) { Directory.CreateDirectory(DataFolderPath); }
+        return DataFolderPath;
+    }
+
+    private string CreateFile(string DateFilePath)
+    {
+        Console.WriteLine("Did not find data file, creating one");
+        File.Create(DateFilePath);
+        return DateFilePath;
+    }
+
+    protected async Task<string> GetDataVersion()
+    {
+        if(gameClient.PingResponse!=null) return gameClient.PingResponse.Ping.DataVersion;
+        var response = await gameClient.SendAndReceive(ClientConstants.RequestPing);
+        if (response != null ) 
+            return response.Ping.DataVersion;
+        else 
+            Console.WriteLine("Ping failure, loadData not possible");
+        return "";
+    }
 
 
     
