@@ -9,6 +9,8 @@ public class GameClient
     private readonly GameConnection _connection;
     private readonly GameSettings _settings;
     private bool _isHost;
+    public Response PingResponse { get; private set; }
+
 
     public GameClient()
     {
@@ -46,8 +48,9 @@ public class GameClient
         if (!await ConnectToActiveClient())
         {
             var Launched = LaunchClient(asHost);
-            await ConnectToClient();
-            
+            var connected = await ConnectToClient();
+            if (!connected) throw new Exception("Failed to connect after maximum tries");
+            else { PingResponse = _connection.PingResponse; }
         }
     }
 

@@ -21,6 +21,8 @@ public class MapService
     public MapData PopulateMapData(Response GameInfoResponse)
     {
         var GameInfo = GameInfoResponse.GameInfo;
+
+      
         ImageData PlacementGrid = GameInfo.StartRaw.PlacementGrid;
         ImageData PathingGrid = GameInfo.StartRaw.PathingGrid;
         ImageData HeightGrid = GameInfo.StartRaw.TerrainHeight;
