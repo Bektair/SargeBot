@@ -41,7 +41,7 @@ public class Game
         // Launch StarCraft II clients and connect
         await Task.WhenAll(players.Select(p => p.Initialize()));
 
-        // Let the host create the game
+        // Host creates the game
         var host = players.First(p => p.IsHost);
         await host.CreateGameRequest();
 

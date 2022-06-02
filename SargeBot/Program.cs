@@ -51,7 +51,10 @@ var game = new Game(playerOne, playerTwo);
 // if args.length > 0 run ladder
 await game.ExecuteMatch();
 
+// never run?
 await host.RunAsync();
+
+// kill sc2 processes?
 
 static GameClient CreatePlayerClient(IServiceProvider services, PlayerSetup playerSetup, bool asHost = false)
 {

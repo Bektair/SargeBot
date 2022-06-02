@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SargeBot.Options;
-using SC2APIProtocol;
 using SC2ClientApi;
 
 namespace SargeBot.GameClients;
@@ -29,19 +28,8 @@ public static class GameSettingsMapper
             GameMap = requestOptions.Value.Create.MapName,
             Realtime = requestOptions.Value.Create.Realtime,
             DisableFog = requestOptions.Value.Create.DisableFog,
-
-            PlayerOne = new()
-            {
-                Type = PlayerType.Participant,
-                Race = requestOptions.Value.Host.Race,
-                PlayerName = requestOptions.Value.Host.PlayerName
-            },
-            PlayerTwo = new()
-            {
-                Type = PlayerType.Participant,
-                Race = requestOptions.Value.Client.Race,
-                PlayerName = requestOptions.Value.Client.PlayerName
-            }
+            PlayerOne = requestOptions.Value.PlayerOne,
+            PlayerTwo = requestOptions.Value.PlayerTwo
         };
     }
 }
