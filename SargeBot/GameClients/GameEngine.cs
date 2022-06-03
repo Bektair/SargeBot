@@ -35,7 +35,12 @@ public class GameEngine : IGameEngine
         var actions = new List<Action>();
         var debugCommands = new List<DebugCommand>();
 
-        debugCommands.Add(_debugService.DrawText($"Frame {observation.Observation.GameLoop}"));
+        // testing debug commands
+        var z = 22;
+        debugCommands.Add(DebugService.DrawText($"Frame {observation.Observation.GameLoop}"));
+        debugCommands.Add(DebugService.DrawLine(new() {X = 0, Y = 0, Z = z}, new() {X = 255, Y = 255, Z = z}, new() {R = 255}));
+        debugCommands.Add(DebugService.DrawSphere(new() {X = 5, Y = 5, Z = z}, color: new() {G = 255}));
+        debugCommands.Add(DebugService.DrawBox(new() {X = 15, Y = 15, Z = z}, new() {X = 100, Y = 100, Z = z}, new() {B = 255}));
 
         actions.Add(_macroManager.BuildProbe(observation));
 
