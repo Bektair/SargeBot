@@ -1,4 +1,3 @@
-using Google.Protobuf.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using SargeBot.Features.GameData;
@@ -8,15 +7,14 @@ using SC2ClientApi;
 using System;
 using System.Text;
 
-namespace SargeBotTest;
+namespace SargeBot.Tests;
 
 [TestClass]
-public class MapServiceTest
+public class MapServiceTests
 {
     private GameClient? _gameClient;
     private IServiceProvider _serviceProvider;
     private GameData? _gameData;
-
 
     [TestCase("Hardwire AIE", ExpectedResult = true)]
     public bool testSimpleResponse(string mapname)

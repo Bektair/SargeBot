@@ -27,7 +27,7 @@ using var host = Host.CreateDefaultBuilder(args)
         services.Configure<RequestOptions>(context.Configuration.GetSection(RequestOptions.RequestSettings));
         services.Configure<ProcessOptions>(context.Configuration.GetSection(ProcessOptions.ProcessSettings));
         services
-            .AddScoped<IGameEngine, GameEngineTwo>()
+            .AddScoped<IGameEngine, GameEngine>()
             .AddScoped<DebugService>()
             .AddScoped<MacroManager>()
             .AddScoped<ProcessOptions>()
@@ -42,9 +42,7 @@ var gameSettings = host.Services.CreateGameSettings();
 
 var playerOne = CreatePlayerClient(host.Services, gameSettings.PlayerOne, true);
 
-var playerTwo = gameSettings.IsMultiplayer()
-    ? CreatePlayerClient(host.Services, gameSettings.PlayerTwo)
-    : null;
+var playerTwo = CreatePlayerClient(host.Services, gameSettings.PlayerTwo);
 
 var game = new Game(playerOne, playerTwo);
 
@@ -56,9 +54,12 @@ await host.RunAsync();
 
 // kill sc2 processes?
 
-static GameClient CreatePlayerClient(IServiceProvider services, PlayerSetup playerSetup, bool asHost = false)
+static GameClient? CreatePlayerClient(IServiceProvider services, PlayerSetup playerSetup, bool asHost = false)
 {
-    Console.WriteLine($"Creating player {playerSetup.PlayerName}...");
+    Console.WriteLine($"Creating {playerSetup.Type} {playerSetup.PlayerName}...");
+
+    if (playerSetup.Type != PlayerType.Participant)
+        return null;
 
     var serviceScope = services.CreateScope();
     var gameEngine = serviceScope.ServiceProvider.GetRequiredService<IGameEngine>();

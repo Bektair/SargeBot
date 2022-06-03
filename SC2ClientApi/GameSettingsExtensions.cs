@@ -28,7 +28,7 @@ public static class GameSettingsExtensions
         return sb.ToString();
     }
 
-    public static bool IsMultiplayer(this GameSettings gs) => gs.PlayerTwo.Type == PlayerType.Participant;
+    public static bool IsMultiplayer(this GameSettings gs) => gs.PlayerTwo is {Type: PlayerType.Participant};
 
     public static PortSet ServerPort(this GameSettings gs) => new() {GamePort = gs.MultiplayerSharedPort + 1, BasePort = gs.MultiplayerSharedPort + 2};
 
