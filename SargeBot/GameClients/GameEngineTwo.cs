@@ -1,40 +1,44 @@
-﻿using SC2APIProtocol;
+﻿using SargeBot.Features.Debug;
+using SargeBot.Features.GameData;
+using SargeBot.Features.GameInfo;
+using SargeBot.Features.Macro;
+using SC2APIProtocol;
 using SC2ClientApi;
-using SC2ClientApi.Constants;
 using Action = SC2APIProtocol.Action;
 
 namespace SargeBot.GameClients;
 
 public class GameEngineTwo : IGameEngine
 {
+    private readonly DataRequestManager _dataRequestManager;
+    private readonly DebugService _debugService;
+    private readonly MacroManager _macroManager;
+    private readonly MapService _mapService;
+
+    public GameEngineTwo(DebugService debugService, MacroManager macroManager, MapService mapService, DataRequestManager dataRequestManager)
+    {
+        _debugService = debugService;
+        _macroManager = macroManager;
+        _mapService = mapService;
+        _dataRequestManager = dataRequestManager;
+    }
+
     public void OnStart(ResponseGameInfo gameInfo)
     {
         Console.WriteLine("Start game engine");
     }
 
-    public List<Action> OnFrame(ResponseObservation observation)
+    public (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation)
     {
         Console.WriteLine($"Frame {observation.Observation.GameLoop}");
 
         var actions = new List<Action>();
+        var debugCommands = new List<DebugCommand>();
 
-        foreach (var unit in observation.Observation.RawData.Units)
-        {
-            if (unit.Alliance != Alliance.Self)
-                continue;
+        debugCommands.Add(_debugService.DrawText($"Frame {observation.Observation.GameLoop}"));
 
-            if (unit.UnitType != (uint) UnitTypes.PROTOSS_NEXUS)
-                continue;
+        actions.Add(_macroManager.BuildProbe(observation));
 
-            var command = new ActionRawUnitCommand();
-            command.UnitTags.Add(unit.Tag);
-            command.AbilityId = (int) Abilities.TRAIN_PROBE;
-
-            var action = new Action {ActionRaw = new() {UnitCommand = command}};
-
-            actions.Add(action);
-        }
-
-        return actions;
+        return (actions, debugCommands);
     }
 }

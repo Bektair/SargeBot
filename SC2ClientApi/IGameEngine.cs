@@ -6,5 +6,5 @@ namespace SC2ClientApi;
 public interface IGameEngine
 {
     void OnStart(ResponseGameInfo gameInfo);
-    List<Action> OnFrame(ResponseObservation observation);
+    (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation);
 }

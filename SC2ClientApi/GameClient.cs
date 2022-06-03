@@ -53,9 +53,10 @@ public class GameClient
 
             var observationResponse = await ObservationRequest();
 
-            var actions = _gameEngine.OnFrame(observationResponse.Observation);
+            var (actions, debugCommands) = _gameEngine.OnFrame(observationResponse.Observation);
 
             await ActionRequest(actions);
+            await DebugRequest(debugCommands);
         }
     }
 
@@ -95,5 +96,11 @@ public class GameClient
         var actionRequest = new Request {Action = new()};
         actionRequest.Action.Actions.AddRange(actions);
         return await SendAndReceive(actionRequest);
+    }
+
+    private async Task<Response> DebugRequest(List<DebugCommand> debugCommands)
+    {
+        var request = new Request {Debug = new() {Debug = {debugCommands}}};
+        return await SendAndReceive(request);
     }
 }

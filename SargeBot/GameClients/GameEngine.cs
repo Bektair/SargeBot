@@ -58,7 +58,6 @@ public class GameEngine
         {
 #if DEBUG
             loopTimeWatch.Restart();
-            await _debugService.DrawText($"Elapsed time {totalTimeWatch.Elapsed:g}");
 #endif
 
             if (!start) await _gameClient.StepRequest();
@@ -76,7 +75,6 @@ public class GameEngine
             }
             else
             { //Have gamestate
-                await _macroManager.BuildProbe(observation);
                 await _macroManager.BuildPylon(observation);
                 await _macroManager.BuildGateWay(observation);
                 await _macroManager.BuildCyber(observation);

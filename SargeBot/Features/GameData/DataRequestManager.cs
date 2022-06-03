@@ -18,16 +18,13 @@ namespace SargeBot.Features.GameData;
 /// </summary>
 public class DataRequestManager
 {
-    private GameClient gameClient;
-    private GameData gameData;
+    private GameData _gameData;
     private string gameVersion;
     private string dataVersion;
 
-
-    public DataRequestManager(GameClient gameClient, IServiceProvider services, GameData gameData)
+    public DataRequestManager(GameData gameData)
     {
-        this.gameClient = gameClient;
-        this.gameData = gameData;
+        _gameData = gameData;
     }
 
     public async Task LoadData ()
@@ -39,26 +36,26 @@ public class DataRequestManager
             Console.WriteLine("You have data file allready");
             //Load
         }else {
-            var filePath = CreateFileAndDirectory(DataFileName);
-            //GetData
-            var dataResponse = await gameClient.SendAndReceive(ClientConstants.RequestData);
-            //Write data
-            writeValuesToFile(filePath, dataResponse);
-            //Load
+            // var filePath = CreateFileAndDirectory(DataFileName);
+            // //GetData
+            // var dataResponse = await gameClient.SendAndReceive(ClientConstants.RequestData);
+            // //Write data
+            // writeValuesToFile(filePath, dataResponse);
+            // //Load
         }
     }
 
     private void writeValuesToFile(string filePath, Response dataResponse)
     {
         RepeatedField<AbilityData> abilities = dataResponse.Data.Abilities;
-        gameData.FillAbilities(abilities);
-        string jsonString = JsonSerializer.Serialize(gameData);
+        _gameData.FillAbilities(abilities);
+        string jsonString = JsonSerializer.Serialize(_gameData);
         Console.WriteLine(jsonString);
         //FileStream write = File.OpenWrite(filePath);
         RepeatedField<UnitTypeData> units = dataResponse.Data.Units;
-        gameData.FillUnits(units);
+        _gameData.FillUnits(units);
         RepeatedField<UpgradeData> upgrades = dataResponse.Data.Upgrades;
-        gameData.FillUpgrades(upgrades);
+        _gameData.FillUpgrades(upgrades);
 
     }
 
@@ -89,11 +86,11 @@ public class DataRequestManager
     protected async Task<string> GetDataVersion()
     {
         // if(gameClient.PingResponse!=null) return gameClient.PingResponse.Ping.DataVersion;
-        var response = await gameClient.SendAndReceive(ClientConstants.RequestPing);
-        if (response != null ) 
-            return response.Ping.DataVersion;
-        else 
-            Console.WriteLine("Ping failure, loadData not possible");
+        // var response = await gameClient.SendAndReceive(ClientConstants.RequestPing);
+        // if (response != null ) 
+        //     return response.Ping.DataVersion;
+        // else 
+        //     Console.WriteLine("Ping failure, loadData not possible");
         return "";
     }
 
