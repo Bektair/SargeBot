@@ -21,7 +21,7 @@ public class MapServiceTests
     {
         MapService service = new MapService(new MapData());
         Response dummy = createDummyResponse();
-        MapData test = service.PopulateMapData(dummy);
+        MapData test = service.PopulateMapData(dummy.GameInfo);
 
         return mapname == test.MapName;
     }

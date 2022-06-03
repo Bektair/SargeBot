@@ -28,7 +28,6 @@ using var host = Host.CreateDefaultBuilder(args)
         services.Configure<ProcessOptions>(context.Configuration.GetSection(ProcessOptions.ProcessSettings));
         services
             .AddScoped<IGameEngine, GameEngine>()
-            .AddScoped<DebugService>()
             .AddScoped<MacroManager>()
             .AddScoped<ProcessOptions>()
             .AddScoped<MapData>()

@@ -11,26 +11,30 @@ namespace SargeBot.GameClients;
 public class GameEngine : IGameEngine
 {
     private readonly DataRequestManager _dataRequestManager;
-    private readonly DebugService _debugService;
     private readonly MacroManager _macroManager;
     private readonly MapService _mapService;
 
-    public GameEngine(DebugService debugService, MacroManager macroManager, MapService mapService, DataRequestManager dataRequestManager)
+    public GameEngine(MacroManager macroManager, MapService mapService, DataRequestManager dataRequestManager)
     {
-        _debugService = debugService;
         _macroManager = macroManager;
         _mapService = mapService;
         _dataRequestManager = dataRequestManager;
     }
 
-    public void OnStart(ResponseGameInfo gameInfo)
+    public void OnStart(ResponseGameInfo gameInfo, string dataFileName = "", ResponseData? responseData = null)
     {
         Console.WriteLine("Start game engine");
+
+        _mapService.PopulateMapData(gameInfo);
+
+        if (responseData != null) _dataRequestManager.CreateData(responseData, dataFileName);
+        _dataRequestManager.LoadData(); //Loads gameDataObject
     }
 
     public (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation)
     {
-        Console.WriteLine($"Frame {observation.Observation.GameLoop}");
+        if (observation.Observation.GameLoop % 100 == 0)
+            Console.WriteLine($"Frame {observation.Observation.GameLoop}");
 
         var actions = new List<Action>();
         var debugCommands = new List<DebugCommand>();
