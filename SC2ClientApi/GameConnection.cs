@@ -60,7 +60,9 @@ internal class GameConnection
         await Task.Delay(TIMEOUT);
         
         var pingResponse = await SendAndReceiveAsync(ClientConstants.RequestPing);
-        return pingResponse.Ping.HasGameVersion;
+        if (pingResponse != null)
+            return pingResponse.Ping.HasGameVersion;
+        else return false;
     }
 
     public async Task<Response?> SendAndReceiveAsync(Request req)
