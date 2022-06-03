@@ -1,25 +1,23 @@
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SargeBot.Features.GameData;
 using SC2ClientApi;
-using System;
 
-namespace SargeBotTest;
+namespace SargeBot.Tests;
 
 [TestClass]
-public class DataRequestManagerTest
+public class DataRequestManagerTests
 {
     private GameClient? _gameClient;
-    private IServiceProvider _serviceProvider;
     private GameData? _gameData;
+    private IServiceProvider _serviceProvider;
 
     [TestMethod]
     public void CreatesFileAndDirectoryWithData()
     {
-        DataRequestManager dataRequestManager = new DataRequestManager(_gameClient, _serviceProvider, _gameData);
-        string dataFile = "data.json";
+        var dataRequestManager = new DataRequestManager(_gameData);
+        var dataFile = "data.json";
 
         dataRequestManager.CreateFileAndDirectory("data.json");
-
-
     }
 }
