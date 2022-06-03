@@ -10,7 +10,6 @@ public class GameClient
     private readonly GameConnection _connection;
     private readonly IGameEngine _gameEngine;
     private readonly GameSettings _settings;
-    private bool _isHost;
 
     public GameClient(GameSettings settings, IGameEngine gameEngine, bool asHost)
     {
@@ -36,13 +35,18 @@ public class GameClient
 
     public async Task Run()
     {
+        while (_connection.Status != Status.InGame)
+        {
+            // wait for game to start
+        }
+
         var gameInfoResponse = await GameInfoRequest();
 
         // game data?
 
         _gameEngine.OnStart(gameInfoResponse.GameInfo);
 
-        while (true)
+        while (_connection.Status == Status.InGame)
         {
             // check in to progress the game
             await StepRequest();

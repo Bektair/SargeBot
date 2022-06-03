@@ -7,19 +7,29 @@ namespace SC2ClientApi;
 
 internal class GameConnection
 {
-    private const int READ_BUFFER = 1024 * 1024;
+    private const int READ_BUFFER = 1024;
     private const int MAX_CONNECTION_ATTEMPTS = 25;
-    private const int TIMEOUT = 550; //ms
+    private const int TIMEOUT = 500; //ms
     private readonly ResponseHandler _responseHandler;
     private readonly CancellationToken token = new CancellationTokenSource().Token;
     private ClientWebSocket? _socket;
+    private Status _status;
 
     public GameConnection()
     {
         _responseHandler = new();
     }
 
-    public Status Status { get; private set; }
+    public Status Status
+    {
+        get => _status;
+        private set
+        {
+            if (_status == value) return;
+            Console.WriteLine($"Status changed from {_status} to {value}");
+            _status = value;
+        }
+    }
 
     public async Task<bool> Connect(Uri uri, int maxAttempts = MAX_CONNECTION_ATTEMPTS)
     {
@@ -46,26 +56,27 @@ internal class GameConnection
         if (_socket.State != WebSocketState.Open)
             return false;
 
-        Task.Run(ReceiveForever);
-
+        Task.Factory.StartNew(ReceiveForever, TaskCreationOptions.LongRunning);
+        await Task.Delay(TIMEOUT);
+        
         var pingResponse = await SendAndReceiveAsync(ClientConstants.RequestPing);
         return pingResponse.Ping.HasGameVersion;
     }
 
-    public async Task<Response> SendAndReceiveAsync(Request req)
+    public async Task<Response?> SendAndReceiveAsync(Request req)
     {
-        Response response = null;
+        Response? response = null;
 
-        var marker = new Task(() => { });
+        var handlerResolve = new Task(() => { });
         var handler = new Action<Response>(r =>
         {
             response = r;
-            marker.RunSynchronously();
+            handlerResolve.RunSynchronously();
         });
 
         _responseHandler.RegisterHandler(req.RequestCase, handler);
         await SendAsync(req);
-        marker.Wait(TIMEOUT);
+        handlerResolve.Wait(TIMEOUT);
         _responseHandler.DeregisterHandler(req.RequestCase);
 
         return response;
@@ -98,21 +109,19 @@ internal class GameConnection
     private async Task ReceiveForever()
     {
         var buffer = new ArraySegment<byte>(new byte[READ_BUFFER]);
-        while (_socket.State == WebSocketState.Open)
+        while (true)
         {
             WebSocketReceiveResult result;
-            using (var ms = new MemoryStream())
+            using var ms = new MemoryStream();
+            do
             {
-                do
-                {
-                    result = await _socket.ReceiveAsync(buffer, CancellationToken.None);
-                    ms.Write(buffer.Array, buffer.Offset, result.Count);
-                } while (!result.EndOfMessage);
+                result = await _socket.ReceiveAsync(buffer, CancellationToken.None);
+                ms.Write(buffer.Array, buffer.Offset, result.Count);
+            } while (!result.EndOfMessage);
 
-                var msg = Response.Parser.ParseFrom(ms.GetBuffer(), 0, (int) ms.Position);
-                Status = msg.Status;
-                _responseHandler.Handle(msg.ResponseCase, msg);
-            }
+            var response = Response.Parser.ParseFrom(ms.GetBuffer(), 0, (int) ms.Position);
+            Status = response.Status;
+            _responseHandler.Handle(response.ResponseCase, response);
         }
     }
 

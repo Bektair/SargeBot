@@ -35,7 +35,14 @@ public class ResponseHandler
 
     public void Handle(ResponseType key, Response response)
     {
-        // if (!_handlers.ContainsKey(key)) return;
+        if (key == ResponseType.None)
+        {
+            Console.WriteLine($"Response handle error: {response.Error}");
+            return;
+        }
+
+        if (!_handlers.ContainsKey(key))
+            return;
 
         _handlers[key](response);
     }
