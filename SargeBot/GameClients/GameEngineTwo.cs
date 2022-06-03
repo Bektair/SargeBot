@@ -14,17 +14,27 @@ public class GameEngineTwo : IGameEngine
     private readonly DebugService _debugService;
     private readonly MacroManager _macroManager;
     private readonly MapService _mapService;
+    private readonly GameData _gameData;
 
-    public GameEngineTwo(DebugService debugService, MacroManager macroManager, MapService mapService, DataRequestManager dataRequestManager)
+    public GameEngineTwo(DebugService debugService, MacroManager macroManager, MapService mapService, DataRequestManager dataRequestManager, GameData gameData)
     {
         _debugService = debugService;
         _macroManager = macroManager;
         _mapService = mapService;
         _dataRequestManager = dataRequestManager;
+        _gameData = gameData;
     }
 
-    public void OnStart(ResponseGameInfo gameInfo)
+    public void OnStart(ResponseGameInfo gameInfo, string dataFileName="", ResponseData? responseData=null)
     {
+        _mapService.PopulateMapData(gameInfo);
+
+        if (responseData != null)
+        {
+            _dataRequestManager.CreateData(responseData, dataFileName);
+        }
+         _dataRequestManager.LoadData(); //Loads gameDataObject
+
         Console.WriteLine("Start game engine");
     }
 

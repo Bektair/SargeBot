@@ -2,7 +2,6 @@
 using SC2APIProtocol;
 using SC2ClientApi.Constants;
 using Action = SC2APIProtocol.Action;
-
 namespace SC2ClientApi;
 
 public class GameClient
@@ -41,10 +40,12 @@ public class GameClient
         }
 
         var gameInfoResponse = await GameInfoRequest();
-
-        // game data?
-
-        _gameEngine.OnStart(gameInfoResponse.GameInfo);
+        var pingResponse = await PingRequest();
+        var dataFileName = "data" + pingResponse.Ping.DataVersion + ".json";
+        if (!dateFileExists(dataFileName)) {
+            var gameDataResponse = await DataRequest();
+            _gameEngine.OnStart(gameInfoResponse.GameInfo, dataFileName, gameDataResponse.Data);
+        }else _gameEngine.OnStart(gameInfoResponse.GameInfo);
 
         while (_connection.Status == Status.InGame)
         {
@@ -58,6 +59,13 @@ public class GameClient
             await ActionRequest(actions);
             await DebugRequest(debugCommands);
         }
+    }
+
+    public static bool dateFileExists(string filename)
+    {
+        if (File.Exists(Path.Combine(@"data", filename)))
+            return true;
+        else return false;
     }
 
     private Process? LaunchClient(bool asHost)

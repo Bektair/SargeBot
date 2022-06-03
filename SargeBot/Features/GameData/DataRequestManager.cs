@@ -27,22 +27,18 @@ public class DataRequestManager
         _gameData = gameData;
     }
 
-    public async Task LoadData ()
+    public void CreateData (ResponseData data, string DataFileName)
     {
-        dataVersion = await GetDataVersion();
-        string DataFileName = "data_"+ dataVersion + ".json";
-        if (File.Exists(Path.Combine(@"data", DataFileName)))
-        {
-            Console.WriteLine("You have data file allready");
-            //Load
-        }else {
-            // var filePath = CreateFileAndDirectory(DataFileName);
-            // //GetData
-            // var dataResponse = await gameClient.SendAndReceive(ClientConstants.RequestData);
-            // //Write data
-            // writeValuesToFile(filePath, dataResponse);
-            // //Load
-        }
+        // var filePath = CreateFileAndDirectory(DataFileName);
+        // //GetData
+        // var dataResponse = await gameClient.SendAndReceive(ClientConstants.RequestData);
+        // //Write data
+        // writeValuesToFile(filePath, dataResponse);
+    }
+
+    public void LoadData()
+    {
+        //fills gameData object
     }
 
     private void writeValuesToFile(string filePath, Response dataResponse)
