@@ -1,5 +1,6 @@
 ﻿using Google.Protobuf.Collections;
 using SC2APIProtocol;
+using System.Text.Json.Serialization;
 using static SC2APIProtocol.AbilityData.Types;
 
 namespace SargeBot.Features.GameData;
@@ -8,29 +9,41 @@ namespace SargeBot.Features.GameData;
 /// </summary>
 public class Ability
 {
-    uint AbillityId { get; set; } = 0;
-    bool Available { get; set; } = false;
-    float CastRange { get; set; } = 0;
-    float FootprintRadius { get; set; } = 0;
-    string FriendlyName { get; set; } = "";
-    bool IsBuilding { get; set; } = false;
-    bool IsInstantPlacement { get; set; } = false;
-    bool AutoCast { get; set; } = false;
-    Target Target { get; set; } = Target.None;
+    public string FriendlyName { get; set; } = "";
+    public uint AbilityId { get; set; } = 0;
+    public bool Available { get; set; } = false;
+    public float CastRange { get; set; } = 0;
+    public float FootprintRadius { get; set; } = 0;
+    public bool IsBuilding { get; set; } = false;
+    public bool IsInstantPlacement { get; set; } = false;
+    public bool AutoCast { get; set; } = false;
+    public Target Target { get; set; } = Target.None;
 
-    public Ability(AbilityData abillities)
+    public Ability(AbilityData abilities)
     {
         //Finally
-        AbillityId = abillities.AbilityId;
-        Available = abillities.Available;
-        CastRange = abillities.CastRange;
-        FootprintRadius = abillities.FootprintRadius;
-        FriendlyName = abillities.FriendlyName;
-        IsBuilding = abillities.IsBuilding;
-        IsInstantPlacement = abillities.IsInstantPlacement;
-        Target = abillities.Target;
-        AutoCast = abillities.AllowAutocast;
+        AbilityId = abilities.AbilityId;
+        Available = abilities.Available;
+        CastRange = abilities.CastRange;
+        FootprintRadius = abilities.FootprintRadius;
+        FriendlyName = abilities.FriendlyName;
+        IsBuilding = abilities.IsBuilding;
+        IsInstantPlacement = abilities.IsInstantPlacement;
+        Target = abilities.Target;
+        AutoCast = abilities.AllowAutocast;
     }
 
-
+    [JsonConstructor]
+    public Ability(string friendlyName, uint abilityId, bool available, float castRange, float footprintRadius, bool isBuilding, bool isInstantPlacement, bool autoCast, Target target)
+    {
+        FriendlyName = friendlyName;
+        AbilityId = abilityId;
+        Available = available;
+        CastRange = castRange;
+        FootprintRadius = footprintRadius;
+        IsBuilding = isBuilding;
+        IsInstantPlacement = isInstantPlacement;
+        AutoCast = autoCast;
+        Target = target;
+    }
 }

@@ -23,9 +23,27 @@ public class GameEngine : IGameEngine
         _dataRequestManager = dataRequestManager;
     }
 
-    public void OnStart(ResponseGameInfo gameInfo)
+    /// <summary>
+    /// Can be called before status ingame to use cache
+    /// And after status ingame to use response
+    /// Should Populate both MapData and GameData
+    /// </summary>
+    /// <param name="dataFileName"></param>
+    /// <param name="gameInfo"></param>
+    /// <param name="responseData"></param>
+    public void OnStart(string dataFileName= "", ResponseGameInfo? gameInfo = null, ResponseData? responseData = null)
     {
-        Console.WriteLine("Start game engine");
+        if (gameInfo != null) {
+            _mapService.PopulateMapData(gameInfo);
+            if(responseData != null)
+                if (dataFileName != string.Empty) //To create file as future cache you need a name
+                    _dataRequestManager.CreateLoadData(responseData, dataFileName);
+                else //backup solution if the fileName was not gathered(possibly due to failing ping request)
+                    _dataRequestManager.LoadDataFromResponse(responseData);
+        }
+        else {  //It is before status ingame, load from file
+            _dataRequestManager.LoadDataFromFile(dataFileName);
+        }
     }
 
     public (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation)

@@ -5,6 +5,6 @@ namespace SC2ClientApi;
 
 public interface IGameEngine
 {
-    void OnStart(ResponseGameInfo gameInfo,string dataFileName="", ResponseData? responseData=null);
+    void OnStart(string dataFileName = "", ResponseGameInfo? gameInfo = null, ResponseData? responseData = null);
     (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation);
 }

@@ -34,7 +34,7 @@ using var host = Host.CreateDefaultBuilder(args)
             .AddScoped<MapData>()
             .AddScoped<MapService>()
             .AddScoped<DataRequestManager>()
-            .AddScoped<GameData>()
+            .AddScoped<GameDataService>()
             ;
     }).Build();
 

@@ -5,28 +5,30 @@ using SargeBot.Features.GameInfo;
 using SC2APIProtocol;
 using SC2ClientApi;
 using System;
+using System.Diagnostics;
 using System.Text;
 
 namespace SargeBot.Tests;
 
 [TestClass]
-public class MapServiceTests
+public class MapSerivceTests
 {
     private GameClient? _gameClient;
     private IServiceProvider _serviceProvider;
-    private GameData? _gameData;
+    private GameDataService? _gameData;
 
     [TestCase("Hardwire AIE", ExpectedResult = true)]
     public bool testSimpleResponse(string mapname)
     {
         MapService service = new MapService(new MapData());
-        Response dummy = createDummyResponse();
+        ResponseGameInfo dummy = createDummyResponse();
         MapData test = service.PopulateMapData(dummy);
 
         return mapname == test.MapName;
     }
 
-    private Response createDummyResponse()
+
+    private ResponseGameInfo createDummyResponse()
     {
         Response dummyResponse = new Response();
         string mapName = "Hardwire AIE";
@@ -56,7 +58,24 @@ public class MapServiceTests
         };
 
         ResponseGameInfo responseGameInfo = new ResponseGameInfo { StartRaw = start, Options = options, MapName = mapName, LocalMapPath = localMapPath };
-        dummyResponse.GameInfo = responseGameInfo;
-        return dummyResponse;
+        return responseGameInfo;
     }
+
+    [TestMethod]
+    public void testMapLoadTime()
+    {
+        MapService _mapService = new MapService(new MapData());
+        int loops = 100;
+        Stopwatch stopWatch = new Stopwatch();
+        stopWatch.Start();
+        for (int i = 0; i < loops; i++)
+        {
+            _mapService.PopulateMapData(createDummyResponse());
+        }
+        stopWatch.Stop();
+        float AvrageTime = stopWatch.ElapsedMilliseconds / loops;
+        Console.WriteLine("Avrage for MapDataLoading only " + AvrageTime);
+    }
+
+
 }

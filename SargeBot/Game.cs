@@ -1,4 +1,5 @@
-﻿using SC2ClientApi;
+﻿using SC2APIProtocol;
+using SC2ClientApi;
 
 namespace SargeBot;
 
@@ -43,7 +44,9 @@ public class Game
 
         // Host creates the game
         var host = players.First(p => p.IsHost);
-        await host.CreateGameRequest();
+
+        //Can get the mapName from here to cache the static mapInfo
+        Response create = await host.CreateGameRequest();
 
         // Join game
         await Task.WhenAll(players.Select(p => p.JoinGameRequest()));

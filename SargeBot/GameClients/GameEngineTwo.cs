@@ -14,9 +14,9 @@ public class GameEngineTwo : IGameEngine
     private readonly DebugService _debugService;
     private readonly MacroManager _macroManager;
     private readonly MapService _mapService;
-    private readonly GameData _gameData;
+    private readonly GameDataService _gameData;
 
-    public GameEngineTwo(DebugService debugService, MacroManager macroManager, MapService mapService, DataRequestManager dataRequestManager, GameData gameData)
+    public GameEngineTwo(DebugService debugService, MacroManager macroManager, MapService mapService, DataRequestManager dataRequestManager, GameDataService gameData)
     {
         _debugService = debugService;
         _macroManager = macroManager;
@@ -25,15 +25,15 @@ public class GameEngineTwo : IGameEngine
         _gameData = gameData;
     }
 
-    public void OnStart(ResponseGameInfo gameInfo, string dataFileName="", ResponseData? responseData=null)
+    public void OnStart(string dataFileName="", ResponseGameInfo? gameInfo = null, ResponseData? responseData=null)
     {
         _mapService.PopulateMapData(gameInfo);
 
         if (responseData != null)
         {
-            _dataRequestManager.CreateData(responseData, dataFileName);
+            _dataRequestManager.CreateLoadData(responseData, dataFileName);
         }
-         _dataRequestManager.LoadData(); //Loads gameDataObject
+         _dataRequestManager.LoadDataFromFile(dataFileName); //Loads gameDataObject
 
         Console.WriteLine("Start game engine");
     }

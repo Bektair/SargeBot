@@ -14,6 +14,7 @@ internal class GameConnection
     private readonly CancellationToken token = new CancellationTokenSource().Token;
     private ClientWebSocket? _socket;
     private Status _status;
+    public string _version { get; private set; } =string.Empty;
 
     public GameConnection()
     {
@@ -30,6 +31,8 @@ internal class GameConnection
             _status = value;
         }
     }
+
+    
 
     public async Task<bool> Connect(Uri uri, int maxAttempts = MAX_CONNECTION_ATTEMPTS)
     {
@@ -60,8 +63,10 @@ internal class GameConnection
         await Task.Delay(TIMEOUT);
         
         var pingResponse = await SendAndReceiveAsync(ClientConstants.RequestPing);
-        if (pingResponse != null)
+        if (pingResponse != null) {
+            _version = pingResponse.Ping.GameVersion;
             return pingResponse.Ping.HasGameVersion;
+        }
         else return false;
     }
 

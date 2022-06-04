@@ -34,18 +34,21 @@ public class GameClient
 
     public async Task Run()
     {
+        string dataFileName = string.Empty;
+        bool readFile = LoadCache(dataFileName);
+
         while (_connection.Status != Status.InGame)
         {
             // wait for game to start
         }
 
         var gameInfoResponse = await GameInfoRequest();
-        var pingResponse = await PingRequest();
-        var dataFileName = "data" + pingResponse.Ping.DataVersion + ".json";
-        if (!dateFileExists(dataFileName)) {
+        if (!readFile){
             var gameDataResponse = await DataRequest();
-            _gameEngine.OnStart(gameInfoResponse.GameInfo, dataFileName, gameDataResponse.Data);
-        }else _gameEngine.OnStart(gameInfoResponse.GameInfo);
+            _gameEngine.OnStart(dataFileName, gameInfoResponse.GameInfo, gameDataResponse.Data);
+        }
+        else _gameEngine.OnStart(dataFileName, gameInfoResponse.GameInfo);
+
 
         while (_connection.Status == Status.InGame)
         {
@@ -61,11 +64,24 @@ public class GameClient
         }
     }
 
-    public static bool dateFileExists(string filename)
+    public static bool DataFileExists(string filename)
     {
         if (File.Exists(Path.Combine(@"data", filename)))
             return true;
         else return false;
+    }
+    private bool LoadCache(string dataFileName)
+    {
+        bool hasFile = false;
+        if (_connection._version != string.Empty)
+        {
+            dataFileName = "data" + _connection._version + ".json";
+            if (hasFile = DataFileExists(dataFileName))
+            {
+                _gameEngine.OnStart(dataFileName);
+            }
+        }
+        return hasFile;
     }
 
     private Process? LaunchClient(bool asHost)

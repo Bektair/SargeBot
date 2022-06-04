@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Google.Protobuf.Collections;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,78 +19,75 @@ namespace SargeBot.Features.GameData;
 /// </summary>
 public class DataRequestManager
 {
-    private GameData _gameData;
+    private GameDataService _gameData;
     private string gameVersion;
     private string dataVersion;
+    private JsonSerializerOptions serializerOptions = new JsonSerializerOptions
+    {
+        WriteIndented = true,
+        Converters =
+        {
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+        }
+    };
 
-    public DataRequestManager(GameData gameData)
+    public DataRequestManager(GameDataService gameData)
     {
         _gameData = gameData;
     }
 
-    public void CreateData (ResponseData data, string DataFileName)
+    public void CreateLoadData(ResponseData data, string dataFileName)
     {
-        // var filePath = CreateFileAndDirectory(DataFileName);
-        // //GetData
-        // var dataResponse = await gameClient.SendAndReceive(ClientConstants.RequestData);
-        // //Write data
-        // writeValuesToFile(filePath, dataResponse);
+        var dir = CreateDirectoryIfNeeded();
+        writeValuesToFile(Path.Combine(dir, dataFileName), data);
+        LoadDataFromFile(dataFileName);
     }
 
-    public void LoadData()
+    public void LoadDataFromResponse(ResponseData dataResponse)
     {
-        //fills gameData object
-    }
-
-    private void writeValuesToFile(string filePath, Response dataResponse)
-    {
-        RepeatedField<AbilityData> abilities = dataResponse.Data.Abilities;
-        _gameData.FillAbilities(abilities);
-        string jsonString = JsonSerializer.Serialize(_gameData);
-        Console.WriteLine(jsonString);
-        //FileStream write = File.OpenWrite(filePath);
-        RepeatedField<UnitTypeData> units = dataResponse.Data.Units;
-        _gameData.FillUnits(units);
-        RepeatedField<UpgradeData> upgrades = dataResponse.Data.Upgrades;
+        RepeatedField<UpgradeData> upgrades = dataResponse.Upgrades;
         _gameData.FillUpgrades(upgrades);
-
+        RepeatedField<AbilityData> abilities = dataResponse.Abilities;
+        _gameData.FillAbilities(abilities);
+        RepeatedField<UnitTypeData> units = dataResponse.Units;
+        _gameData.FillUnits(units);
     }
 
-    public string CreateFileAndDirectory(string DataFileName)
+    public void LoadDataFromFile(string dataFileName)
     {
-        Console.WriteLine("cwd:" + Directory.GetCurrentDirectory());
-        string DataFolderPath = CreateDirectory();
-        Console.WriteLine("FolderPathRelative:" + Path.Combine(DataFolderPath, DataFileName));
-        string fullPath = Path.GetFullPath(Path.Combine(DataFolderPath, DataFileName));
-        Console.WriteLine("FolderPathAbs:" + fullPath);
-        return CreateFile(fullPath);
+        var dir = CreateDirectoryIfNeeded();
+        string desJsonString = File.ReadAllText(Path.Combine(dir, dataFileName));
+        var newData = JsonSerializer.Deserialize<GameDataService>(desJsonString, serializerOptions);
+        _gameData.unitsDict = newData.unitsDict;
+        _gameData.upgradesDict = newData.upgradesDict;
+        _gameData.abilitiesDict = newData.abilitiesDict;
     }
 
-    private string CreateDirectory()
+    public void LoadDataFullPath(string fullPath)
+    {
+        string desJsonString = File.ReadAllText(fullPath);
+        var newData = JsonSerializer.Deserialize<GameDataService>(desJsonString, serializerOptions);
+        _gameData.unitsDict = newData.unitsDict;
+        _gameData.upgradesDict = newData.upgradesDict;
+        _gameData.abilitiesDict = newData.abilitiesDict;
+    }
+
+    private void writeValuesToFile(string filePath, ResponseData dataResponse)
+    {
+        RepeatedField<UpgradeData> upgrades = dataResponse.Upgrades;
+        _gameData.FillUpgrades(upgrades);
+        RepeatedField<AbilityData> abilities = dataResponse.Abilities;
+        _gameData.FillAbilities(abilities);
+        RepeatedField<UnitTypeData> units = dataResponse.Units;
+        _gameData.FillUnits(units);
+        string jsonString = JsonSerializer.Serialize(_gameData, serializerOptions);
+        File.WriteAllText(filePath, jsonString);
+    }
+
+    private string CreateDirectoryIfNeeded()
     {
         string DataFolderPath = @"data";
         if (!Directory.Exists(DataFolderPath)) { Directory.CreateDirectory(DataFolderPath); }
         return DataFolderPath;
     }
-
-    private string CreateFile(string DateFilePath)
-    {
-        Console.WriteLine("Did not find data file, creating one");
-        File.Create(DateFilePath);
-        return DateFilePath;
-    }
-
-    protected async Task<string> GetDataVersion()
-    {
-        // if(gameClient.PingResponse!=null) return gameClient.PingResponse.Ping.DataVersion;
-        // var response = await gameClient.SendAndReceive(ClientConstants.RequestPing);
-        // if (response != null ) 
-        //     return response.Ping.DataVersion;
-        // else 
-        //     Console.WriteLine("Ping failure, loadData not possible");
-        return "";
-    }
-
-
-    
 }

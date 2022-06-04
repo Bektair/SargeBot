@@ -3,31 +3,34 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SargeBot.Features.GameData;
 
 public class Unit
 {
-    uint AbilityId { get; set; } = 0;
-    float Armor { get; set; } = 0;
-    List<SC2APIProtocol.Attribute> Attributes { get; set; } = new List<SC2APIProtocol.Attribute>();
-    bool Available = false;
-    float BuildTime { get; set; } = 0;
-    uint CargoSize { get; set; } = 0;
-    float FoodProvided { get; set; } = 0;
-    float FoodRequired { get; set; } = 0;
-    uint MineralCost { get; set; } = 0;
-    uint VespeneCost { get; set; } = 0;
-    float MovementSpeed { get; set; } = 0;
-    string Name { get; set; } = string.Empty;
-    Race Race { get; set; } = Race.NoRace;
-    float SightRange { get; set; } = 0;
-    List<uint> TechAlias { get; set; } = new List<uint>();
-    uint TechRequirement { get; set; } = 0;
-    uint UnitAlias { get; set; } = 0;
-    uint UnitId { get; set; } = 0;
-    List<Weapon> Weapons { get; set; } = new List<Weapon>();
+    public string Name { get; set; } = string.Empty;
+    public uint AbilityId { get; set; } = 0;
+    public float Armor { get; set; } = 0;
+    public List<SC2APIProtocol.Attribute> Attributes { get; set; } = new List<SC2APIProtocol.Attribute>();
+    public bool Available { get; set; } = false;
+    public float BuildTime { get; set; } = 0;
+    public uint CargoSize { get; set; } = 0;
+    public float FoodProvided { get; set; } = 0;
+    public float FoodRequired { get; set; } = 0;
+    public uint MineralCost { get; set; } = 0;
+    public uint VespeneCost { get; set; } = 0;
+    public float MovementSpeed { get; set; } = 0;
+    public Race Race { get; set; } = Race.NoRace;
+    public float SightRange { get; set; } = 0;
+    public List<uint> TechAlias { get; set; } = new List<uint>();
+    public uint TechRequirement { get; set; } = 0;
+    public uint UnitAlias { get; set; } = 0;
+    public uint UnitId { get; set; } = 0;
+    public List<Weapon> Weapons { get; set; } = new List<Weapon>();
+
+
     public Unit(UnitTypeData unitType)
     {
         AbilityId = unitType.AbilityId;
@@ -52,8 +55,28 @@ public class Unit
 
     }
 
-
-
-
+    [JsonConstructor]
+    public Unit(string name, uint abilityId, float armor, List<SC2APIProtocol.Attribute> attributes, bool available, float buildTime, uint cargoSize, float foodProvided, float foodRequired, uint mineralCost, uint vespeneCost, float movementSpeed, Race race, float sightRange, List<uint> techAlias, uint techRequirement, uint unitAlias, uint unitId, List<Weapon> weapons)
+    {
+        Name = name;
+        AbilityId = abilityId;
+        Armor = armor;
+        Attributes = attributes;
+        Available = available;
+        BuildTime = buildTime;
+        CargoSize = cargoSize;
+        FoodProvided = foodProvided;
+        FoodRequired = foodRequired;
+        MineralCost = mineralCost;
+        VespeneCost = vespeneCost;
+        MovementSpeed = movementSpeed;
+        Race = race;
+        SightRange = sightRange;
+        TechAlias = techAlias;
+        TechRequirement = techRequirement;
+        UnitAlias = unitAlias;
+        UnitId = unitId;
+        Weapons = weapons;
+    }
 }
 

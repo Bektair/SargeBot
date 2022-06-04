@@ -1,4 +1,5 @@
 ﻿using SargeBot.Features.GameInfo;
+using SargeBot.Features.GameData;
 using SC2APIProtocol;
 using SC2ClientApi.Constants;
 using Action = SC2APIProtocol.Action;
@@ -13,30 +14,38 @@ namespace SargeBot.Features.Macro;
 public class MacroManager
 {
     private readonly MapService _mapService;
+    private readonly GameDataService _gameData;
 
-    public MacroManager(MapService mapService)
+    public MacroManager(MapService mapService, GameDataService gameData)
     {
         _mapService = mapService;
+        _gameData = gameData;
     }
 
     public Action? BuildProbe(ResponseObservation observation)
     {
-        foreach (var unit in observation.Observation.RawData.Units)
-        {
-            if (unit.Alliance != Alliance.Self)
-                continue;
+        var probeCost = _gameData.unitsDict.GetValueOrDefault((uint)UnitTypes.PROTOSS_PROBE).MineralCost;
+        var minerals = observation.Observation.PlayerCommon.Minerals;
+        if(minerals >= probeCost) { 
 
-            if (unit.UnitType != (uint) UnitTypes.PROTOSS_NEXUS)
-                continue;
+            foreach (var unit in observation.Observation.RawData.Units)
+            {
+                if (unit.Alliance != Alliance.Self)
+                    continue;
 
-            var command = new ActionRawUnitCommand();
-            command.UnitTags.Add(unit.Tag);
-            command.AbilityId = (int) Abilities.TRAIN_PROBE;
+                if (unit.UnitType != (uint) UnitTypes.PROTOSS_NEXUS)
+                    continue;
 
-            return new() {ActionRaw = new() {UnitCommand = command}};
+                var command = new ActionRawUnitCommand();
+                command.UnitTags.Add(unit.Tag);
+
+                command.AbilityId = (int) Abilities.TRAIN_PROBE;
+
+                return new() {ActionRaw = new() {UnitCommand = command}};
+            }
         }
 
-        return null;
+        return new() { ActionRaw = new() };
     }
 
     public async Task BuildPylon(ResponseObservation observation)
