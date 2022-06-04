@@ -21,7 +21,6 @@ public class GameEngine : IGameEngine
         _dataRequestManager = dataRequestManager;
     }
 
-<<<<<<< HEAD
     /// <summary>
     /// Can be called before status ingame to use cache
     /// And after status ingame to use response
@@ -43,16 +42,6 @@ public class GameEngine : IGameEngine
         else {  //It is before status ingame, load from file
             _dataRequestManager.LoadDataFromFile(dataFileName);
         }
-=======
-    public void OnStart(ResponseGameInfo gameInfo, string dataFileName = "", ResponseData? responseData = null)
-    {
-        Console.WriteLine("Start game engine");
-
-        _mapService.PopulateMapData(gameInfo);
-
-        if (responseData != null) _dataRequestManager.CreateData(responseData, dataFileName);
-        _dataRequestManager.LoadData(); //Loads gameDataObject
->>>>>>> d34775f7670d4b5fd52499e43c88275dc255d307
     }
 
     public (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation)

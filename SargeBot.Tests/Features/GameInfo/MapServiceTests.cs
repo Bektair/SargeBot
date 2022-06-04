@@ -21,13 +21,9 @@ public class MapSerivceTests
     public bool testSimpleResponse(string mapname)
     {
         MapService service = new MapService(new MapData());
-<<<<<<< HEAD:SargeBot.Tests/Features/GameInfo/MapServiceTests.cs
+
         ResponseGameInfo dummy = createDummyResponse();
         MapData test = service.PopulateMapData(dummy);
-=======
-        Response dummy = createDummyResponse();
-        MapData test = service.PopulateMapData(dummy.GameInfo);
->>>>>>> d34775f7670d4b5fd52499e43c88275dc255d307:SargeBot.Tests/MapServiceTests.cs
 
         return mapname == test.MapName;
     }

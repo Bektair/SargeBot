@@ -24,7 +24,7 @@ public class MacroManager
 
     public Action? BuildProbe(ResponseObservation observation)
     {
-        var probeCost = _gameData.unitsDict.GetValueOrDefault((uint)UnitTypes.PROTOSS_PROBE).MineralCost;
+        var probeCost = _gameData.unitsDict.GetValueOrDefault(UnitTypes.PROTOSS_PROBE).MineralCost;
         var minerals = observation.Observation.PlayerCommon.Minerals;
         if(minerals >= probeCost) { 
 

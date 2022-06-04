@@ -29,6 +29,8 @@ public class Unit
     public uint UnitAlias { get; set; } = 0;
     public uint UnitId { get; set; } = 0;
     public List<Weapon> Weapons { get; set; } = new List<Weapon>();
+    public bool RequreAttached { get; set; } = false;
+
 
 
     public Unit(UnitTypeData unitType)
@@ -52,11 +54,12 @@ public class Unit
         UnitAlias = unitType.UnitAlias;
         UnitId = unitType.UnitId;
         Weapons.AddRange(unitType.Weapons);
+        RequreAttached = unitType.RequireAttached;
 
     }
 
     [JsonConstructor]
-    public Unit(string name, uint abilityId, float armor, List<SC2APIProtocol.Attribute> attributes, bool available, float buildTime, uint cargoSize, float foodProvided, float foodRequired, uint mineralCost, uint vespeneCost, float movementSpeed, Race race, float sightRange, List<uint> techAlias, uint techRequirement, uint unitAlias, uint unitId, List<Weapon> weapons)
+    public Unit(string name, uint abilityId, float armor, List<SC2APIProtocol.Attribute> attributes, bool available, float buildTime, uint cargoSize, float foodProvided, float foodRequired, uint mineralCost, uint vespeneCost, float movementSpeed, Race race, float sightRange, List<uint> techAlias, uint techRequirement, uint unitAlias, uint unitId, List<Weapon> weapons, bool requreAttached)
     {
         Name = name;
         AbilityId = abilityId;
@@ -77,6 +80,7 @@ public class Unit
         UnitAlias = unitAlias;
         UnitId = unitId;
         Weapons = weapons;
+        RequreAttached = requreAttached;
     }
 }
 

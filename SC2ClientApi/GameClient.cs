@@ -35,7 +35,7 @@ public class GameClient
     public async Task Run()
     {
         string dataFileName = string.Empty;
-        bool readFile = LoadCache(dataFileName);
+        bool readFile = LoadCache(out dataFileName);
 
         while (_connection.Status != Status.InGame)
         {
@@ -45,7 +45,7 @@ public class GameClient
         var gameInfoResponse = await GameInfoRequest();
         if (!readFile){
             var gameDataResponse = await DataRequest();
-            _gameEngine.OnStart(dataFileName, gameInfoResponse.GameInfo, gameDataResponse.Data);
+             _gameEngine.OnStart(dataFileName, gameInfoResponse.GameInfo, gameDataResponse.Data);
         }
         else _gameEngine.OnStart(dataFileName, gameInfoResponse.GameInfo);
 
@@ -70,8 +70,9 @@ public class GameClient
             return true;
         else return false;
     }
-    private bool LoadCache(string dataFileName)
+    private bool LoadCache(out string dataFileName)
     {
+        dataFileName = "";
         bool hasFile = false;
         if (_connection._version != string.Empty)
         {
@@ -80,7 +81,7 @@ public class GameClient
             {
                 _gameEngine.OnStart(dataFileName);
             }
-        }
+        }else dataFileName = string.Empty;
         return hasFile;
     }
 
