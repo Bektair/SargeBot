@@ -28,7 +28,6 @@ using var host = Host.CreateDefaultBuilder(args)
         services.Configure<ProcessOptions>(context.Configuration.GetSection(ProcessOptions.ProcessSettings));
         services
             .AddScoped<IGameEngine, GameEngine>()
-            .AddScoped<DebugService>()
             .AddScoped<MacroManager>()
             .AddScoped<ProcessOptions>()
             .AddScoped<MapData>()
@@ -48,11 +47,6 @@ var game = new Game(playerOne, playerTwo);
 
 // if args.length > 0 run ladder
 await game.ExecuteMatch();
-
-// never run?
-await host.RunAsync();
-
-// kill sc2 processes?
 
 static GameClient? CreatePlayerClient(IServiceProvider services, PlayerSetup playerSetup, bool asHost = false)
 {
