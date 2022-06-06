@@ -12,6 +12,10 @@ public class GameSettings
     public int MultiplayerSharedPort { get; set; }
     public InterfaceOptions InterfaceOptions { get; set; }
 
+    // Cache
+    public string DataFileName { get; set; }
+    public string DataFolderName { get; set; }
+
     // Client Settings
     public bool Fullscreen { get; set; }
     public int ClientWindowWidth { get; set; }

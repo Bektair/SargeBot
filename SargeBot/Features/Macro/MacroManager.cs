@@ -13,10 +13,10 @@ namespace SargeBot.Features.Macro;
 /// </summary>
 public class MacroManager
 {
-    private readonly MapService _mapService;
+    private readonly MapDataService _mapService;
     private readonly GameDataService _gameData;
 
-    public MacroManager(MapService mapService, GameDataService gameData)
+    public MacroManager(MapDataService mapService, GameDataService gameData)
     {
         _mapService = mapService;
         _gameData = gameData;
@@ -24,6 +24,7 @@ public class MacroManager
 
     public Action? BuildProbe(ResponseObservation observation)
     {
+        var positionThatRox = _mapService.GetHeightZ(107, 117);
         var probeCost = _gameData.unitsDict.GetValueOrDefault(UnitTypes.PROTOSS_PROBE).MineralCost;
         var minerals = observation.Observation.PlayerCommon.Minerals;
         if(minerals >= probeCost) { 

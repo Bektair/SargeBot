@@ -13,6 +13,8 @@ public static class GameSettingsMapper
         var requestOptions = services.GetRequiredService<IOptions<RequestOptions>>();
         var gameConnectionOptions = services.GetRequiredService<IOptions<GameConnectionOptions>>();
         var processSettings = services.GetRequiredService<IOptions<ProcessOptions>>();
+        var cacheSettings = services.GetRequiredService<IOptions<CacheOptions>>();
+
 
         return new()
         {
@@ -25,6 +27,8 @@ public static class GameSettingsMapper
             ConnectionClientPort = gameConnectionOptions.Value.ClientPort,
             MultiplayerSharedPort = gameConnectionOptions.Value.SharedPort,
             InterfaceOptions = requestOptions.Value.Join,
+            DataFileName = cacheSettings.Value.DataFileName,
+            DataFolderName = cacheSettings.Value.DataFolderName,
             GameMap = requestOptions.Value.Create.MapName,
             Realtime = requestOptions.Value.Create.Realtime,
             DisableFog = requestOptions.Value.Create.DisableFog,

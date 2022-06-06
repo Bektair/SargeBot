@@ -5,6 +5,7 @@ namespace SC2ClientApi;
 
 public interface IGameEngine
 {
-    void OnStart(string dataFileName = "", ResponseGameInfo? gameInfo = null, ResponseData? responseData = null);
+    void LoadFromCache(string gameMap, bool shouldLoadDataCache, bool shouldLoadInfoCache);
+    void OnStart(ResponseData? responseData = null, ResponseGameInfo? gameInfo = null, string mapName = "");
     (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation);
 }

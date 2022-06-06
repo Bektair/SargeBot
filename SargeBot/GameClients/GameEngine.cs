@@ -12,14 +12,16 @@ public class GameEngine : IGameEngine
 {
     private readonly DataRequestManager _dataRequestManager;
     private readonly MacroManager _macroManager;
-    private readonly MapService _mapService;
+    private readonly MapDataService _mapService;
 
-    public GameEngine(MacroManager macroManager, MapService mapService, DataRequestManager dataRequestManager)
+    public GameEngine(MacroManager macroManager, MapDataService mapService, DataRequestManager dataRequestManager, GameInfoRequestManager gameInfoRequestManager)
     {
         _macroManager = macroManager;
         _mapService = mapService;
         _dataRequestManager = dataRequestManager;
     }
+
+
 
     /// <summary>
     /// Can be called before status ingame to use cache
@@ -29,19 +31,14 @@ public class GameEngine : IGameEngine
     /// <param name="dataFileName"></param>
     /// <param name="gameInfo"></param>
     /// <param name="responseData"></param>
-    public void OnStart(string dataFileName= "", ResponseGameInfo? gameInfo = null, ResponseData? responseData = null)
+    public void OnStart(ResponseData? responseData = null, ResponseGameInfo? gameInfo = null, string mapName = "")
     {
-        if (gameInfo != null) {
-            _mapService.PopulateMapData(gameInfo);
-            if(responseData != null)
-                if (dataFileName != string.Empty) //To create file as future cache you need a name
-                    _dataRequestManager.CreateLoadData(responseData, dataFileName);
-                else //backup solution if the fileName was not gathered(possibly due to failing ping request)
-                    _dataRequestManager.LoadDataFromResponse(responseData);
-        }
-        else {  //It is before status ingame, load from file
-            _dataRequestManager.LoadDataFromFile(dataFileName);
-        }
+        if (gameInfo != null) 
+            _mapService.CreateLoadFile(gameInfo, mapName);
+
+        if(responseData != null)
+            if(!_dataRequestManager.CreateLoadData(responseData))
+                _dataRequestManager.LoadDataFromResponse(responseData);
     }
 
     public (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation)
@@ -62,5 +59,13 @@ public class GameEngine : IGameEngine
         actions.Add(_macroManager.BuildProbe(observation));
 
         return (actions, debugCommands);
+    }
+
+    public void LoadFromCache(string gameMap, bool shouldLoadDataCache, bool shouldLoadInfoCache)
+    {
+        if(shouldLoadDataCache)
+            _dataRequestManager.LoadDataFromFile();
+        if (shouldLoadInfoCache)
+            _mapService.LoadDataFromFile(gameMap);
     }
 }

@@ -20,10 +20,12 @@ public class MapSerivceTests
     [TestCase("Hardwire AIE", ExpectedResult = true)]
     public bool testSimpleResponse(string mapname)
     {
-        MapService service = new MapService(new MapData());
+        MapDataService service = new MapDataService(new MapData());
 
         ResponseGameInfo dummy = createDummyResponse();
         MapData test = service.PopulateMapData(dummy);
+
+
 
         return mapname == test.MapName;
     }
@@ -63,9 +65,9 @@ public class MapSerivceTests
     }
 
     [TestMethod]
-    public void testMapLoadTime()
+    public void testMapLoadTimeFromRequest()
     {
-        MapService _mapService = new MapService(new MapData());
+        MapDataService _mapService = new MapDataService(new MapData());
         int loops = 100;
         Stopwatch stopWatch = new Stopwatch();
         stopWatch.Start();
@@ -78,5 +80,20 @@ public class MapSerivceTests
         Console.WriteLine("Avrage for MapDataLoading only " + AvrageTime);
     }
 
-
+    [TestMethod]
+    public void testMapLoadTimeFromFile()
+    {
+        MapDataService _mapService = new MapDataService(new MapData());
+        GameInfoRequestManager game = new GameInfoRequestManager(_mapService, null);
+        int loops = 100;
+        Stopwatch stopWatch = new Stopwatch();
+        stopWatch.Start();
+        for (int i = 0; i < loops; i++)
+        {
+            _mapService.
+        }
+        stopWatch.Stop();
+        float AvrageTime = stopWatch.ElapsedMilliseconds / loops;
+        Console.WriteLine("Avrage for MapDataLoading only " + AvrageTime);
+    }
 }

@@ -17,9 +17,12 @@ public class MapData
     public string MapName { get; set; }
     public Dictionary<Point2D, MapCell> Map { get; set; }
 
+
+
     public MapData()
     {
     }
+
 
 
 }

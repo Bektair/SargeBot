@@ -70,17 +70,13 @@ public class GameDataService
         upgradesDict = new Dictionary<Upgrades, Upgrade>();
     }
 
-
     public void FillAbilities(RepeatedField<AbilityData> apiAbilities)
     {
-
-
         foreach (AbilityData abilityData in apiAbilities)
         {
             if(abilityData.FriendlyName != String.Empty) //removes dummies like index 0
                 abilitiesDict.Add((Abilities)abilityData.AbilityId, new Ability(abilityData));
         }
-
     }
 
     //Helper to fix broken part of API
@@ -127,6 +123,13 @@ public class GameDataService
             if (upgrade.Name!=String.Empty) //removes dummies like index 0
                 upgradesDict.Add((Upgrades)upgrade.UpgradeId, new Upgrade(upgrade));
         }
+    }
+
+    public void FillAllData(ResponseData data)
+    {
+        FillAbilities(data.Abilities);
+        FillUnits(data.Units);
+        FillUpgrades(data.Upgrades);
     }
 
 

@@ -25,13 +25,14 @@ using var host = Host.CreateDefaultBuilder(args)
     {
         services.Configure<GameConnectionOptions>(context.Configuration.GetSection(GameConnectionOptions.GameConnection));
         services.Configure<RequestOptions>(context.Configuration.GetSection(RequestOptions.RequestSettings));
+        services.Configure<CacheOptions>(context.Configuration.GetSection(CacheOptions.CacheSettings));
         services.Configure<ProcessOptions>(context.Configuration.GetSection(ProcessOptions.ProcessSettings));
         services
             .AddScoped<IGameEngine, GameEngine>()
             .AddScoped<MacroManager>()
             .AddScoped<ProcessOptions>()
             .AddScoped<MapData>()
-            .AddScoped<MapService>()
+            .AddScoped<MapDataService>()
             .AddScoped<DataRequestManager>()
             .AddScoped<GameDataService>()
             ;

@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 namespace SargeBot.Features.Macro.Zerg;
 public class ZergBuildingPlacement
 {
-    private MapService MapService;
-    public ZergBuildingPlacement(MapService MapService)
+    private MapDataService MapService;
+    public ZergBuildingPlacement(MapDataService MapService)
     {
         this.MapService = MapService;
     }
