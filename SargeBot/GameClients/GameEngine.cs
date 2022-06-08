@@ -1,6 +1,7 @@
 ﻿using SargeBot.Features.Debug;
 using SargeBot.Features.GameData;
 using SargeBot.Features.GameInfo;
+using SargeBot.Features.Intel;
 using SargeBot.Features.Macro;
 using SC2APIProtocol;
 using SC2ClientApi;
@@ -13,12 +14,14 @@ public class GameEngine : IGameEngine
     private readonly DataRequestManager _dataRequestManager;
     private readonly MacroManager _macroManager;
     private readonly MapDataService _mapService;
+    private readonly IntelService _intelService;
 
-    public GameEngine(MacroManager macroManager, MapDataService mapService, DataRequestManager dataRequestManager)
+    public GameEngine(MacroManager macroManager, MapDataService mapService, DataRequestManager dataRequestManager, IntelService intelService)
     {
         _macroManager = macroManager;
         _mapService = mapService;
         _dataRequestManager = dataRequestManager;
+        _intelService = intelService;
     }
 
     /// <summary>
@@ -28,7 +31,7 @@ public class GameEngine : IGameEngine
     /// </summary>
     public void OnStart(ResponseObservation firstObservation, ResponseData? responseData = null, ResponseGameInfo? gameInfo = null, string mapName = "")
     {
-        // use observation to create mineralfields, destructibles, xelnaga etc
+        _intelService.OnStart(firstObservation, responseData, gameInfo);
         
         if (gameInfo != null) 
             _mapService.CreateLoadFile(gameInfo, mapName);
