@@ -48,9 +48,9 @@ public class GameClient
         ResponseData gameDataResponse = null;
         if (!shouldLoadInfoCache) { gameInfoResponse = (await GameInfoRequest()).GameInfo; }
         if (!shouldLoadDataCache){ gameDataResponse = (await DataRequest()).Data; }
-        //if null then they dont get used
-        _gameEngine.OnStart(gameDataResponse, gameInfoResponse, _settings.GameMap);
-
+        
+        var firstObservationResponse = await ObservationRequest();
+        _gameEngine.OnStart(firstObservationResponse.Observation, gameDataResponse, gameInfoResponse, _settings.GameMap);
 
         while (_connection.Status == Status.InGame)
         {

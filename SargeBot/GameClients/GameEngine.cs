@@ -21,18 +21,15 @@ public class GameEngine : IGameEngine
         _dataRequestManager = dataRequestManager;
     }
 
-
-
     /// <summary>
     /// Can be called before status ingame to use cache
     /// And after status ingame to use response
     /// Should Populate both MapData and GameData
     /// </summary>
-    /// <param name="dataFileName"></param>
-    /// <param name="gameInfo"></param>
-    /// <param name="responseData"></param>
-    public void OnStart(ResponseData? responseData = null, ResponseGameInfo? gameInfo = null, string mapName = "")
+    public void OnStart(ResponseObservation firstObservation, ResponseData? responseData = null, ResponseGameInfo? gameInfo = null, string mapName = "")
     {
+        // use observation to create mineralfields, destructibles, xelnaga etc
+        
         if (gameInfo != null) 
             _mapService.CreateLoadFile(gameInfo, mapName);
 
