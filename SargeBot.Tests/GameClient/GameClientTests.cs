@@ -23,7 +23,7 @@ public class GameClientTests
         stopWatch.Start();
         for (int i = 0; i < loops; i++)
         {
-            GameClient.DataFileExists(file);
+            //GameClient.DataFileExists(file);
         }
         stopWatch.Stop();
         float AvrageTime = stopWatch.ElapsedMilliseconds / loops;

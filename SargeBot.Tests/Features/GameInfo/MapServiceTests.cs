@@ -1,7 +1,10 @@
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using NUnit.Framework;
 using SargeBot.Features.GameData;
 using SargeBot.Features.GameInfo;
+using SargeBot.Options;
 using SC2APIProtocol;
 using SC2ClientApi;
 using System;
@@ -16,19 +19,6 @@ public class MapSerivceTests
     private GameClient? _gameClient;
     private IServiceProvider _serviceProvider;
     private GameDataService? _gameData;
-
-    [TestCase("Hardwire AIE", ExpectedResult = true)]
-    public bool testSimpleResponse(string mapname)
-    {
-        MapDataService service = new MapDataService(new MapData());
-
-        ResponseGameInfo dummy = createDummyResponse();
-        MapData test = service.PopulateMapData(dummy);
-
-
-
-        return mapname == test.MapName;
-    }
 
 
     private ResponseGameInfo createDummyResponse()
@@ -67,30 +57,35 @@ public class MapSerivceTests
     [TestMethod]
     public void testMapLoadTimeFromRequest()
     {
-        MapDataService _mapService = new MapDataService(new MapData());
-        int loops = 100;
-        Stopwatch stopWatch = new Stopwatch();
-        stopWatch.Start();
-        for (int i = 0; i < loops; i++)
-        {
-            _mapService.PopulateMapData(createDummyResponse());
-        }
-        stopWatch.Stop();
-        float AvrageTime = stopWatch.ElapsedMilliseconds / loops;
-        Console.WriteLine("Avrage for MapDataLoading only " + AvrageTime);
+        //MapDataService _mapService = new MapDataService(new MapData());
+        //int loops = 100;
+        //Stopwatch stopWatch = new Stopwatch();
+        //stopWatch.Start();
+        //for (int i = 0; i < loops; i++)
+        //{
+        //    _mapService.PopulateMapData(createDummyResponse());
+        //}
+        //stopWatch.Stop();
+        //float AvrageTime = stopWatch.ElapsedMilliseconds / loops;
+        //Console.WriteLine("Avrage for MapDataLoading only " + AvrageTime);
     }
 
+   
     [TestMethod]
     public void testMapLoadTimeFromFile()
     {
-        MapDataService _mapService = new MapDataService(new MapData());
-        GameInfoRequestManager game = new GameInfoRequestManager(_mapService, null);
-        int loops = 100;
+        var mapName = "HardwireAIE.SC2Map";
+        var options = new Mock<IOptions<CacheOptions>>();
+        var cache = new CacheOptions { DataFolderName = "data" };
+        options.Setup(x => x.Value)
+            .Returns(cache);
+        MapDataService _mapService = new MapDataService(new MapData(), options.Object);
+        int loops = 1;
         Stopwatch stopWatch = new Stopwatch();
         stopWatch.Start();
         for (int i = 0; i < loops; i++)
         {
-            _mapService.
+            _mapService.LoadDataFromFile(mapName);
         }
         stopWatch.Stop();
         float AvrageTime = stopWatch.ElapsedMilliseconds / loops;

@@ -29,10 +29,9 @@ public class MapDataService
         }
     };
 
-    public MapDataService(MapData Data, IServiceProvider services)
+    public MapDataService(MapData Data, IOptions<CacheOptions> cacheSettings)
     {
         this.MapData = Data;
-        var cacheSettings = services.GetRequiredService<IOptions<CacheOptions>>();
         _dataFolderName = cacheSettings.Value.DataFolderName;
     }
 

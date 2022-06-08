@@ -14,7 +14,7 @@ public class GameEngine : IGameEngine
     private readonly MacroManager _macroManager;
     private readonly MapDataService _mapService;
 
-    public GameEngine(MacroManager macroManager, MapDataService mapService, DataRequestManager dataRequestManager, GameInfoRequestManager gameInfoRequestManager)
+    public GameEngine(MacroManager macroManager, MapDataService mapService, DataRequestManager dataRequestManager)
     {
         _macroManager = macroManager;
         _mapService = mapService;
