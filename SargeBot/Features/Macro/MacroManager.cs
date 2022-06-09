@@ -1,6 +1,8 @@
 ﻿using SargeBot.Features.GameInfo;
 using SargeBot.Features.GameData;
+using SargeBot.Features.Macro.Building.Zerg;
 using SC2APIProtocol;
+using SC2ClientApi;
 using SC2ClientApi.Constants;
 using Action = SC2APIProtocol.Action;
 
@@ -15,11 +17,34 @@ public class MacroManager
 {
     private readonly MapDataService _mapService;
     private readonly GameDataService _gameData;
+    private readonly ZergBuildingPlacement _zergBuildingPlacement;
 
-    public MacroManager(MapDataService mapService, GameDataService gameData)
+    public MacroManager(MapDataService mapService, GameDataService gameData, ZergBuildingPlacement zergBuildingPlacement)
     {
         _mapService = mapService;
         _gameData = gameData;
+        _zergBuildingPlacement = zergBuildingPlacement;
+    }
+
+    public Action BuildSpawningPool(ResponseObservation observation)
+    {
+        foreach (var unit in observation.Observation.RawData.Units)
+        {
+            if (unit.Alliance != Alliance.Self)
+                continue;
+
+            if (!unit.UnitType.Is(UnitTypes.ZERG_DRONE))
+                continue;
+
+            var command = new ActionRawUnitCommand();
+            command.UnitTags.Add(unit.Tag);
+            command.AbilityId = (int) Abilities.BUILD_SPAWNINGPOOL;
+            command.TargetWorldSpacePos = _zergBuildingPlacement.FindPlacement();
+
+            return new() {ActionRaw = new() {UnitCommand = command}};
+        }
+
+        return new() {ActionRaw = new()};
     }
 
     public Action? BuildProbe(ResponseObservation observation)
