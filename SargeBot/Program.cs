@@ -6,6 +6,7 @@ using SargeBot.Features.GameData;
 using SargeBot.Features.GameInfo;
 using SargeBot.Features.Intel;
 using SargeBot.Features.Macro;
+using SargeBot.Features.Macro.Building.Zerg;
 using SargeBot.GameClients;
 using SargeBot.Options;
 using SC2APIProtocol;
@@ -36,6 +37,7 @@ using var host = Host.CreateDefaultBuilder(args)
             .AddScoped<DataRequestManager>()
             .AddScoped<GameDataService>()
             .AddScoped<IntelService>()
+            .AddScoped<ZergBuildingPlacement>()
             ;
     }).Build();
 

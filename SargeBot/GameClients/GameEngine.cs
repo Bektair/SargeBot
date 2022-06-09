@@ -56,7 +56,7 @@ public class GameEngine : IGameEngine
         debugCommands.Add(DebugService.DrawSphere(new() {X = 5, Y = 5, Z = z}, color: new() {G = 255}));
         debugCommands.Add(DebugService.DrawBox(new() {X = 15, Y = 15, Z = z}, new() {X = 100, Y = 100, Z = z}, new() {B = 255}));
 
-        actions.Add(_macroManager.BuildProbe(observation));
+        actions.Add(_macroManager.BuildSpawningPool(observation));
 
         return (actions, debugCommands);
     }

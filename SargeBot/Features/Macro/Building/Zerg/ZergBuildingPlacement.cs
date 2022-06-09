@@ -1,29 +1,28 @@
-﻿using SargeBot.Features.GameInfo;
+﻿using SargeBot.Features.Intel;
 using SC2APIProtocol;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SargeBot.Features.Macro.Zerg;
+namespace SargeBot.Features.Macro.Building.Zerg;
+
 public class ZergBuildingPlacement
 {
-    private MapDataService MapService;
-    public ZergBuildingPlacement(MapDataService MapService)
+    private readonly IntelService _intelService;
+
+    public ZergBuildingPlacement(IntelService intelService)
     {
-        this.MapService = MapService;
+        _intelService = intelService;
     }
 
-    //PreCondition: You have enough resources for the building && It is next in line to be made
-    private Point2D FindPlaceMent()
+    public Point2D FindPlacement()
     {
-        //Begin with choosing base to put it in?
+        var mainBase = _intelService.SelfColonies.First(x => x.IsStartingLocation);
 
-        return null;
+        //  consider copy paste Sharkys circle math
+
+        // temporary random placement
+        var r = new Random();
+        var x = mainBase.Point.X + r.Next(-10, 10);
+        var y = mainBase.Point.Y + r.Next(-10, 10);
+
+        return new() {X = x, Y = y};
     }
-
-
-
-
 }
