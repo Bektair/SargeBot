@@ -33,12 +33,13 @@ public class GameEngine : IGameEngine
     /// <param name="responseData"></param>
     public void OnStart(ResponseData? responseData = null, ResponseGameInfo? gameInfo = null, string mapName = "")
     {
-        if (gameInfo != null) 
-            _mapService.CreateLoadFile(gameInfo, mapName);
+
 
         if(responseData != null)
             if(!_dataRequestManager.CreateLoadData(responseData))
                 _dataRequestManager.LoadDataFromResponse(responseData);
+        if (gameInfo != null)
+            _mapService.CreateLoadFile(gameInfo, mapName);
     }
 
     public (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation)

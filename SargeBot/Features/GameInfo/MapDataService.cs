@@ -44,9 +44,14 @@ public class MapDataService
 
     public void CreateLoadFile(ResponseGameInfo GameInfo, string mapName)
     {
+        CreateDirectoryIfNeeded();
         MapData data = PopulateMapData(GameInfo);
         string jsonString = JsonSerializer.Serialize(data, serializerOptions);
         File.WriteAllText(Path.Combine(_dataFolderName, mapName + ".json"), jsonString);
+    }
+    private void CreateDirectoryIfNeeded()
+    {
+        if (!Directory.Exists(_dataFolderName)) { Directory.CreateDirectory(_dataFolderName); }
     }
     public MapData PopulateMapData(ResponseGameInfo GameInfo)
     {
