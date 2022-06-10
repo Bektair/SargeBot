@@ -7,6 +7,7 @@ using SargeBot.Features.GameInfo;
 using SargeBot.Features.Intel;
 using SargeBot.Features.Macro;
 using SargeBot.Features.Macro.Building.Zerg;
+using SargeBot.Features.Micro;
 using SargeBot.GameClients;
 using SargeBot.Options;
 using SC2APIProtocol;
@@ -38,6 +39,7 @@ using var host = Host.CreateDefaultBuilder(args)
             .AddScoped<GameDataService>()
             .AddScoped<IntelService>()
             .AddScoped<ZergBuildingPlacement>()
+            .AddScoped<MicroManager>()
             ;
     }).Build();
 

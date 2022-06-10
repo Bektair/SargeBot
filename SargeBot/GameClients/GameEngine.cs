@@ -3,6 +3,7 @@ using SargeBot.Features.GameData;
 using SargeBot.Features.GameInfo;
 using SargeBot.Features.Intel;
 using SargeBot.Features.Macro;
+using SargeBot.Features.Micro;
 using SC2APIProtocol;
 using SC2ClientApi;
 using SC2ClientApi.Constants;
@@ -15,14 +16,15 @@ public class GameEngine : IGameEngine
     private readonly DataRequestManager _dataRequestManager;
     private readonly MacroManager _macroManager;
     private readonly MapDataService _mapService;
-    private readonly IntelService _intelService;
+    private readonly MicroManager _microManager;
 
-    public GameEngine(MacroManager macroManager, MapDataService mapService, DataRequestManager dataRequestManager, IntelService intelService)
+    public GameEngine(MacroManager macroManager, MapDataService mapService, DataRequestManager dataRequestManager, IntelService intelService, MicroManager microManager)
     {
         _macroManager = macroManager;
         _mapService = mapService;
         _dataRequestManager = dataRequestManager;
         _intelService = intelService;
+        _microManager = microManager;
     }
 
     /// <summary>
@@ -60,6 +62,8 @@ public class GameEngine : IGameEngine
         var hasSpawningPool = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitTypes.ZERG_SPAWNINGPOOL));
         if (canAffordSpawningPool && !hasSpawningPool)
             actions.Add(_macroManager.BuildSpawningPool(observation));
+
+        actions.Add(_microManager.OverlordScout(observation));
 
         return (actions, debugCommands);
     }
