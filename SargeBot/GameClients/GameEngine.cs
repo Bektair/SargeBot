@@ -65,6 +65,9 @@ public class GameEngine : IGameEngine
 
         actions.Add(_microManager.OverlordScout(observation));
 
+        var lingCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitTypes.ZERG_ZERGLING));
+        if (lingCount <= 6) actions.Add(MacroManager.MorphLarva(observation, Abilities.TRAIN_ZERGLING));
+
         return (actions, debugCommands);
     }
 

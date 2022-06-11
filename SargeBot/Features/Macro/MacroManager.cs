@@ -46,6 +46,26 @@ public class MacroManager
 
         return new() {ActionRaw = new()};
     }
+    
+    public static Action MorphLarva(ResponseObservation observation, Abilities ability)
+    {
+        foreach (var unit in observation.Observation.RawData.Units)
+        {
+            if (unit.Alliance != Alliance.Self)
+                continue;
+
+            if (!unit.UnitType.Is(UnitTypes.ZERG_LARVA))
+                continue;
+
+            var command = new ActionRawUnitCommand();
+            command.UnitTags.Add(unit.Tag);
+            command.AbilityId = (int) ability;
+
+            return new() {ActionRaw = new() {UnitCommand = command}};
+        }
+
+        return new() {ActionRaw = new()};
+    }
 
     public Action? BuildProbe(ResponseObservation observation)
     {
