@@ -14,6 +14,7 @@ namespace SargeBot.GameClients;
 public class GameEngine : IGameEngine
 {
     private readonly DataRequestManager _dataRequestManager;
+    private readonly IntelService _intelService;
     private readonly MacroManager _macroManager;
     private readonly MapDataService _mapService;
     private readonly MicroManager _microManager;
@@ -50,14 +51,22 @@ public class GameEngine : IGameEngine
 
         var actions = new List<Action>();
         var debugCommands = new List<DebugCommand>();
+        
+        _intelService.OnFrame(observation);
 
+        var enemyBase = _intelService.EnemyColonies.First();
+        
         // testing debug commands
-        var z = 22;
+        var z = 12;
         debugCommands.Add(DebugService.DrawText($"Frame {observation.Observation.GameLoop}"));
-        debugCommands.Add(DebugService.DrawLine(new() {X = 0, Y = 0, Z = z}, new() {X = 255, Y = 255, Z = z}, new() {R = 255}));
-        debugCommands.Add(DebugService.DrawSphere(new() {X = 5, Y = 5, Z = z}, color: new() {G = 255}));
-        debugCommands.Add(DebugService.DrawBox(new() {X = 15, Y = 15, Z = z}, new() {X = 100, Y = 100, Z = z}, new() {B = 255}));
-
+        // debugCommands.Add(DebugService.DrawSphere(new() {X = 14.5f, Y = 24.5f, Z = z}, color: new() {G = 255}));
+        // debugCommands.Add(DebugService.DrawSphere(new() {X = 113.5f, Y = 123.5f, Z = z}, color: new() {R = 255, B = 255}));
+        // debugCommands.Add(DebugService.DrawLine(new() {X = 0, Y = 0, Z = z}, new() {X = 255, Y = 255, Z = z}, new() {R = 255}));
+        // debugCommands.Add(DebugService.DrawBox(new() {X = 15, Y = 15, Z = z}, new() {X = 100, Y = 100, Z = z}, new() {B = 255}));
+        debugCommands.Add(DebugService.DrawBox(new() {X = enemyBase.Point.X, Y = enemyBase.Point.Y, Z = z}, new() {X = enemyBase.Point.X + 5, Y = enemyBase.Point.Y + 5, Z = z}, new() {B = 255}));
+        if (_intelService.SelfNatural != null)
+            debugCommands.Add(DebugService.DrawSphere(new() {X = _intelService.SelfNatural.X, Y = _intelService.SelfNatural.Y, Z = z}, color: new() {G = 255}));
+        
         var canAffordSpawningPool = observation.Observation.PlayerCommon.Minerals >= 200;
         var hasSpawningPool = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitTypes.ZERG_SPAWNINGPOOL));
         if (canAffordSpawningPool && !hasSpawningPool)

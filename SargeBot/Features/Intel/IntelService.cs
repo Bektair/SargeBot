@@ -11,6 +11,8 @@ public class IntelService
     public List<Unit> Destructibles { get; set; } = new();
     public List<Unit> XelNagaTowers { get; set; } = new();
     public List<Unit> SelfBuildings { get; set; } = new();
+    public List<Unit> StartingMineralFields { get; set; } = new();
+    public Point? SelfNatural { get; set; }
 
     public void OnStart(ResponseObservation firstObservation, ResponseData? responseData = null, ResponseGameInfo? gameInfo = null)
     {
@@ -30,6 +32,20 @@ public class IntelService
                 case Alliance.Neutral:
                     if (unit.UnitType.Is(UnitTypes.NEUTRAL_XELNAGATOWER)) XelNagaTowers.Add(unit);
                     if (unit.UnitType.IsDestructible()) Destructibles.Add(unit);
+                    if (unit.UnitType.IsMineralField()) StartingMineralFields.Add(unit);
+                    break;
+            }
+    }
+    
+    public void OnFrame(ResponseObservation observation)
+    {
+        // the first discovered minerals not in starting minerals are probably natural, or third
+        foreach (var unit in observation.Observation.RawData.Units)
+            switch (unit.Alliance)
+            {
+                case Alliance.Neutral:
+                    if (unit.UnitType.IsMineralField() && SelfNatural == null && !StartingMineralFields.Contains(unit)) 
+                        SelfNatural = unit.Pos;
                     break;
             }
     }
