@@ -18,8 +18,6 @@ public class MapSerivceTests
 {
     private GameClient? _gameClient;
     private IServiceProvider _serviceProvider;
-    private GameDataService? _gameData;
-
 
     private ResponseGameInfo createDummyResponse()
     {
@@ -79,7 +77,8 @@ public class MapSerivceTests
         var cache = new CacheOptions { DataFolderName = "data" };
         options.Setup(x => x.Value)
             .Returns(cache);
-        MapDataService _mapService = new MapDataService(new MapData(), options.Object);
+        MapDataService _mapService = new MapDataService(options.Object);
+        _mapService.Save();
         int loops = 1;
         Stopwatch stopWatch = new Stopwatch();
         stopWatch.Start();

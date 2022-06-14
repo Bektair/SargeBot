@@ -16,14 +16,14 @@ namespace SargeBot.Features.Macro;
 public class MacroManager
 {
     private readonly MapDataService _mapService;
-    private readonly GameDataService _gameData;
     private readonly ZergBuildingPlacement _zergBuildingPlacement;
+    private readonly StaticGameData _staticGameData;
 
-    public MacroManager(MapDataService mapService, GameDataService gameData, ZergBuildingPlacement zergBuildingPlacement)
+    public MacroManager(MapDataService mapService, ZergBuildingPlacement zergBuildingPlacement, StaticGameData staticGameData)
     {
         _mapService = mapService;
-        _gameData = gameData;
         _zergBuildingPlacement = zergBuildingPlacement;
+        _staticGameData = staticGameData;
     }
 
     public Action BuildSpawningPool(ResponseObservation observation)
@@ -70,7 +70,7 @@ public class MacroManager
     public Action? BuildProbe(ResponseObservation observation)
     {
         var positionThatRox = _mapService.GetHeightZ(107, 117);
-        var probeCost = _gameData.unitsDict.GetValueOrDefault(UnitTypes.PROTOSS_PROBE).MineralCost;
+        var probeCost = _staticGameData.PlainUnits[UnitType.PROTOSS_PROBE].MineralCost;
         var minerals = observation.Observation.PlayerCommon.Minerals;
         if(minerals >= probeCost) { 
 

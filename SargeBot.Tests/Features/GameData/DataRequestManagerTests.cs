@@ -12,7 +12,6 @@ namespace SargeBot.Tests;
 public class DataRequestManagerTests
 {
     private GameClient? _gameClient;
-    private GameDataService? _gameData;
     private IServiceProvider _serviceProvider;
     private CacheOptions options;
 
@@ -26,7 +25,6 @@ public class DataRequestManagerTests
     public void AvrageDataLoadTime()
     {
         setUPSerivces();
-        DataRequestManager man = new DataRequestManager(_gameData, _serviceProvider);
         int loops = 1;
         Stopwatch stopWatch = new Stopwatch();
         stopWatch.Start();

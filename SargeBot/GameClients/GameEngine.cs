@@ -13,35 +13,32 @@ namespace SargeBot.GameClients;
 
 public class GameEngine : IGameEngine
 {
-    private readonly DataRequestManager _dataRequestManager;
     private readonly IntelService _intelService;
     private readonly MacroManager _macroManager;
     private readonly MapDataService _mapService;
     private readonly MicroManager _microManager;
+    private readonly StaticGameData _staticGameData;
 
-    public GameEngine(MacroManager macroManager, MapDataService mapService, DataRequestManager dataRequestManager, IntelService intelService, MicroManager microManager)
+    public GameEngine(IntelService intelService, MacroManager macroManager, MapDataService mapService, MicroManager microManager, StaticGameData staticGameData)
     {
+        _intelService = intelService;
         _macroManager = macroManager;
         _mapService = mapService;
-        _dataRequestManager = dataRequestManager;
-        _intelService = intelService;
         _microManager = microManager;
+        _staticGameData = staticGameData;
     }
 
     /// <summary>
-    /// Can be called before status ingame to use cache
-    /// And after status ingame to use response
-    /// Should Populate both MapData and GameData
+    ///     Can be called before status ingame to use cache
+    ///     And after status ingame to use response
+    ///     Should Populate both MapData and GameData
     /// </summary>
-    public void OnStart(ResponseObservation firstObservation, ResponseData? responseData = null, ResponseGameInfo? gameInfo = null, string mapName = "")
+    public void OnStart(ResponseObservation firstObservation, ResponseData responseData, ResponseGameInfo gameInfo, string mapName = "")
     {
         _intelService.OnStart(firstObservation, responseData, gameInfo);
-
-        if(responseData != null)
-            if(!_dataRequestManager.CreateLoadData(responseData))
-                _dataRequestManager.LoadDataFromResponse(responseData);
-        if (gameInfo != null)
-            _mapService.CreateLoadFile(gameInfo, mapName);
+        _staticGameData.PopulateGameData(responseData);
+        Task.Run(() => _staticGameData.Save());
+        _mapService.PopulateMapData(gameInfo);
     }
 
     public (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation)
@@ -51,11 +48,11 @@ public class GameEngine : IGameEngine
 
         var actions = new List<Action>();
         var debugCommands = new List<DebugCommand>();
-        
+
         _intelService.OnFrame(observation);
 
         var enemyBase = _intelService.EnemyColonies.First();
-        
+
         // testing debug commands
         var z = 12;
         debugCommands.Add(DebugService.DrawText($"Frame {observation.Observation.GameLoop}"));
@@ -66,7 +63,7 @@ public class GameEngine : IGameEngine
         debugCommands.Add(DebugService.DrawBox(new() {X = enemyBase.Point.X, Y = enemyBase.Point.Y, Z = z}, new() {X = enemyBase.Point.X + 5, Y = enemyBase.Point.Y + 5, Z = z}, new() {B = 255}));
         if (_intelService.SelfNatural != null)
             debugCommands.Add(DebugService.DrawSphere(new() {X = _intelService.SelfNatural.X, Y = _intelService.SelfNatural.Y, Z = z}, color: new() {G = 255}));
-        
+
         var canAffordSpawningPool = observation.Observation.PlayerCommon.Minerals >= 200;
         var hasSpawningPool = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitTypes.ZERG_SPAWNINGPOOL));
         if (canAffordSpawningPool && !hasSpawningPool)
@@ -80,13 +77,5 @@ public class GameEngine : IGameEngine
         actions.Add(_microManager.ZerglingAttack(observation));
 
         return (actions, debugCommands);
-    }
-
-    public void LoadFromCache(string gameMap, bool shouldLoadDataCache, bool shouldLoadInfoCache)
-    {
-        if(shouldLoadDataCache)
-            _dataRequestManager.LoadDataFromFile();
-        if (shouldLoadInfoCache)
-            _mapService.LoadDataFromFile(gameMap);
     }
 }

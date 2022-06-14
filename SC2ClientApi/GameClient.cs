@@ -2,6 +2,7 @@
 using SC2APIProtocol;
 using SC2ClientApi.Constants;
 using Action = SC2APIProtocol.Action;
+
 namespace SC2ClientApi;
 
 public class GameClient
@@ -34,21 +35,13 @@ public class GameClient
 
     public async Task Run()
     {
-        bool shouldLoadDataCache = LoadDataCache();
-        bool shouldLoadInfoCache = LoadInfoCache();
-        if (shouldLoadDataCache || shouldLoadInfoCache)
-                _gameEngine.LoadFromCache(_settings.GameMap, shouldLoadDataCache, shouldLoadInfoCache);
         while (_connection.Status != Status.InGame)
         {
             // wait for game to start
         }
 
-
-        ResponseGameInfo gameInfoResponse = null;
-        ResponseData gameDataResponse = null;
-        if (!shouldLoadInfoCache) { gameInfoResponse = (await GameInfoRequest()).GameInfo; }
-        if (!shouldLoadDataCache){ gameDataResponse = (await DataRequest()).Data; }
-        
+        var gameInfoResponse = await GetGameInfo();
+        var gameDataResponse = await GetStaticGameData();
         var firstObservationResponse = await ObservationRequest();
         _gameEngine.OnStart(firstObservationResponse.Observation, gameDataResponse, gameInfoResponse, _settings.GameMap);
 
@@ -66,20 +59,16 @@ public class GameClient
         }
     }
 
-    private bool LoadDataCache()
+    private async Task<ResponseGameInfo?> GetGameInfo()
     {
-        return DataFileExists(_settings.DataFileName);
+        var response = await GameInfoRequest();
+        return response.GameInfo;
     }
 
-    private bool LoadInfoCache()
+    private async Task<ResponseData?> GetStaticGameData()
     {
-        return DataFileExists(_settings.GameMap + ".json");
-    }
-    public bool DataFileExists(string filename)
-    {
-        if (File.Exists(Path.Combine(_settings.DataFolderName, filename)))
-            return true;
-        else return false;
+        var response = await DataRequest();
+        return response.Data;
     }
 
     private Process? LaunchClient(bool asHost)
