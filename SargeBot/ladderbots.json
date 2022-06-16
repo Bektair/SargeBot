@@ -1,0 +1,10 @@
+{
+  "Bots": {
+    "SargeBot": {
+      "Race": "Zerg",
+      "Type": "dotnetcore",
+      "RootPath": "./",
+      "FileName": "SargeBot.dll"
+    }
+  }
+}

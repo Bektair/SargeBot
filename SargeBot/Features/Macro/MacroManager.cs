@@ -47,7 +47,7 @@ public class MacroManager
         return new() {ActionRaw = new()};
     }
     
-    public static Action MorphLarva(ResponseObservation observation, Abilities ability)
+    public static Action MorphLarva(ResponseObservation observation, Ability ability)
     {
         foreach (var unit in observation.Observation.RawData.Units)
         {

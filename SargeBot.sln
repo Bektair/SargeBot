@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SargeBot.Tests", "SargeBot.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SC2ClientApi", "SC2ClientApi\SC2ClientApi.csproj", "{E12344A2-DFD6-409F-A081-98D8D1CA7C7F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroBot", "ZeroBot\ZeroBot.csproj", "{E07C8466-9A45-47BB-AE55-8B0544B9C8A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{E12344A2-DFD6-409F-A081-98D8D1CA7C7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E12344A2-DFD6-409F-A081-98D8D1CA7C7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E12344A2-DFD6-409F-A081-98D8D1CA7C7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E07C8466-9A45-47BB-AE55-8B0544B9C8A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E07C8466-9A45-47BB-AE55-8B0544B9C8A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E07C8466-9A45-47BB-AE55-8B0544B9C8A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E07C8466-9A45-47BB-AE55-8B0544B9C8A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

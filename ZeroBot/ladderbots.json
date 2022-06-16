@@ -1,0 +1,10 @@
+{
+  "Bots": {
+    "ZeroBot": {
+      "Race": "Zerg",
+      "Type": "dotnetcore",
+      "RootPath": "./",
+      "FileName": "ZeroBot.dll"
+    }
+  }
+}

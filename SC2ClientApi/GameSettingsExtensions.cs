@@ -8,6 +8,9 @@ namespace SC2ClientApi;
 
 public static class GameSettingsExtensions
 {
+    public static int GetPort(this GameSettings gs, bool isHost) => isHost ? gs.ConnectionServerPort : gs.ConnectionClientPort;
+
+
     public static string ToArguments(this GameSettings gs, bool isHost)
     {
         var sb = new StringBuilder();
@@ -21,10 +24,10 @@ public static class GameSettingsExtensions
         if (gs.Fullscreen)
             sb.Append($"{ClientConstants.Fullscreen} 1 ");
         else
-            sb.Append($"{ClientConstants.Fullscreen} 0 {ClientConstants.WindowHeight} {gs.ClientWindowHeight} {ClientConstants.WindowVertical} {gs.ClientWindowWidth} ");
+            sb.Append($"{ClientConstants.Fullscreen} 0 {ClientConstants.WindowWidth} {gs.WindowWidth} ");
 
         if (!isHost)
-            sb.Append($"{ClientConstants.WindowVertical} {gs.ClientWindowWidth} ");
+            sb.Append($"{ClientConstants.WindowX} {gs.WindowWidth} ");
         return sb.ToString();
     }
 
@@ -74,10 +77,12 @@ public static class GameSettingsExtensions
                 PlayerSetup = {gs.PlayerOne, gs.PlayerTwo}
             }
         };
-        if (File.Exists(gs.GameMap) || File.Exists($"{gs.FolderPath}\\Maps\\{gs.GameMap}"))
-            r.CreateGame.LocalMap = new() {MapPath = gs.GameMap};
+
+        var folderPath = @"C:\Program Files (x86)\StarCraft II";
+        if (File.Exists(gs.MapName) || File.Exists($"{folderPath}\\Maps\\{gs.MapName}"))
+            r.CreateGame.LocalMap = new() {MapPath = gs.MapName};
         else
-            r.CreateGame.BattlenetMapName = gs.GameMap;
+            r.CreateGame.BattlenetMapName = gs.MapName;
         return r;
     }
 
@@ -85,13 +90,50 @@ public static class GameSettingsExtensions
         ? new($"ws://{gs.ConnectionAddress}:{gs.ConnectionServerPort}/sc2api")
         : new Uri($"ws://{gs.ConnectionAddress}:{gs.ConnectionClientPort}/sc2api");
 
-    public static string WorkingDirectory(this GameSettings gs) => $"{gs.FolderPath}\\Support";
+    public static string WorkingDirectory(this GameSettings gs) => $"{Sc2Directory()}\\Support";
 
     public static string ExecutableClientPath(this GameSettings gs)
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            return Directory.GetDirectories(gs.FolderPath + @"\Versions\", @"Base*")[0] + @"\SC2.app";
+            return Directory.GetDirectories(Sc2Directory() + @"\Versions\", @"Base*")[0] + @"\SC2.app";
 
-        return Directory.GetDirectories(gs.FolderPath + @"\Versions\", @"Base*")[0] + @"\SC2.exe";
+        return Directory.GetDirectories(Sc2Directory() + @"\Versions\", @"Base*")[0] + @"\SC2.exe";
+    }
+
+    public static string Sc2Directory()
+    {
+        string starcraftExe;
+        var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        var executeInfo = Path.Combine(myDocuments, "Starcraft II", "ExecuteInfo.txt");
+        if (File.Exists(executeInfo))
+        {
+            var lines = File.ReadAllLines(executeInfo);
+            foreach (var line in lines)
+            {
+                var argument = line.Substring(line.IndexOf('=') + 1).Trim();
+                if (line.Trim().StartsWith("executable"))
+                {
+                    starcraftExe = argument;
+                    var starcraftFolder = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(starcraftExe)));
+                    return starcraftFolder;
+                }
+            }
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            return Path.Combine(programFiles, "StarCraft II");
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            //Mac
+            var applications = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            return Path.Combine(applications, "StarCraft II");
+        }
+        // ladder plays on linux
+
+        throw new("Not using a supported OS");
     }
 }

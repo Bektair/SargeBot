@@ -35,16 +35,14 @@ public class MicroManager
 
         return new() {ActionRaw = new()};
     }
-    public Action ZerglingAttack(ResponseObservation observation)
+    
+    public Action AttackWithAll(ResponseObservation observation, UnitType unitType)
     {
-        foreach (var unit in observation.Observation.RawData.Units)
+        var units = observation.Observation.RawData.Units
+            .Where(u => u.Alliance == Alliance.Self)
+            .Where(u => u.UnitType.Is(unitType));
+        foreach (var unit in units)
         {
-            if (unit.Alliance != Alliance.Self)
-                continue;
-
-            if (!unit.UnitType.Is(UnitTypes.ZERG_ZERGLING))
-                continue;
-
             var command = new ActionRawUnitCommand();
             command.UnitTags.Add(unit.Tag);
             command.AbilityId = (int) Abilities.ATTACK;

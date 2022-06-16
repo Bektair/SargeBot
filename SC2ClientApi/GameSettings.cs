@@ -4,25 +4,22 @@ namespace SC2ClientApi;
 
 public class GameSettings
 {
-    // Technical Settings
-    public string FolderPath { get; set; }
+    // server settings
     public string ConnectionAddress { get; set; }
     public int ConnectionServerPort { get; set; }
     public int ConnectionClientPort { get; set; }
     public int MultiplayerSharedPort { get; set; }
     public InterfaceOptions InterfaceOptions { get; set; }
 
-    // Cache
-    public string DataFileName { get; set; }
-    public string DataFolderName { get; set; }
-
-    // Client Settings
+    // client settings
     public bool Fullscreen { get; set; }
-    public int ClientWindowWidth { get; set; }
-    public int ClientWindowHeight { get; set; }
+    public int WindowWidth { get; set; }
+    public int WindowHeight { get; set; }
+    public int WindowX { get; set; }
+    public int WindowY { get; set; }
 
-    // Game Settings
-    public string GameMap { get; set; }
+    // game settings
+    public string MapName { get; set; }
     public bool DisableFog { get; set; }
     public bool Realtime { get; set; }
     public PlayerSetup PlayerOne { get; set; }

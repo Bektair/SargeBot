@@ -5,6 +5,7 @@ namespace SC2ClientApi;
 
 public interface IGameEngine
 {
-    void OnStart(ResponseObservation firstObservation, ResponseData? responseData = null, ResponseGameInfo? gameInfo = null, string mapName = "");
+    void OnStart(ResponseObservation firstObservation, ResponseData responseData, ResponseGameInfo gameInfo);
     (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation);
+    void OnEnd(ResponseObservation observation, Result result);
 }

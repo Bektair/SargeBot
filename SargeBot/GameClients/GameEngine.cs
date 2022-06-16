@@ -33,7 +33,7 @@ public class GameEngine : IGameEngine
     ///     And after status ingame to use response
     ///     Should Populate both MapData and GameData
     /// </summary>
-    public void OnStart(ResponseObservation firstObservation, ResponseData responseData, ResponseGameInfo gameInfo, string mapName = "")
+    public void OnStart(ResponseObservation firstObservation, ResponseData responseData, ResponseGameInfo gameInfo)
     {
         _intelService.OnStart(firstObservation, responseData, gameInfo);
         _staticGameData.PopulateGameData(responseData);
@@ -65,17 +65,20 @@ public class GameEngine : IGameEngine
             debugCommands.Add(DebugService.DrawSphere(new() {X = _intelService.SelfNatural.X, Y = _intelService.SelfNatural.Y, Z = z}, color: new() {G = 255}));
 
         var canAffordSpawningPool = observation.Observation.PlayerCommon.Minerals >= 200;
-        var hasSpawningPool = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitTypes.ZERG_SPAWNINGPOOL));
+        var hasSpawningPool = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL));
         if (canAffordSpawningPool && !hasSpawningPool)
             actions.Add(_macroManager.BuildSpawningPool(observation));
 
         actions.Add(_microManager.OverlordScout(observation));
 
-        var lingCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitTypes.ZERG_ZERGLING));
-        if (lingCount <= 6) actions.Add(MacroManager.MorphLarva(observation, Abilities.TRAIN_ZERGLING));
-
-        actions.Add(_microManager.ZerglingAttack(observation));
+        var lingCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_ZERGLING));
+        if (lingCount <= 16) actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_ZERGLING));
 
         return (actions, debugCommands);
+    }
+
+    public void OnEnd(ResponseObservation observation, Result result)
+    {
+        Console.WriteLine($"[{DateTime.Now:T}] OnEnd {observation.Observation.GameLoop} - Result: {result}");
     }
 }

@@ -52,6 +52,6 @@ public class Game
         await Task.WhenAll(players.Select(p => p.JoinGameRequest()));
 
         // Run game loop
-        await Task.WhenAll(players.Select(p => p.Run()));
+        await Task.WhenAll(players.Select(p => p.Run(1)));
     }
 }
