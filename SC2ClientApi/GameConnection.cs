@@ -29,7 +29,7 @@ internal class GameConnection
         private set
         {
             if (_status == value) return;
-            Console.WriteLine($"[{DateTime.Now:T}] GameConnection Status changed: {_status} -> {value}");
+            Log.Info($"GameConnection Status changed: {_status} -> {value}");
             _status = value;
         }
     }
@@ -38,7 +38,7 @@ internal class GameConnection
     {
         var uri = new Uri($"ws://{address}:{port}/sc2api");
 
-        Console.WriteLine($"[{DateTime.Now:T}] Connecting to {uri}");
+        Log.Info($"Connecting to {uri}");
         var connectionAttempt = 1;
         do
         {
@@ -50,11 +50,11 @@ internal class GameConnection
             catch (AggregateException ex)
             {
                 // handle AggEx differently?
-                Console.WriteLine($"[{DateTime.Now:T}] Connection attempt {connectionAttempt}/{maxAttempts} failed: {ex.Message}");
+                Log.Info($"Connection attempt {connectionAttempt}/{maxAttempts} failed: {ex.Message}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[{DateTime.Now:T}] Connection attempt {connectionAttempt}/{maxAttempts} failed: {ex.Message}");
+                Log.Info($"Connection attempt {connectionAttempt}/{maxAttempts} failed: {ex.Message}");
             }
 
             connectionAttempt++;
@@ -64,19 +64,19 @@ internal class GameConnection
         if (_socket.State != WebSocketState.Open)
             return false;
 
-        Console.WriteLine($"[{DateTime.Now:T}] Connection success. Starting receive forever task");
+        Log.Info("Connection success. Starting receive forever task");
         Task.Factory.StartNew(ReceiveForever, TaskCreationOptions.LongRunning);
         await Task.Delay(TIMEOUT);
 
         var pingResponse = await SendAndReceiveAsync(ClientConstants.RequestPing);
         if (pingResponse == null)
         {
-            Console.WriteLine($"[{DateTime.Now:T}] Ping failed");
+            Log.Info("Ping failed");
             return false;
         }
 
         Version = pingResponse.Ping.GameVersion;
-        Console.WriteLine($"[{DateTime.Now:T}] Ping success. Version {Version}");
+        Log.Info($"Ping success. Version {Version}");
         return pingResponse.Ping.HasGameVersion;
     }
 
@@ -86,7 +86,7 @@ internal class GameConnection
 
         if (_socket.State != WebSocketState.Open)
         {
-            Console.WriteLine($"[{DateTime.Now:T}] Can't send request due to socket state {_socket.State}");
+            Log.Info($"Can't send request due to socket state {_socket.State}");
             return response;
         }
 
@@ -100,7 +100,7 @@ internal class GameConnection
         _responseHandler.RegisterHandler(req.RequestCase, handler);
         await SendAsync(req);
         var shouldWaitLonger = req.RequestCase is Request.RequestOneofCase.Step or Request.RequestOneofCase.JoinGame or Request.RequestOneofCase.CreateGame;
-        if (!handlerResolve.Wait(shouldWaitLonger ? TIMEOUT_LONG : TIMEOUT)) Console.WriteLine($"[{DateTime.Now:T}] Request timed out \n{req.ToString()}");
+        if (!handlerResolve.Wait(shouldWaitLonger ? TIMEOUT_LONG : TIMEOUT)) Log.Info($"Request timed out \n{req}");
         _responseHandler.DeregisterHandler(req.RequestCase);
 
         return response;

@@ -15,7 +15,7 @@ public static class GameSettingsMapper
 
         return new()
         {
-            ServerAddress = serverOptions.LadderServer,
+            ServerAddress = serverOptions.ServerAddress ?? "127.0.0.1",
             GamePort = serverOptions.GamePort,
             StartPort = serverOptions.StartPort,
 

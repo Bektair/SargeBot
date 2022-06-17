@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 using SC2ClientApi.Constants;
 
 namespace SC2ClientApi;
@@ -9,12 +8,13 @@ public static class Sc2Process
 {
     private static string? _sc2Directory;
 
-    public static void Start(string arguments)
+    public static void Start(GameSettings gs, bool isHost)
     {
         var sc2Exe = Sc2Exe();
         var workingDirectory = WorkingDirectory();
+        var arguments = Arguments(gs, isHost);
 
-        Console.WriteLine($"[{DateTime.Now:T}] Starting sc2 process {arguments}");
+        Log.Info($"Starting sc2 process {arguments}");
         Process.Start(new ProcessStartInfo(sc2Exe)
         {
             Arguments = arguments, WorkingDirectory = workingDirectory
@@ -23,25 +23,20 @@ public static class Sc2Process
 
     public static string MapDirectory() => @$"{Sc2Directory()}\Maps";
 
-    //todo: array join on space
-    public static string Arguments(GameSettings gs, bool isHost)
+    private static string Arguments(GameSettings gs, bool isHost)
     {
-        var sb = new StringBuilder();
-        sb.Append($"{ClientConstants.Address} {gs.ServerAddress} ");
+        var arguments = new List<string>
+        {
+            ClientConstants.Address,
+            gs.ServerAddress,
+            ClientConstants.Port,
+            (isHost ? gs.GamePort : gs.StartPort).ToString(),
+            ClientConstants.Fullscreen,
+            gs.Fullscreen ? "1" : "0"
+        };
+        // window management doesn't seem to have any effect
 
-        if (isHost)
-            sb.Append($"{ClientConstants.Port} {gs.GamePort} ");
-        else
-            sb.Append($"{ClientConstants.Port} {gs.StartPort} ");
-
-        if (gs.Fullscreen)
-            sb.Append($"{ClientConstants.Fullscreen} 1 ");
-        else
-            sb.Append($"{ClientConstants.Fullscreen} 0 {ClientConstants.WindowWidth} {gs.WindowWidth} ");
-
-        if (!isHost)
-            sb.Append($"{ClientConstants.WindowX} {gs.WindowWidth} ");
-        return sb.ToString();
+        return string.Join(" ", arguments);
     }
 
 

@@ -37,7 +37,7 @@ public class ResponseHandler
     {
         if (key == ResponseType.None)
         {
-            Console.WriteLine($"[{DateTime.Now:T}] ResponseHandler error:\n {response.ToString()}");
+            Log.Error($"ResponseHandler error: {response}");
             return;
         }
 

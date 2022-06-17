@@ -40,7 +40,7 @@ public class Game
             players.Add(PlayerTwo);
 
         // Launch StarCraft II clients and connect
-        await Task.WhenAll(players.Select(p => p.Initialize()));
+        await Task.WhenAll(players.Select(p => p.Connect()));
 
         // Host creates the game
         var host = players.First(p => p.IsHost);
@@ -52,6 +52,6 @@ public class Game
         await Task.WhenAll(players.Select(p => p.JoinGame()));
 
         // Run game loop
-        await Task.WhenAll(players.Select(p => p.Run(1)));
+        await Task.WhenAll(players.Select(p => p.Run()));
     }
 }

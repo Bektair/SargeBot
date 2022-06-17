@@ -1,7 +1,6 @@
 ﻿using SargeBot.Features.Intel;
 using SC2APIProtocol;
 using SC2ClientApi;
-using SC2ClientApi.Constants;
 using Action = SC2APIProtocol.Action;
 
 namespace SargeBot.Features.Micro;
@@ -22,12 +21,12 @@ public class MicroManager
             if (unit.Alliance != Alliance.Self)
                 continue;
 
-            if (!unit.UnitType.Is(UnitTypes.ZERG_OVERLORD))
+            if (!unit.UnitType.Is(UnitType.ZERG_OVERLORD))
                 continue;
 
             var command = new ActionRawUnitCommand();
             command.UnitTags.Add(unit.Tag);
-            command.AbilityId = (int) Abilities.MOVE;
+            command.AbilityId = (int) Ability.move_Move;
             command.TargetWorldSpacePos = _intelService.EnemyColonies.First().Point;
 
             return new() {ActionRaw = new() {UnitCommand = command}};
@@ -35,7 +34,7 @@ public class MicroManager
 
         return new() {ActionRaw = new()};
     }
-    
+
     public Action AttackWithAll(ResponseObservation observation, UnitType unitType)
     {
         var units = observation.Observation.RawData.Units
@@ -45,7 +44,7 @@ public class MicroManager
         {
             var command = new ActionRawUnitCommand();
             command.UnitTags.Add(unit.Tag);
-            command.AbilityId = (int) Abilities.ATTACK;
+            command.AbilityId = (int) Ability.ATTACK;
             command.TargetWorldSpacePos = _intelService.EnemyColonies.First().Point;
 
             return new() {ActionRaw = new() {UnitCommand = command}};

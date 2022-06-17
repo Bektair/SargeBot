@@ -3,7 +3,7 @@ using SC2ClientApi;
 using SC2ClientApi.Constants;
 using Action = SC2APIProtocol.Action;
 
-namespace ZeroBot.GameClients;
+namespace ZeroBot;
 
 public class GameEngine : IGameEngine
 {
@@ -13,7 +13,7 @@ public class GameEngine : IGameEngine
 
     public void OnStart(ResponseObservation firstObservation, ResponseData responseData, ResponseGameInfo gameInfo)
     {
-        Console.WriteLine($"[{DateTime.Now:T}] OnStart {firstObservation.Observation.GameLoop}");
+        Log.Info($"OnStart {firstObservation.Observation.GameLoop}");
 
         _enemyStartingLocation = gameInfo.StartRaw.StartLocations.Last();
     }
@@ -21,19 +21,19 @@ public class GameEngine : IGameEngine
     public (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation)
     {
         if (observation.Observation.GameLoop <= 5 || observation.Observation.GameLoop % 100 == 0)
-            Console.WriteLine($"[{DateTime.Now:T}] OnFrame {observation.Observation.GameLoop}");
+            Log.Info($"OnFrame {observation.Observation.GameLoop}");
 
         var actions = new List<Action>();
         var debugCommands = new List<DebugCommand>();
 
         actions.Add(MorphLarva(observation, Ability.TRAIN_DRONE));
         var droneCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_DRONE));
-        if (droneCount > _previousDroneCount) Console.WriteLine($"[{DateTime.Now:T}] Drone count {droneCount}");
+        if (droneCount > _previousDroneCount) Log.Info($"Drone count {droneCount}");
 
         if (droneCount >= 14)
         {
             actions.Add(AttackWithAll(observation, UnitType.ZERG_DRONE, _enemyStartingLocation));
-            if (!_isAttacking) Console.WriteLine($"[{DateTime.Now:T}] Attacking {_enemyStartingLocation.ToString()}");
+            if (!_isAttacking) Log.Success($"Attacking {_enemyStartingLocation}");
 
             _isAttacking = true;
         }
@@ -45,7 +45,7 @@ public class GameEngine : IGameEngine
 
     public void OnEnd(ResponseObservation observation)
     {
-        Console.WriteLine($"[{DateTime.Now:T}] OnEnd {observation.Observation.GameLoop} {observation.PlayerResult.ToString()}");
+        Log.Info($"OnEnd {observation.Observation.GameLoop} {observation.PlayerResult.ToString()}");
     }
 
     public static Action MorphLarva(ResponseObservation observation, Ability ability)
@@ -78,7 +78,7 @@ public class GameEngine : IGameEngine
         {
             var command = new ActionRawUnitCommand();
             command.UnitTags.Add(unit.Tag);
-            command.AbilityId = (int) Abilities.ATTACK;
+            command.AbilityId = (int) Ability.ATTACK;
             command.TargetWorldSpacePos = target;
 
             return new() {ActionRaw = new() {UnitCommand = command}};

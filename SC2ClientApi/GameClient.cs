@@ -23,18 +23,19 @@ public class GameClient
     public bool IsHost { get; }
     public Status Status => _connection.Status;
     public uint GameLoop { get; set; }
+    public uint PlayerId { get; set; }
 
-    public async Task Initialize()
+    public async Task Connect()
     {
         if (!await ConnectToClient(1))
         {
-            Sc2Process.Start(_gs.ToArguments(IsHost));
+            Sc2Process.Start(_gs, IsHost);
             await Task.Delay(5000);
             await ConnectToClient(20);
         }
     }
 
-    public async Task Run(uint playerId)
+    public async Task Run()
     {
         while (Status != Status.InGame)
         {
@@ -57,13 +58,13 @@ public class GameClient
             observation = await Observation();
             if (observation == null)
             {
-                Console.WriteLine($"[{DateTime.Now:T}] Observation null. Request for next game loop manually");
+                Log.Info($"[{DateTime.Now:T}] Observation null. Request for next game loop manually");
                 observation = await Observation(GameLoop + 1);
             }
 
             if (observation == null)
             {
-                Console.WriteLine($"[{DateTime.Now:T}] Observation null again. Running next iteration");
+                Log.Info("Observation null again. Running next iteration");
                 continue;
             }
 
@@ -103,12 +104,12 @@ public class GameClient
         else
             request.CreateGame.BattlenetMapName = _gs.MapName;
 
-        Console.WriteLine($"[{DateTime.Now:T}] Creating game \n{request.CreateGame.ToString()}");
+        Log.Info($"Creating game \n{request.CreateGame}");
         var response = await _connection.SendAndReceiveAsync(request);
         if (response.CreateGame == null)
-            Console.WriteLine($"[{DateTime.Now:T}] Creating game failed \n{response.Error.ToString()}");
+            Log.Info($"Creating game failed \n{response.Error}");
         else
-            Console.WriteLine($"[{DateTime.Now:T}] Created game \n{response.CreateGame.ToString()}");
+            Log.Info($"Created game \n{response.CreateGame}");
 
         return response.CreateGame;
     }
@@ -132,9 +133,10 @@ public class GameClient
             request.JoinGame.ClientPorts.Add(new PortSet {BasePort = _gs.GamePort + 4, GamePort = _gs.GamePort + 5});
         }
 
-        Console.WriteLine($"[{DateTime.Now:T}] Joining game \n{request.JoinGame.ToString()}");
+        Log.Info($"Joining game \n{request.JoinGame}");
         var response = await _connection.SendAndReceiveAsync(request);
-        return response?.JoinGame;
+        PlayerId = response.JoinGame.PlayerId;
+        return response.JoinGame;
     }
 
     private async Task<ResponseObservation?> Observation(uint? gameLoop = null)
@@ -145,6 +147,7 @@ public class GameClient
             request.Observation.GameLoop = gameLoop.Value;
 
         var response = await _connection.SendAndReceiveAsync(request);
+        GameLoop = response.Observation.Observation.GameLoop;
         return response?.Observation;
     }
 

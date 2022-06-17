@@ -5,10 +5,9 @@ using SC2APIProtocol;
 using SC2ClientApi;
 using SC2ClientApi.Constants;
 using ZeroBot;
-using ZeroBot.GameClients;
 using ZeroBot.Options;
 
-Console.WriteLine("Starting ZeroBot");
+Log.Info($"Starting ZeroBot");
 
 var isLadder = args.Length > 0;
 
@@ -32,8 +31,8 @@ if (isLadder)
     try
     {
         await playerOne.ConnectToClient(20);
-        var joinResponse = await playerOne.JoinGame();
-        await playerOne.Run(joinResponse.PlayerId);
+        await playerOne.JoinGame();
+        await playerOne.Run();
     }
     catch (Exception e)
     {
@@ -45,16 +44,16 @@ else
 {
     if (!await playerOne.ConnectToClient(1))
     {
-        var arguments =
-            $"{ClientConstants.Address} {gs.ServerAddress} {ClientConstants.Port} {gs.GamePort} {ClientConstants.Fullscreen} 0 {ClientConstants.WindowWidth} 800 {ClientConstants.WindowHeight} 600 {ClientConstants.WindowX} 20 {ClientConstants.WindowY} 30 ";
-        Sc2Process.Start(arguments);
+        Sc2Process.Start(gs, true);
         await Task.Delay(5000);
         await playerOne.ConnectToClient(20);
     }
 
     await playerOne.CreateGame();
     await playerOne.JoinGame();
-    await playerOne.Run(1);
+    await playerOne.Run();
+    
+    //TODO: multiplayer
 }
 
 void ArgsToServerOptions(ServerOptions options, string[] args)
@@ -72,7 +71,7 @@ void ArgsToServerOptions(ServerOptions options, string[] args)
                 break;
             case "-l":
             case "--LadderServer":
-                options.LadderServer = args[i + 1];
+                options.ServerAddress = args[i + 1];
                 break;
             case "--OpponentId":
                 options.OpponentId = args[i + 1];
