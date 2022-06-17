@@ -1,13 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SC2APIProtocol;
 using SC2ClientApi;
-using SC2ClientApi.Constants;
 using ZeroBot;
 using ZeroBot.Options;
 
-Log.Info($"Starting ZeroBot");
+Log.Info("Starting ZeroBot");
 
 var isLadder = args.Length > 0;
 
@@ -24,7 +22,7 @@ using var host = Host.CreateDefaultBuilder(args)
 
 var gs = host.Services.CreateGameSettings();
 
-var playerOne = new GameClient(gs, new GameEngine(), gs.PlayerOne, isHost: !isLadder);
+var playerOne = new GameClient(gs, new GameEngine(), gs.PlayerOne, !isLadder);
 
 if (isLadder)
 {
@@ -52,7 +50,7 @@ else
     await playerOne.CreateGame();
     await playerOne.JoinGame();
     await playerOne.Run();
-    
+
     //TODO: multiplayer
 }
 

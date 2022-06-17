@@ -10,7 +10,7 @@ internal class GameConnection
     private const int READ_BUFFER = 1024;
     private const int MAX_CONNECTION_ATTEMPTS = 25;
     private const int TIMEOUT = 2000; //ms
-    private const int TIMEOUT_LONG = 10000; //ms
+    private const int TIMEOUT_LONG = 25000; //ms
     private readonly ResponseHandler _responseHandler;
     private readonly CancellationToken _token = CancellationToken.None;
     private ClientWebSocket? _socket;
@@ -21,7 +21,7 @@ internal class GameConnection
         _responseHandler = new();
     }
 
-    private string Version { get; set; } = string.Empty;
+    private string GameVersion { get; set; } = string.Empty;
 
     public Status Status
     {
@@ -29,7 +29,7 @@ internal class GameConnection
         private set
         {
             if (_status == value) return;
-            Log.Info($"GameConnection Status changed: {_status} -> {value}");
+            Log.Info($"ConnectionStatus changed {_status} -> {value}");
             _status = value;
         }
     }
@@ -37,8 +37,8 @@ internal class GameConnection
     public async Task<bool> Connect(string address, int port, int maxAttempts = MAX_CONNECTION_ATTEMPTS)
     {
         var uri = new Uri($"ws://{address}:{port}/sc2api");
-
         Log.Info($"Connecting to {uri}");
+
         var connectionAttempt = 1;
         do
         {
@@ -50,11 +50,11 @@ internal class GameConnection
             catch (AggregateException ex)
             {
                 // handle AggEx differently?
-                Log.Info($"Connection attempt {connectionAttempt}/{maxAttempts} failed: {ex.Message}");
+                Log.Info($"Connection to {uri} attempt {connectionAttempt}/{maxAttempts} failed: {ex.Message}");
             }
             catch (Exception ex)
             {
-                Log.Info($"Connection attempt {connectionAttempt}/{maxAttempts} failed: {ex.Message}");
+                Log.Info($"Connection to {uri} attempt {connectionAttempt}/{maxAttempts} failed: {ex.Message}");
             }
 
             connectionAttempt++;
@@ -64,19 +64,19 @@ internal class GameConnection
         if (_socket.State != WebSocketState.Open)
             return false;
 
-        Log.Info("Connection success. Starting receive forever task");
+        Log.Success( $"Connected to {uri}. Start receiving responses from client");
         Task.Factory.StartNew(ReceiveForever, TaskCreationOptions.LongRunning);
         await Task.Delay(TIMEOUT);
 
         var pingResponse = await SendAndReceiveAsync(ClientConstants.RequestPing);
         if (pingResponse == null)
         {
-            Log.Info("Ping failed");
+            Log.Error($"Ping to {uri} failed");
             return false;
         }
 
-        Version = pingResponse.Ping.GameVersion;
-        Log.Info($"Ping success. Version {Version}");
+        Log.Info($"Pinged {uri} - [GameVersion={pingResponse.Ping.GameVersion}] [DataVersion={pingResponse.Ping.DataVersion}] [DataBuild={pingResponse.Ping.DataBuild}] [BaseBuild={pingResponse.Ping.BaseBuild}]");
+        GameVersion = pingResponse.Ping.GameVersion;
         return pingResponse.Ping.HasGameVersion;
     }
 
@@ -86,7 +86,7 @@ internal class GameConnection
 
         if (_socket.State != WebSocketState.Open)
         {
-            Log.Info($"Can't send request due to socket state {_socket.State}");
+            Log.Warning($"Can't send request due to socket state {_socket.State}");
             return response;
         }
 
@@ -100,35 +100,14 @@ internal class GameConnection
         _responseHandler.RegisterHandler(req.RequestCase, handler);
         await SendAsync(req);
         var shouldWaitLonger = req.RequestCase is Request.RequestOneofCase.Step or Request.RequestOneofCase.JoinGame or Request.RequestOneofCase.CreateGame;
-        if (!handlerResolve.Wait(shouldWaitLonger ? TIMEOUT_LONG : TIMEOUT)) Log.Info($"Request timed out \n{req}");
+        if (!handlerResolve.Wait(shouldWaitLonger ? TIMEOUT_LONG : TIMEOUT)) Log.Error($"Request timed out \n{req}");
         _responseHandler.DeregisterHandler(req.RequestCase);
 
         return response;
     }
 
-    public async Task SendAsync(Request req) => await _socket.SendAsync
+    private async Task SendAsync(Request req) => await _socket.SendAsync
         (new(req.ToByteArray()), WebSocketMessageType.Binary, true, _token);
-
-    [Obsolete("Remove when handlers are okay")]
-    private async Task<Response> ReceiveAsync()
-    {
-        var buffer = new ArraySegment<byte>(new byte[READ_BUFFER]);
-        WebSocketReceiveResult result;
-        using var ms = new MemoryStream();
-
-        do
-        {
-            result = await _socket.ReceiveAsync(buffer, _token);
-            ms.Write(buffer.Array, buffer.Offset, result.Count);
-        } while (!result.EndOfMessage);
-
-        ms.Seek(0, SeekOrigin.Begin);
-
-        var response = Response.Parser.ParseFrom(ms);
-        Status = response.Status;
-
-        return response;
-    }
 
     private async Task ReceiveForever()
     {

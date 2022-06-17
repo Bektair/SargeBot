@@ -2,22 +2,17 @@
 
 namespace SargeBot.Options;
 
-public class RequestOptions
+public class GameOptions
 {
-    public const string RequestSettings = "RequestSettings";
-
     public PlayerSetup PlayerOne { get; set; }
-
     public PlayerSetup PlayerTwo { get; set; }
-
-    public CreateSettings Create { get; set; }
-
+    public CreateOptions Create { get; set; }
     public InterfaceOptions Join { get; set; }
 
-    public class CreateSettings
+    public class CreateOptions
     {
         public string MapName { get; set; }
-        public bool Realtime { get; set; } = false;
+        public bool Realtime { get; set; }
         public bool DisableFog { get; set; }
     }
 }

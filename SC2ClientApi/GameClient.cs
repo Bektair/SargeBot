@@ -21,7 +21,7 @@ public class GameClient
 
     public PlayerSetup Player { get; }
     public bool IsHost { get; }
-    public Status Status => _connection.Status;
+    public Status ConnectionStatus => _connection.Status;
     public uint GameLoop { get; set; }
     public uint PlayerId { get; set; }
 
@@ -37,7 +37,7 @@ public class GameClient
 
     public async Task Run()
     {
-        while (Status != Status.InGame)
+        while (ConnectionStatus != Status.InGame)
         {
             // wait for game to start
         }
@@ -70,7 +70,7 @@ public class GameClient
 
             GameLoop = observation.Observation.GameLoop;
 
-            if (Status != Status.InGame)
+            if (ConnectionStatus != Status.InGame)
             {
                 _gameEngine.OnEnd(observation);
                 break;
@@ -104,12 +104,12 @@ public class GameClient
         else
             request.CreateGame.BattlenetMapName = _gs.MapName;
 
-        Log.Info($"Creating game \n{request.CreateGame}");
+        Log.Info($"Creating game {request.CreateGame}");
         var response = await _connection.SendAndReceiveAsync(request);
         if (response.CreateGame == null)
-            Log.Info($"Creating game failed \n{response.Error}");
+            Log.Error($"Creating game failed {response.Error}");
         else
-            Log.Info($"Created game \n{response.CreateGame}");
+            Log.Success("Created game");
 
         return response.CreateGame;
     }
@@ -128,13 +128,21 @@ public class GameClient
 
         if (_gs.IsMultiplayer())
         {
-            request.JoinGame.SharedPort = _gs.GamePort + 1;
-            request.JoinGame.ServerPorts = new() {BasePort = _gs.GamePort + 2, GamePort = _gs.GamePort + 3};
-            request.JoinGame.ClientPorts.Add(new PortSet {BasePort = _gs.GamePort + 4, GamePort = _gs.GamePort + 5});
+            request.JoinGame.SharedPort = _gs.GamePort;
+            request.JoinGame.ServerPorts = new() {GamePort = _gs.GamePort + 1, BasePort = _gs.GamePort + 2};
+            var clientPort = IsHost ? _gs.GamePort : _gs.StartPort;
+            request.JoinGame.ClientPorts.Add(new PortSet {GamePort = clientPort + 3, BasePort = clientPort + 4});
         }
 
-        Log.Info($"Joining game \n{request.JoinGame}");
+        Log.Info($"Joining game {request.JoinGame}");
         var response = await _connection.SendAndReceiveAsync(request);
+        if (response == null)
+        {
+            Log.Error("Joining game failed");
+            return null;
+        }
+
+        Log.Success($"Joined game {response.JoinGame}");
         PlayerId = response.JoinGame.PlayerId;
         return response.JoinGame;
     }

@@ -32,9 +32,8 @@ public static class Sc2Process
             ClientConstants.Port,
             (isHost ? gs.GamePort : gs.StartPort).ToString(),
             ClientConstants.Fullscreen,
-            gs.Fullscreen ? "1" : "0"
+            gs.Fullscreen ? "1" : isHost ? "0" : $"0 {ClientConstants.WindowX} {gs.WindowWidth + gs.WindowX}"
         };
-        // window management doesn't seem to have any effect
 
         return string.Join(" ", arguments);
     }

@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SargeBot.Options;
 using SC2ClientApi;
@@ -10,22 +9,28 @@ public static class GameSettingsMapper
 {
     public static GameSettings CreateGameSettings(this IServiceProvider services)
     {
-        var requestOptions = services.GetRequiredService<IOptions<RequestOptions>>();
-        var gameConnectionOptions = services.GetRequiredService<IOptions<GameConnectionOptions>>();
-        var processSettings = services.GetRequiredService<IOptions<ProcessOptions>>();
+        var serverOptions = services.GetRequiredService<IOptions<ServerOptions>>().Value;
+        var sc2ProcessOptions = services.GetRequiredService<IOptions<Sc2ProcessOptions>>().Value;
+        var gameOptions = services.GetRequiredService<IOptions<GameOptions>>().Value;
 
         return new()
         {
-            Fullscreen = processSettings.Value.Fullsceen,
-            ServerAddress = IPAddress.Loopback.ToString(),
-            GamePort = gameConnectionOptions.Value.ServerPort,
-            StartPort = gameConnectionOptions.Value.ClientPort,
-            InterfaceOptions = requestOptions.Value.Join,
-            MapName = requestOptions.Value.Create.MapName,
-            Realtime = requestOptions.Value.Create.Realtime,
-            DisableFog = requestOptions.Value.Create.DisableFog,
-            PlayerOne = requestOptions.Value.PlayerOne,
-            PlayerTwo = requestOptions.Value.PlayerTwo
+            ServerAddress = serverOptions.ServerAddress ?? "127.0.0.1",
+            GamePort = serverOptions.GamePort,
+            StartPort = serverOptions.StartPort,
+
+            Fullscreen = sc2ProcessOptions.Fullscreen,
+            WindowWidth = sc2ProcessOptions.WindowWidth,
+            WindowHeight = sc2ProcessOptions.WindowHeight,
+            WindowX = sc2ProcessOptions.WindowX,
+            WindowY = sc2ProcessOptions.WindowY,
+
+            InterfaceOptions = gameOptions.Join,
+            MapName = gameOptions.Create.MapName,
+            Realtime = gameOptions.Create.Realtime,
+            DisableFog = gameOptions.Create.DisableFog,
+            PlayerOne = gameOptions.PlayerOne,
+            PlayerTwo = gameOptions.PlayerTwo
         };
     }
 }
