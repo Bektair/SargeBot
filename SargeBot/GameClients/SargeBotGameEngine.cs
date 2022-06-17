@@ -6,12 +6,11 @@ using SargeBot.Features.Macro;
 using SargeBot.Features.Micro;
 using SC2APIProtocol;
 using SC2ClientApi;
-using SC2ClientApi.Constants;
 using Action = SC2APIProtocol.Action;
 
 namespace SargeBot.GameClients;
 
-public class GameEngine : IGameEngine
+public class SargeBotGameEngine : IGameEngine
 {
     private readonly IntelService _intelService;
     private readonly MacroManager _macroManager;
@@ -19,7 +18,7 @@ public class GameEngine : IGameEngine
     private readonly MicroManager _microManager;
     private readonly StaticGameData _staticGameData;
 
-    public GameEngine(IntelService intelService, MacroManager macroManager, MapDataService mapService, MicroManager microManager, StaticGameData staticGameData)
+    public SargeBotGameEngine(IntelService intelService, MacroManager macroManager, MapDataService mapService, MicroManager microManager, StaticGameData staticGameData)
     {
         _intelService = intelService;
         _macroManager = macroManager;
@@ -28,11 +27,6 @@ public class GameEngine : IGameEngine
         _staticGameData = staticGameData;
     }
 
-    /// <summary>
-    ///     Can be called before status ingame to use cache
-    ///     And after status ingame to use response
-    ///     Should Populate both MapData and GameData
-    /// </summary>
     public void OnStart(ResponseObservation firstObservation, ResponseData responseData, ResponseGameInfo gameInfo)
     {
         _intelService.OnStart(firstObservation, responseData, gameInfo);
@@ -71,14 +65,28 @@ public class GameEngine : IGameEngine
 
         actions.Add(_microManager.OverlordScout(observation));
 
+
+        var eggCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_EGG));
+        if (eggCount == 0 && !hasSpawningPool) actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_DRONE));
+        if (eggCount == 0 && hasSpawningPool && observation.Observation.PlayerCommon.FoodUsed == 14) actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_OVERLORD));
+
+        var droneCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_DRONE));
         var lingCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_ZERGLING));
-        if (lingCount <= 16) actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_ZERGLING));
+        if (lingCount <= 6 || droneCount > 20) actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_ZERGLING));
+        else actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_DRONE));
+
+        _microManager.AttackWithAll(observation, UnitType.ZERG_ZERGLING, enemyBase.Point);
+        if (lingCount >= 6)
+        {
+            actions.Add(_microManager.AttackWithAll(observation, UnitType.ZERG_DRONE, enemyBase.Point));
+        }
 
         return (actions, debugCommands);
     }
 
-    public void OnEnd(ResponseObservation observation)
+    public void OnEnd(ResponseObservation? observation)
     {
-        Console.WriteLine($"[{DateTime.Now:T}] OnEnd {observation.Observation.GameLoop} {observation.PlayerResult.ToString()}");
+        if (observation == null) return;
+        Log.Info($"OnEnd {observation.Observation.GameLoop} {observation.PlayerResult.ToString()}");
     }
 }

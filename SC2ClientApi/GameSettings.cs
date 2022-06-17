@@ -5,9 +5,9 @@ namespace SC2ClientApi;
 public class GameSettings
 {
     // server settings
-    public string ServerAddress { get; set; }
-    public int GamePort { get; set; }
-    public int StartPort { get; set; }
+    public string HostAddress { get; set; }
+    public int HostPort { get; set; }
+    public int GuestPort { get; set; }
     public InterfaceOptions InterfaceOptions { get; set; }
 
     // client settings

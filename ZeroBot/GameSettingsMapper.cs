@@ -15,9 +15,9 @@ public static class GameSettingsMapper
 
         return new()
         {
-            ServerAddress = serverOptions.ServerAddress ?? "127.0.0.1",
-            GamePort = serverOptions.GamePort,
-            StartPort = serverOptions.StartPort,
+            HostAddress = serverOptions.ServerAddress ?? "127.0.0.1",
+            HostPort = serverOptions.GamePort,
+            GuestPort = serverOptions.StartPort,
 
             Fullscreen = sc2ProcessOptions.Fullscreen,
             WindowWidth = sc2ProcessOptions.WindowWidth,

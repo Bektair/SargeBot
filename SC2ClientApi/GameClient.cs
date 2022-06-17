@@ -45,7 +45,6 @@ public class GameClient
         var gameInfo = await GameInfo();
         var staticGameData = await StaticGameData();
         var observation = await Observation();
-        GameLoop = observation.Observation.GameLoop;
         _gameEngine.OnStart(observation, staticGameData, gameInfo);
 
         await Task.Delay(1000);
@@ -58,19 +57,11 @@ public class GameClient
             observation = await Observation();
             if (observation == null)
             {
-                Log.Info($"[{DateTime.Now:T}] Observation null. Request for next game loop manually");
+                Log.Warning($"[{DateTime.Now:T}] Observation null. Request for next game loop manually");
                 observation = await Observation(GameLoop + 1);
             }
 
-            if (observation == null)
-            {
-                Log.Info("Observation null again. Running next iteration");
-                continue;
-            }
-
-            GameLoop = observation.Observation.GameLoop;
-
-            if (ConnectionStatus != Status.InGame)
+            if (observation == null || ConnectionStatus != Status.InGame)
             {
                 _gameEngine.OnEnd(observation);
                 break;
@@ -83,7 +74,7 @@ public class GameClient
         }
     }
 
-    public async Task<bool> ConnectToClient(int maxAttempts) => await _connection.Connect(_gs.ServerAddress, _gs.GetPort(IsHost), maxAttempts);
+    public async Task<bool> ConnectToClient(int maxAttempts) => await _connection.Connect(_gs.HostAddress, _gs.GetPort(IsHost), maxAttempts);
 
     private async Task Step() => await _connection.SendAndReceiveAsync(ClientConstants.RequestStep);
 
@@ -99,19 +90,19 @@ public class GameClient
             }
         };
 
-        if (File.Exists(_gs.MapName) || File.Exists(@$"{Sc2Process.MapDirectory()}\{_gs.MapName}"))
+        if (File.Exists(_gs.MapName) || File.Exists(Sc2Process.MapDirectory(_gs.MapName)))
             request.CreateGame.LocalMap = new() {MapPath = _gs.MapName};
         else
             request.CreateGame.BattlenetMapName = _gs.MapName;
 
-        Log.Info($"Creating game {request.CreateGame}");
+        Log.Info($"{Player.PlayerName} Creating game");
         var response = await _connection.SendAndReceiveAsync(request);
-        if (response.CreateGame == null)
-            Log.Error($"Creating game failed {response.Error}");
+        if (response?.CreateGame == null || response.CreateGame.HasError)
+            Log.Error($"Creating game failed {response?.Error} {response?.CreateGame?.Error}");
         else
-            Log.Success("Created game");
+            Log.Success($"{Player.PlayerName} Created game");
 
-        return response.CreateGame;
+        return response?.CreateGame;
     }
 
     public async Task<ResponseJoinGame?> JoinGame()
@@ -128,21 +119,21 @@ public class GameClient
 
         if (_gs.IsMultiplayer())
         {
-            request.JoinGame.SharedPort = _gs.GamePort;
-            request.JoinGame.ServerPorts = new() {GamePort = _gs.GamePort + 1, BasePort = _gs.GamePort + 2};
-            var clientPort = IsHost ? _gs.GamePort : _gs.StartPort;
-            request.JoinGame.ClientPorts.Add(new PortSet {GamePort = clientPort + 3, BasePort = clientPort + 4});
+            // request.JoinGame.SharedPort // deprecated: https://github.com/Blizzard/s2client-proto/blob/master/s2clientprotocol/sc2api.proto#L220
+            request.JoinGame.ServerPorts = new() {GamePort = _gs.HostPort + 1, BasePort = _gs.HostPort + 2};
+            request.JoinGame.ClientPorts.Add(new PortSet {GamePort = _gs.GuestPort + 1, BasePort = _gs.GuestPort + 2});
         }
 
-        Log.Info($"Joining game {request.JoinGame}");
+        Log.Info($"{Player.PlayerName} Joining game");
         var response = await _connection.SendAndReceiveAsync(request);
-        if (response == null)
+        if (response?.JoinGame == null || response.JoinGame.HasError)
         {
-            Log.Error("Joining game failed");
+            // getting null response, but the clients are still joining :/
+            // Log.Error($"{Player.PlayerName} Joining game failed {response?.JoinGame.Error}");
             return null;
         }
 
-        Log.Success($"Joined game {response.JoinGame}");
+        Log.Success($"{Player.PlayerName} Joined game {response.JoinGame}");
         PlayerId = response.JoinGame.PlayerId;
         return response.JoinGame;
     }
@@ -155,8 +146,14 @@ public class GameClient
             request.Observation.GameLoop = gameLoop.Value;
 
         var response = await _connection.SendAndReceiveAsync(request);
+        if (response?.Observation == null)
+        {
+            Log.Warning("Observation null");
+            return null;
+        }
+
         GameLoop = response.Observation.Observation.GameLoop;
-        return response?.Observation;
+        return response.Observation;
     }
 
     private async Task<ResponseAction?> ActionRequest(List<Action> actions)

@@ -21,18 +21,22 @@ public static class Sc2Process
         });
     }
 
-    public static string MapDirectory() => @$"{Sc2Directory()}\Maps";
+    public static string MapDirectory(string mapName) => @$"{Sc2Directory()}\Maps\{mapName}";
 
     private static string Arguments(GameSettings gs, bool isHost)
     {
         var arguments = new List<string>
         {
             ClientConstants.Address,
-            gs.ServerAddress,
+            gs.HostAddress,
             ClientConstants.Port,
-            (isHost ? gs.GamePort : gs.StartPort).ToString(),
+            (isHost ? gs.HostPort : gs.GuestPort).ToString(),
             ClientConstants.Fullscreen,
-            gs.Fullscreen ? "1" : isHost ? "0" : $"0 {ClientConstants.WindowX} {gs.WindowWidth + gs.WindowX}"
+            gs.Fullscreen
+                ? "1"
+                : isHost
+                    ? $"0 {ClientConstants.WindowWidth} {gs.WindowWidth} {ClientConstants.WindowWidth} {gs.WindowWidth} {ClientConstants.WindowY} 0 {ClientConstants.WindowX} 0"
+                    : $"0 {ClientConstants.WindowWidth} {gs.WindowWidth} {ClientConstants.WindowWidth} {gs.WindowWidth} {ClientConstants.WindowY} 0 {ClientConstants.WindowX} {gs.WindowWidth}"
         };
 
         return string.Join(" ", arguments);

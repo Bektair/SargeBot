@@ -35,17 +35,18 @@ public class MicroManager
         return new() {ActionRaw = new()};
     }
 
-    public Action AttackWithAll(ResponseObservation observation, UnitType unitType)
+    public Action AttackWithAll(ResponseObservation observation, UnitType unitType, Point2D? target)
     {
         var units = observation.Observation.RawData.Units
             .Where(u => u.Alliance == Alliance.Self)
             .Where(u => u.UnitType.Is(unitType));
+
         foreach (var unit in units)
         {
             var command = new ActionRawUnitCommand();
             command.UnitTags.Add(unit.Tag);
             command.AbilityId = (int) Ability.ATTACK;
-            command.TargetWorldSpacePos = _intelService.EnemyColonies.First().Point;
+            command.TargetWorldSpacePos = target;
 
             return new() {ActionRaw = new() {UnitCommand = command}};
         }

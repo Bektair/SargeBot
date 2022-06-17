@@ -28,7 +28,7 @@ using var host = Host.CreateDefaultBuilder(args)
         if (isLadder)
             services.PostConfigure<ServerOptions>(options => ArgsToServerOptions(options, args));
         services
-            .AddScoped<IGameEngine, GameEngine>()
+            .AddScoped<IGameEngine, SargeBotGameEngine>()
             .AddScoped<MacroManager>()
             .AddScoped<StaticGameData>()
             .AddScoped<MapDataService>()
@@ -40,16 +40,19 @@ using var host = Host.CreateDefaultBuilder(args)
 
 var gameSettings = host.Services.CreateGameSettings();
 
-var playerOne = CreatePlayerClient(host.Services, gameSettings.PlayerOne, true);
+var hostClient = CreateGameClient(host.Services, gameSettings.PlayerOne, true);
 
-var playerTwo = CreatePlayerClient(host.Services, gameSettings.PlayerTwo);
+var guestClient = CreateGameClient(host.Services, gameSettings.PlayerTwo);
 
-var game = new Game(playerOne, playerTwo);
+await Task.WhenAll(hostClient.Connect(), guestClient?.Connect() ?? Task.CompletedTask);
 
-// if args.length > 0 run ladder
-await game.ExecuteMatch();
+await hostClient.CreateGame();
 
-static GameClient? CreatePlayerClient(IServiceProvider services, PlayerSetup playerSetup, bool asHost = false)
+await Task.WhenAll(hostClient.JoinGame(), guestClient?.JoinGame() ?? Task.CompletedTask);
+
+await Task.WhenAll(hostClient.Run(), guestClient?.Run() ?? Task.CompletedTask);
+
+static GameClient? CreateGameClient(IServiceProvider services, PlayerSetup playerSetup, bool isHost = false)
 {
     Log.Info($"Creating {playerSetup.Type} {playerSetup.PlayerName}...");
 
@@ -57,8 +60,8 @@ static GameClient? CreatePlayerClient(IServiceProvider services, PlayerSetup pla
         return null;
 
     var serviceScope = services.CreateScope();
-    var gameEngine = serviceScope.ServiceProvider.GetRequiredService<IGameEngine>();
-    return new(services.CreateGameSettings(), gameEngine, playerSetup, asHost);
+    var gameEngine = isHost ? serviceScope.ServiceProvider.GetRequiredService<IGameEngine>() : new ZeroBotGameEngine();
+    return new(services.CreateGameSettings(), gameEngine, playerSetup, isHost);
 }
 
 

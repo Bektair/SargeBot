@@ -10,7 +10,7 @@ internal class GameConnection
     private const int READ_BUFFER = 1024;
     private const int MAX_CONNECTION_ATTEMPTS = 25;
     private const int TIMEOUT = 2000; //ms
-    private const int TIMEOUT_LONG = 25000; //ms
+    private const int TIMEOUT_LONG = 5000; //ms
     private readonly ResponseHandler _responseHandler;
     private readonly CancellationToken _token = CancellationToken.None;
     private ClientWebSocket? _socket;
@@ -64,7 +64,7 @@ internal class GameConnection
         if (_socket.State != WebSocketState.Open)
             return false;
 
-        Log.Success( $"Connected to {uri}. Start receiving responses from client");
+        Log.Success($"Connected to {uri}. Start receiving responses from client");
         Task.Factory.StartNew(ReceiveForever, TaskCreationOptions.LongRunning);
         await Task.Delay(TIMEOUT);
 
@@ -99,9 +99,14 @@ internal class GameConnection
 
         _responseHandler.RegisterHandler(req.RequestCase, handler);
         await SendAsync(req);
-        var shouldWaitLonger = req.RequestCase is Request.RequestOneofCase.Step or Request.RequestOneofCase.JoinGame or Request.RequestOneofCase.CreateGame;
-        if (!handlerResolve.Wait(shouldWaitLonger ? TIMEOUT_LONG : TIMEOUT)) Log.Error($"Request timed out \n{req}");
-        _responseHandler.DeregisterHandler(req.RequestCase);
+        //TODO: find out why join requests never get any responses
+        if (req.RequestCase is not Request.RequestOneofCase.JoinGame)
+        {
+            var shouldWaitLonger = req.RequestCase is Request.RequestOneofCase.Step or Request.RequestOneofCase.JoinGame or Request.RequestOneofCase.CreateGame;
+            if (!handlerResolve.Wait(shouldWaitLonger ? TIMEOUT_LONG : TIMEOUT)) Log.Error($"Request timed out \n{req}");
+        }
+
+        _responseHandler.DeregisterHandler(req.RequestCase, handler);
 
         return response;
     }
@@ -124,7 +129,7 @@ internal class GameConnection
 
             var response = Response.Parser.ParseFrom(ms.GetBuffer(), 0, (int) ms.Position);
             Status = response.Status;
-            _responseHandler.Handle(response.ResponseCase, response);
+            _responseHandler.Handle((Request.RequestOneofCase) response.ResponseCase, response);
         }
     }
 

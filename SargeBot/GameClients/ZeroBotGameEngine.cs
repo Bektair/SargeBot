@@ -2,9 +2,9 @@
 using SC2ClientApi;
 using Action = SC2APIProtocol.Action;
 
-namespace ZeroBot;
+namespace SargeBot.GameClients;
 
-public class GameEngine : IGameEngine
+public class ZeroBotGameEngine : IGameEngine
 {
     private Point2D? _enemyStartingLocation;
     private bool _isAttacking;

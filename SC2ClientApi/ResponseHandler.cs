@@ -1,5 +1,4 @@
 ﻿using SC2APIProtocol;
-using ResponseType = SC2APIProtocol.Response.ResponseOneofCase;
 using RequestType = SC2APIProtocol.Request.RequestOneofCase;
 
 namespace SC2ClientApi;
@@ -10,40 +9,49 @@ namespace SC2ClientApi;
 /// </summary>
 public class ResponseHandler
 {
-    private readonly IDictionary<ResponseType, Action<Response>> _handlers;
+    private readonly IDictionary<RequestType, List<Action<Response>>> _handlers;
 
     public ResponseHandler()
     {
-        _handlers = new Dictionary<ResponseType, Action<Response>>();
+        _handlers = new Dictionary<RequestType, List<Action<Response>>>();
     }
 
-    public void RegisterHandler(RequestType key, Action<Response> handler) => RegisterHandler((ResponseType) key, handler);
-
-    public void RegisterHandler(ResponseType key, Action<Response> handler)
+    public void RegisterHandler(RequestType key, Action<Response> handler)
     {
-        _handlers[key] = handler;
+        lock (_handlers)
+        {
+            if (_handlers.ContainsKey(key))
+                _handlers[key].Add(handler);
+            else
+                _handlers[key] = new() {handler};
+        }
     }
 
-    public void DeregisterHandler(RequestType key) => DeregisterHandler((ResponseType) key);
-
-    public void DeregisterHandler(ResponseType key)
+    public void DeregisterHandler(RequestType key, Action<Response> handler)
     {
-        _handlers.Remove(key);
+        lock (_handlers)
+        {
+            if (_handlers.ContainsKey(key))
+                _handlers[key].Remove(handler);
+        }
     }
 
-    public void Handle(RequestType key, Response response) => Handle((ResponseType) key, response);
-
-    public void Handle(ResponseType key, Response response)
+    public void Handle(RequestType key, Response response)
     {
-        if (key == ResponseType.None)
+        if (key == RequestType.None)
         {
             Log.Error($"ResponseHandler error: {response}");
             return;
         }
 
-        if (!_handlers.ContainsKey(key))
-            return;
-
-        _handlers[key](response);
+        lock (_handlers)
+        {
+            // returns the same first response of a request type, to all other waiting requests for that type as well :|
+            if (_handlers.ContainsKey(key))
+            {
+                if (_handlers[key].Count > 1) Log.Warning($"{key} > 1 handlers: {_handlers[key].First()} {_handlers[key].Last()}");
+                _handlers[key].ForEach(handler => handler(response));
+            }
+        }
     }
 }
