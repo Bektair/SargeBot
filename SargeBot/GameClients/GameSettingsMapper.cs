@@ -17,10 +17,9 @@ public static class GameSettingsMapper
         return new()
         {
             Fullscreen = processSettings.Value.Fullsceen,
-            ConnectionAddress = IPAddress.Loopback.ToString(),
-            ConnectionServerPort = gameConnectionOptions.Value.ServerPort,
-            ConnectionClientPort = gameConnectionOptions.Value.ClientPort,
-            MultiplayerSharedPort = gameConnectionOptions.Value.SharedPort,
+            ServerAddress = IPAddress.Loopback.ToString(),
+            GamePort = gameConnectionOptions.Value.ServerPort,
+            StartPort = gameConnectionOptions.Value.ClientPort,
             InterfaceOptions = requestOptions.Value.Join,
             MapName = requestOptions.Value.Create.MapName,
             Realtime = requestOptions.Value.Create.Realtime,

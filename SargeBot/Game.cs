@@ -46,10 +46,10 @@ public class Game
         var host = players.First(p => p.IsHost);
 
         //Can get the mapName from here to cache the static mapInfo
-        await host.CreateGameRequest();
+        await host.CreateGame();
 
         // Join game
-        await Task.WhenAll(players.Select(p => p.JoinGameRequest()));
+        await Task.WhenAll(players.Select(p => p.JoinGame()));
 
         // Run game loop
         await Task.WhenAll(players.Select(p => p.Run(1)));

@@ -9,16 +9,15 @@ public static class GameSettingsMapper
 {
     public static GameSettings CreateGameSettings(this IServiceProvider services)
     {
-        var gameOptions = services.GetRequiredService<IOptions<GameOptions>>().Value;
         var serverOptions = services.GetRequiredService<IOptions<ServerOptions>>().Value;
         var sc2ProcessOptions = services.GetRequiredService<IOptions<Sc2ProcessOptions>>().Value;
+        var gameOptions = services.GetRequiredService<IOptions<GameOptions>>().Value;
 
         return new()
         {
-            ConnectionAddress = serverOptions.LadderServer,
-            ConnectionServerPort = serverOptions.GamePort,
-            ConnectionClientPort = serverOptions.GamePort,
-            MultiplayerSharedPort = serverOptions.GamePort,
+            ServerAddress = serverOptions.LadderServer,
+            GamePort = serverOptions.GamePort,
+            StartPort = serverOptions.StartPort,
 
             Fullscreen = sc2ProcessOptions.Fullscreen,
             WindowWidth = sc2ProcessOptions.WindowWidth,

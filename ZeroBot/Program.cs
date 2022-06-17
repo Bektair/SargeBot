@@ -25,15 +25,15 @@ using var host = Host.CreateDefaultBuilder(args)
 
 var gs = host.Services.CreateGameSettings();
 
-var playerOne = new GameClient(gs, new GameEngine(), !isLadder);
+var playerOne = new GameClient(gs, new GameEngine(), gs.PlayerOne, isHost: !isLadder);
 
 if (isLadder)
 {
     try
     {
         await playerOne.ConnectToClient(20);
-        var joinResponse = await playerOne.JoinLadderGameRequest(Race.Zerg, gs.ConnectionServerPort);
-        await playerOne.Run(joinResponse.JoinGame.PlayerId);
+        var joinResponse = await playerOne.JoinGame();
+        await playerOne.Run(joinResponse.PlayerId);
     }
     catch (Exception e)
     {
@@ -45,18 +45,15 @@ else
 {
     if (!await playerOne.ConnectToClient(1))
     {
-        var folderPath = @"C:\Program Files (x86)\StarCraft II";
-        var sc2Exe = Directory.GetDirectories(folderPath + @"\Versions\", @"Base*")[0] + @"\SC2_x64.exe";
-        var workingDirectory = $"{folderPath}\\Support64";
         var arguments =
-            $"{ClientConstants.Address} {gs.ConnectionAddress} {ClientConstants.Port} {gs.ConnectionServerPort} {ClientConstants.Fullscreen} 0 {ClientConstants.WindowWidth} 800 {ClientConstants.WindowHeight} 600 {ClientConstants.WindowX} 20 {ClientConstants.WindowY} 30 ";
-        playerOne.LaunchClient(sc2Exe, arguments, workingDirectory);
+            $"{ClientConstants.Address} {gs.ServerAddress} {ClientConstants.Port} {gs.GamePort} {ClientConstants.Fullscreen} 0 {ClientConstants.WindowWidth} 800 {ClientConstants.WindowHeight} 600 {ClientConstants.WindowX} 20 {ClientConstants.WindowY} 30 ";
+        Sc2Process.Start(arguments);
         await Task.Delay(5000);
         await playerOne.ConnectToClient(20);
     }
 
-    await playerOne.CreateGameRequest();
-    await playerOne.JoinLadderGameRequest(gs.PlayerOne.Race, 0);
+    await playerOne.CreateGame();
+    await playerOne.JoinGame();
     await playerOne.Run(1);
 }
 

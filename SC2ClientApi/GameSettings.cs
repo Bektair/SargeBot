@@ -5,10 +5,9 @@ namespace SC2ClientApi;
 public class GameSettings
 {
     // server settings
-    public string ConnectionAddress { get; set; }
-    public int ConnectionServerPort { get; set; }
-    public int ConnectionClientPort { get; set; }
-    public int MultiplayerSharedPort { get; set; }
+    public string ServerAddress { get; set; }
+    public int GamePort { get; set; }
+    public int StartPort { get; set; }
     public InterfaceOptions InterfaceOptions { get; set; }
 
     // client settings

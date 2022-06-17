@@ -77,8 +77,8 @@ public class GameEngine : IGameEngine
         return (actions, debugCommands);
     }
 
-    public void OnEnd(ResponseObservation observation, Result result)
+    public void OnEnd(ResponseObservation observation)
     {
-        Console.WriteLine($"[{DateTime.Now:T}] OnEnd {observation.Observation.GameLoop} - Result: {result}");
+        Console.WriteLine($"[{DateTime.Now:T}] OnEnd {observation.Observation.GameLoop} {observation.PlayerResult.ToString()}");
     }
 }

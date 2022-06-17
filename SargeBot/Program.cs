@@ -16,13 +16,7 @@ using SC2ClientApi;
 Console.WriteLine("Starting SargeBot");
 
 using var host = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((context, configuration) =>
-    {
-        var env = context.HostingEnvironment;
-        configuration
-            .AddJsonFile("appsettings.json", true, true)
-            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true);
-    })
+    .ConfigureAppConfiguration((_, config) => config.AddJsonFile("appsettings.json"))
     .ConfigureServices((context, services) =>
     {
         services.Configure<GameConnectionOptions>(context.Configuration.GetSection(GameConnectionOptions.GameConnection));
@@ -61,5 +55,5 @@ static GameClient? CreatePlayerClient(IServiceProvider services, PlayerSetup pla
 
     var serviceScope = services.CreateScope();
     var gameEngine = serviceScope.ServiceProvider.GetRequiredService<IGameEngine>();
-    return new(services.CreateGameSettings(), gameEngine, asHost);
+    return new(services.CreateGameSettings(), gameEngine, playerSetup, asHost);
 }
