@@ -1,0 +1,229 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="SargeBot.Features.Debug.DebugService" Collapsed="true">
+    <Position X="7.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAEAAIA=</HashCode>
+      <FileName>Features\Debug\DebugService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Features.GameData.PlainAbility" Collapsed="true">
+    <Position X="5.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIIAAAAACBAAAEgAAIAAAAQAAAAEAA=</HashCode>
+      <FileName>Features\GameData\PlainAbility.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Features.GameData.PlainUnit" Collapsed="true">
+    <Position X="7.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QIAAAAAAAIAAEAEAAAAQEAZQACoAAQAIEAAEAAAAEBA=</HashCode>
+      <FileName>Features\GameData\PlainUnit.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SargeBot.Features.GameData.PlainUpgrade" Collapsed="true">
+    <Position X="9" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAABAIAAAAAAAAAQAAQQAAAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Features\GameData\PlainUpgrade.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SargeBot.Features.GameData.StaticGameData" Collapsed="true">
+    <Position X="12.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAgAAAAAACIAAAAAiBAAACAAIAIAAAAAAAAQIA=</HashCode>
+      <FileName>Features\GameData\StaticGameData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Features.GameInfo.MapCell" Collapsed="true">
+    <Position X="9" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIABAQAAAAAAAAAAAAAAAAAAAAAEAgAAAAAAAA=</HashCode>
+      <FileName>Features\GameInfo\MapCell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Features.GameInfo.MapData" Collapsed="true">
+    <Position X="10.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAABAAAAAAAAAQAAAAABA=</HashCode>
+      <FileName>Features\GameInfo\MapData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Features.GameInfo.MapDataService" Collapsed="true">
+    <Position X="12.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAIEAEAAAIAAAAAAAAAACIAAQAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Features\GameInfo\MapDataService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Features.GameInfo.Point2D_DictionarySerializer&lt;TValue&gt;" Collapsed="true">
+    <Position X="10.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAABAAABAAAAAAAAAAAAAgAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Features\GameInfo\Point2D_DictionarySerializer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Features.Intel.IntelColony" Collapsed="true">
+    <Position X="14.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAgAAAAgAAAAAAAAAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>Features\Intel\IntelColony.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Features.Intel.IntelService" Collapsed="true">
+    <Position X="5.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAACAAAQAAEAAAAEAAAgAAAAAAhAAAAAAABAA=</HashCode>
+      <FileName>Features\Intel\IntelService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Features.Macro.Building.Zerg.ZergBuildingPlacement" Collapsed="true">
+    <Position X="7.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Features\Macro\Building\Zerg\ZergBuildingPlacement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Features.Macro.ProductionQueue.ProductionOrder" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="12.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAIAAAAAAAAAQAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Features\Macro\ProductionQueue\ProductionOrder.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="SargeBot.Features.Macro.ProductionQueue.ProductionOrderMapper" Collapsed="true">
+    <Position X="14.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQIAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Features\Macro\ProductionQueue\ProductionOrderMapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Features.Macro.ProductionQueue.ProductionQueue" Collapsed="true">
+    <Position X="5.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAIEAAQBAAEAAAAAQAAIAAAAAACBAAAAAAQAAAAEIA=</HashCode>
+      <FileName>Features\Macro\ProductionQueue\ProductionQueue.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SargeBot.Features.Macro.ProductionQueue.Unsubscriber&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAIAAAAAAAQAAAA=</HashCode>
+      <FileName>Features\Macro\ProductionQueue\ProductionQueue.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="SargeBot.Features.Macro.ProductionQueue.UnitProductionQueue" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEBIAAAAAACAAAJAAAAAAAAAAAICAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Features\Macro\ProductionQueue\UnitProductionQueue.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="SargeBot.Features.Macro.MacroManager" Collapsed="true">
+    <Position X="7.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAEAAACAAAAAAAAAA=</HashCode>
+      <FileName>Features\Macro\MacroManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Features.Micro.MicroManager" Collapsed="true">
+    <Position X="14.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAACAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Features\Micro\MicroManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.GameClients.GameSettingsMapper" Collapsed="true">
+    <Position X="12.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>GameClients\GameSettingsMapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.GameClients.SargeBotGameEngine" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAACAAAAAEAAAAAAACgAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>GameClients\SargeBotGameEngine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="SargeBot.GameClients.ZeroBotGameEngine" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAMAAAASAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>GameClients\ZeroBotGameEngine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="SargeBot.Options.CacheOptions" Collapsed="true">
+    <Position X="5.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAAEAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Options\CacheOptions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Options.GameOptions" Collapsed="true">
+    <Position X="10.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAACAAgAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Options\GameOptions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Options.Sc2ProcessOptions" Collapsed="true">
+    <Position X="9" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAACAAAAAAAAAAAAAAAAAAIAAAAAAAwAAAA=</HashCode>
+      <FileName>Options\Sc2ProcessOptions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Options.ServerOptions" Collapsed="true">
+    <Position X="10.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEQQAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Options\ServerOptions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SargeBot.Game" Collapsed="true">
+    <Position X="9" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Game.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="SargeBot.Features.Macro.ProductionQueue.IProductionOrder" Collapsed="true">
+    <Position X="5.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Features\Macro\ProductionQueue\IProductionOrder.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="SargeBot.Features.Macro.ProductionQueue.IProductionSubQueue" Collapsed="true">
+    <Position X="7.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Features\Macro\ProductionQueue\IProductionSubQueue.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="SargeBot.Features.Macro.ProductionQueue.IUnitProductionQueue" Collapsed="true">
+    <Position X="9" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Features\Macro\ProductionQueue\IUnitProductionQueue.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="SargeBot.Features.Macro.ProductionQueue.ProductionOrderType" Collapsed="true">
+    <Position X="5.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEIABAAAAEAAAAAAAABAAAAAAAAAA=</HashCode>
+      <FileName>Features\Macro\ProductionQueue\ProductionOrderType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

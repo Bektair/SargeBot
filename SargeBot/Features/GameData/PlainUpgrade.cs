@@ -1,9 +1,10 @@
 ﻿using System.Text.Json.Serialization;
+using SargeBot.Features.Macro.ProductionQueue;
 using SC2APIProtocol;
 
 namespace SargeBot.Features.GameData;
 
-public class PlainUpgrade
+public class PlainUpgrade : IProduceable
 {
     [JsonConstructor]
     public PlainUpgrade(string Name, uint UpgradeId, uint MineralCost, uint VespeneCost, uint AbilityId, float ResearchTime)
@@ -32,4 +33,5 @@ public class PlainUpgrade
     public uint VespeneCost { get; set; }
     public uint AbilityId { get; set; }
     public float ResearchTime { get; set; }
+    public float FoodRequired { get; set; } = 0;
 }

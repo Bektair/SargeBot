@@ -58,6 +58,10 @@ public class SargeBotGameEngine : IGameEngine
         if (_intelService.SelfNatural != null)
             debugCommands.Add(DebugService.DrawSphere(new() {X = _intelService.SelfNatural.X, Y = _intelService.SelfNatural.Y, Z = z}, color: new() {G = 255}));
 
+
+        //Her burde vi sjekke om vi kan afforde neste item i queue, om vi kan det så prosesser den.
+
+
         var canAffordSpawningPool = observation.Observation.PlayerCommon.Minerals >= 200;
         var hasSpawningPool = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL));
         if (canAffordSpawningPool && !hasSpawningPool)

@@ -1,12 +1,19 @@
 ﻿using System.Text.Json.Serialization;
+using SargeBot.Features.Macro.ProductionQueue;
 using SC2APIProtocol;
 using Attribute = SC2APIProtocol.Attribute;
 
 namespace SargeBot.Features.GameData;
 
-public class PlainUnit
+public class PlainUnit : IProduceable
 {
-    public PlainUnit(UnitTypeData unitType)
+
+  public PlainUnit()
+  {
+
+  }
+
+  public PlainUnit(UnitTypeData unitType)
     {
         AbilityId = unitType.AbilityId;
         Armor = unitType.Armor;
@@ -76,4 +83,8 @@ public class PlainUnit
     public uint UnitId { get; set; }
     public List<Weapon> Weapons { get; set; } = new();
     public bool RequreAttached { get; set; }
+
+
+
+
 }

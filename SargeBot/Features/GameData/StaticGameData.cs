@@ -70,10 +70,25 @@ public class StaticGameData
         {UnitType.TERRAN_BANSHEE, UnitType.TERRAN_STARPORT},
         {UnitType.TERRAN_SCV, UnitType.TERRAN_COMMANDCENTER},
         // Zerg
-        {UnitType.ZERG_ZERGLING, UnitType.ZERG_LARVA}
+        {UnitType.ZERG_ZERGLING, UnitType.ZERG_LARVA},
+        {UnitType.ZERG_ROACH, UnitType.ZERG_LARVA},
+        {UnitType.ZERG_HYDRALISK, UnitType.ZERG_LARVA},
+        {UnitType.ZERG_SWARMHOSTMP, UnitType.ZERG_LARVA},
+        {UnitType.ZERG_OVERLORD, UnitType.ZERG_LARVA},
+        {UnitType.ZERG_VIPER, UnitType.ZERG_LARVA},
+        {UnitType.ZERG_DRONE, UnitType.ZERG_LARVA},
+        {UnitType.ZERG_CORRUPTOR, UnitType.ZERG_LARVA},
+        {UnitType.ZERG_MUTALISK, UnitType.ZERG_LARVA},
+        {UnitType.ZERG_ULTRALISK, UnitType.ZERG_LARVA},
+        {UnitType.ZERG_INFESTOR, UnitType.ZERG_LARVA},
+        {UnitType.ZERG_QUEEN, UnitType.ZERG_HATCHERY}
     };
 
-    #endregion
+  #endregion
+
+  public List<UnitType> hatcheryLike = new() { UnitType.ZERG_HATCHERY, UnitType.ZERG_LAIR, UnitType.ZERG_HIVE };
+  public List<UnitType> gatewayLike = new() { UnitType.PROTOSS_GATEWAY, UnitType.PROTOSS_WARPGATE };
+
 
     public Dictionary<Ability, PlainAbility> PlainAbilities { get; set; } = new();
     public Dictionary<UnitType, PlainUnit> PlainUnits { get; set; } = new();

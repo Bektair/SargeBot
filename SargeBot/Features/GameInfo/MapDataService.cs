@@ -42,6 +42,7 @@ public class MapDataService
     {
         if (!Directory.Exists(_dataFolderName)) Directory.CreateDirectory(_dataFolderName);
 
+
         var json = JsonSerializer.Serialize(MapData, _serializerOptions);
         File.WriteAllText(Path.Combine(_dataFolderName, $"{MapData.MapName}.json"), json);
     }
