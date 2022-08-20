@@ -104,7 +104,8 @@ public class SargeBotGameEngine : IGameEngine
     if (hasSpawningPoolComplete)
     {
       int lingsInQueues = _productionQueue.CountInstancesOfUnit(UnitType.ZERG_ZERGLING);
-      if (lingCount + lingsInQueues < 6)
+      int lingsInEggs = LarvaQueue.EggsOfAbillityId(observation, Ability.TRAIN_ZERGLING);
+      if (lingCount + lingsInQueues + lingsInEggs < 6)
       {
         _productionQueue.EnqueueUnit(UnitType.ZERG_ZERGLING);
       }

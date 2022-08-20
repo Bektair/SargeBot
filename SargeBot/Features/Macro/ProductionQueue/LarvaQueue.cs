@@ -38,11 +38,15 @@ namespace SargeBot.Features.Macro.ProductionQueue
       return obs.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_LARVA));
     }
 
-    public int EggsOfUnitType(ResponseObservation obs)
+    public static int EggsOfAbillityId(ResponseObservation obs, Ability creationId)
     {
       var eggs = obs.Observation.RawData.Units.Where(u => u.UnitType.Is(UnitType.ZERG_EGG));
-      //eggs.Where(egg => egg
-      return 0;
+      int count = 0;
+      foreach(var egg in eggs)
+      {
+        count+= egg.Orders.Count(order => order.AbilityId == (uint)creationId);
+      }
+      return count;
     }
 
     private bool HasLarvae(ResponseObservation obs)
