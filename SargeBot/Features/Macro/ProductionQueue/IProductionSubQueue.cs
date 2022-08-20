@@ -11,7 +11,7 @@ namespace SargeBot.Features.Macro.ProductionQueue
   public interface IProductionSubQueue
   {
 
-    public Action Activate(ResponseObservation observation);
+    public Action? Activate(ResponseObservation observation);
 
 
   }

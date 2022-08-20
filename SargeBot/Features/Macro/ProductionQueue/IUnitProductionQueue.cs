@@ -1,4 +1,5 @@
 ﻿using SargeBot.Features.GameData;
+using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,11 @@ namespace SargeBot.Features.Macro.ProductionQueue
 
     public void Enqueue(UnitType unit);
 
+    public bool Contains(UnitType unit);
+
+    public int CountOfUnitType(UnitType unit);
+
+    public SC2APIProtocol.Action? CreateUnitAction(ResponseObservation obs, UnitType unitToMake);
 
 
   }

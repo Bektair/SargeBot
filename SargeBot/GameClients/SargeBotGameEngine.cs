@@ -3,6 +3,7 @@ using SargeBot.Features.GameData;
 using SargeBot.Features.GameInfo;
 using SargeBot.Features.Intel;
 using SargeBot.Features.Macro;
+using SargeBot.Features.Macro.ProductionQueue;
 using SargeBot.Features.Micro;
 using SC2APIProtocol;
 using SC2ClientApi;
@@ -17,14 +18,20 @@ public class SargeBotGameEngine : IGameEngine
     private readonly MapDataService _mapService;
     private readonly MicroManager _microManager;
     private readonly StaticGameData _staticGameData;
+  private readonly ProductionQueue _productionQueue;
+  private readonly LarvaQueue _larvaQueue;
 
-    public SargeBotGameEngine(IntelService intelService, MacroManager macroManager, MapDataService mapService, MicroManager microManager, StaticGameData staticGameData)
+
+  public SargeBotGameEngine(IntelService intelService, MacroManager macroManager, MapDataService mapService, MicroManager microManager, 
+      StaticGameData staticGameData, ProductionQueue productionQueue, LarvaQueue larvaQueue)
     {
         _intelService = intelService;
         _macroManager = macroManager;
         _mapService = mapService;
         _microManager = microManager;
         _staticGameData = staticGameData;
+        _productionQueue = productionQueue;
+        _larvaQueue = larvaQueue;
     }
 
     public void OnStart(ResponseObservation firstObservation, ResponseData responseData, ResponseGameInfo gameInfo)
@@ -33,9 +40,10 @@ public class SargeBotGameEngine : IGameEngine
         _staticGameData.PopulateGameData(responseData);
         Task.Run(() => _staticGameData.Save());
         _mapService.PopulateMapData(gameInfo);
-    }
 
-    public (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation)
+  }
+
+  public (List<Action>, List<DebugCommand>) OnFrame(ResponseObservation observation)
     {
         if (observation.Observation.GameLoop % 100 == 0)
             Console.WriteLine($"Frame {observation.Observation.GameLoop}");
@@ -59,13 +67,19 @@ public class SargeBotGameEngine : IGameEngine
             debugCommands.Add(DebugService.DrawSphere(new() {X = _intelService.SelfNatural.X, Y = _intelService.SelfNatural.Y, Z = z}, color: new() {G = 255}));
 
 
-        //Her burde vi sjekke om vi kan afforde neste item i queue, om vi kan det så prosesser den.
+    //Her burde vi sjekke om vi kan afforde neste item i queue, om vi kan det så prosesser den.
+    //Kordan vet e at nå ikke allerede e i queue?
+    //Velge om man vil queue mer
+    
 
 
-        var canAffordSpawningPool = observation.Observation.PlayerCommon.Minerals >= 200;
-        var hasSpawningPool = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL));
+      var hasSpawningPool = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL));
+    var canAffordSpawningPool = observation.Observation.PlayerCommon.Minerals >= 200;
+
+
         if (canAffordSpawningPool && !hasSpawningPool)
             actions.Add(_macroManager.BuildSpawningPool(observation));
+        
 
         actions.Add(_microManager.OverlordScout(observation));
 
@@ -76,8 +90,8 @@ public class SargeBotGameEngine : IGameEngine
 
         var droneCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_DRONE));
         var lingCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_ZERGLING));
-        if (lingCount <= 6 || droneCount > 20) actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_ZERGLING));
-        else actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_DRONE));
+    /*    if (lingCount <= 6 || droneCount > 20) actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_ZERGLING));
+        else actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_DRONE));*/
 
         _microManager.AttackWithAll(observation, UnitType.ZERG_ZERGLING, enemyBase.Point);
         if (lingCount >= 6)
@@ -85,8 +99,41 @@ public class SargeBotGameEngine : IGameEngine
             actions.Add(_microManager.AttackWithAll(observation, UnitType.ZERG_DRONE, enemyBase.Point));
         }
 
-        return (actions, debugCommands);
+        
+    var hasSpawningPoolComplete = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL) && u.BuildProgress>0.9999999);
+    if (hasSpawningPoolComplete)
+    {
+      int lingsInQueues = _productionQueue.CountInstancesOfUnit(UnitType.ZERG_ZERGLING);
+      if (lingCount + lingsInQueues < 6)
+      {
+        _productionQueue.EnqueueUnit(UnitType.ZERG_ZERGLING);
+      }
     }
+
+    uint minerals = observation.Observation.PlayerCommon.Minerals;
+    uint gas = observation.Observation.PlayerCommon.Vespene;
+    bool larvaCreate = false;
+    if (!_larvaQueue.IsEmpty())
+    {
+      if (_larvaQueue.CanCreate(observation)) { 
+        actions.Add(_productionQueue.CreateUnitAction(observation, _larvaQueue.Dequeue()));
+        larvaCreate = true;
+      }
+    }
+
+    if (!_productionQueue.IsEmpty() && !larvaCreate)
+    {
+      if (minerals > _productionQueue.Peek().MineralCost)
+      {
+        actions.Add(_productionQueue.ProduceFirstItem(observation));
+      }
+    }
+    
+    return (actions, debugCommands);
+    }
+
+   
+
 
     public void OnEnd(ResponseObservation? observation)
     {

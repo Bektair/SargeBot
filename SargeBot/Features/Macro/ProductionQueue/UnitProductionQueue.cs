@@ -18,78 +18,104 @@ namespace SargeBot.Features.Macro.ProductionQueue
   {
 
     Queue<UnitType> UnitQueue { get; }
+    /// <summary>
+    /// Waiting for larvae
+    /// </summary>
+    public LarvaQueue LarvaQueue;
+
 
     StaticGameData staticGameData;
 
-    public UnitProductionQueue(StaticGameData staticGameData)
+    public UnitProductionQueue(StaticGameData staticGameData, LarvaQueue larvaQueue)
     {
       UnitQueue = new Queue<UnitType> { };
       this.staticGameData = staticGameData;
+      this.LarvaQueue = larvaQueue;
+    }
+
+    public UnitProductionQueue()
+    {
+    }
+
+    public Action? CreateUnitAction(ResponseObservation obs, UnitType unitToMake)
+    {
+      //If 
+      UnitType producer = staticGameData.UnitToProducer[unitToMake];
+      //Find the actual unit doing the producing
+      Unit? producingBuilding = findProducingBuilding(producer, obs);
+
+      var command = new ActionRawUnitCommand();
+      if (producingBuilding == null)
+      {
+        //If the unit needs larvae update the larvae queue and have the productionqueue get the new state ;)
+        if (producer == UnitType.ZERG_LARVA) { LarvaQueue.Enqueue(unitToMake); }
+
+        return null;
+      }
+      else
+      {
+        command.UnitTags.Add(producingBuilding.Tag);
+        PlainUnit unit = staticGameData.PlainUnits[unitToMake];
+        command.AbilityId = (int)unit.AbilityId;
+        return new() { ActionRaw = new() { UnitCommand = command } };
+      }
     }
 
     /// <summary>
     /// Tell the subscribers about the newly active entry in the queue
     /// Say we get a order to build a queen which is the only allowed Type atm
+    /// Returns null if the producer of the unit is not in the observation list
     /// </summary>
-    public Action Activate(ResponseObservation obs)
+    public Action? Activate(ResponseObservation obs)
     {
       UnitType unitToMake = UnitQueue.Dequeue();
-      Unit? producingBuilding = null;
-      //If 
-      UnitType producer = staticGameData.UnitToProducer[unitToMake];
-      var command = new ActionRawUnitCommand();
+      return CreateUnitAction(obs, unitToMake);
+    }
 
-      //The off case would be hatchery and gateway as there would be multiple producers
-      if (producer == UnitType.ZERG_HATCHERY) 
-      {producingBuilding=findProducer(obs, staticGameData.hatcheryLike);}
-      else if (producer == UnitType.PROTOSS_GATEWAY) 
-      { findProducer(obs, staticGameData.gatewayLike); }
+    private Unit? findProducingBuilding(UnitType producer, ResponseObservation obs)
+    {
+      if (producer == UnitType.ZERG_HATCHERY)
+      { return findProducer(obs, staticGameData.hatcheryLike); }
+      else if (producer == UnitType.PROTOSS_GATEWAY)
+      { return findProducer(obs, staticGameData.gatewayLike); }
       else
-      {producingBuilding = findProducer(obs, producer);}
-      //A command is the unit to perform it and the abillity to be performed
-      command.UnitTags.Add(producingBuilding.Tag);
-      PlainUnit unit = staticGameData.PlainUnits[unitToMake];
-      command.AbilityId = (int)unit.AbilityId;
-      return new() { ActionRaw = new() { UnitCommand = command } };
-      
+      { return findProducer(obs, producer); }
     }
 
     private Unit? findProducer(ResponseObservation obs, UnitType producer)
     {
       var alleUnits = obs.Observation.RawData.Units;
-
-      foreach (Unit currentUnit in alleUnits)
-      {
-        if (currentUnit.Tag == (ulong)producer)
-        {
-          return currentUnit;
-        }
-      }
-      return null;
+      IEnumerable<Unit> producers = alleUnits.Where(u => u.UnitType.Is(producer));
+      if (producers.Count() > 0) return producers.First();
+      else return null;
     }
-    private Unit? findProducer(ResponseObservation obs, List<UnitType> producer)
+    private Unit? findProducer(ResponseObservation obs, List<UnitType> producers)
     {
       var alleUnits = obs.Observation.RawData.Units;
-
-      foreach (Unit currentUnit in alleUnits)
-      {
-        foreach(UnitType type in producer)
+        foreach (UnitType producer in producers)
         {
-          if ((ulong)type == currentUnit.Tag)
-          {
-            return currentUnit;
-          }
-        }
+        IEnumerable<Unit> producersEnum = alleUnits.Where(u => u.UnitType.Is(producer));
+        if (producersEnum.Count() > 0) return producersEnum.First();
+        else return null;
       }
       return null;
-
     }
-      public void Enqueue(UnitType unit)
+    public void Enqueue(UnitType unit)
     {
       UnitQueue.Enqueue(unit);
     }
 
-    
+    public bool Contains(UnitType unit)
+    {
+      if (LarvaQueue.larvaQueue.Contains(unit)) return true;
+      return UnitQueue.Contains(unit);
+    }
+
+    public int CountOfUnitType(UnitType unit)
+    {
+      int count = LarvaQueue.larvaQueue.Where(u => u == unit).Count();
+      return count + UnitQueue.Where(u => u == unit).Count();
+    }
   }
 }
 
