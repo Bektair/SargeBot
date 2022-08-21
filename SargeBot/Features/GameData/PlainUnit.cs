@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using SargeBot.Features.Macro.ProductionQueue;
+using SargeBot.Features.Macro.ProductionQueues;
 using SC2APIProtocol;
 using Attribute = SC2APIProtocol.Attribute;
 

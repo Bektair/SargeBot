@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SargeBot.Features.Macro.ProductionQueue
+namespace SargeBot.Features.Macro.ProductionQueues
 {
   public interface IProductionOrder : IProduceable
   {

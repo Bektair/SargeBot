@@ -6,8 +6,9 @@ using SargeBot.Features.GameData;
 using SargeBot.Features.GameInfo;
 using SargeBot.Features.Intel;
 using SargeBot.Features.Macro;
+using SargeBot.Features.Macro.Build;
 using SargeBot.Features.Macro.Building.Zerg;
-using SargeBot.Features.Macro.ProductionQueue;
+using SargeBot.Features.Macro.ProductionQueues;
 using SargeBot.Features.Micro;
 using SargeBot.GameClients;
 using SargeBot.Options;
@@ -39,6 +40,8 @@ using var host = Host.CreateDefaultBuilder(args)
             .AddScoped<ProductionQueue>()
             .AddScoped<IUnitProductionQueue, UnitProductionQueue>()
             .AddScoped<LarvaQueue>()
+            .AddScoped<BuildState, BuildPoolState>()
+            .AddScoped<Build>()
             ;
     }).Build();
 

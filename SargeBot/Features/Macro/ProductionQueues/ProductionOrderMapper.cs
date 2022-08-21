@@ -1,4 +1,4 @@
-﻿namespace SargeBot.Features.Macro.ProductionQueue;
+﻿namespace SargeBot.Features.Macro.ProductionQueues;
 
 /// <summary>
 ///     Go from unitType to ProductionType

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Action = SC2APIProtocol.Action;
 
-namespace SargeBot.Features.Macro.ProductionQueue;
+namespace SargeBot.Features.Macro.ProductionQueues;
 /// <summary>
 /// This queue holds the order of which the other queues should be activated
 /// Should be peeked to know when the next item is to be made

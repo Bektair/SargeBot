@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Action = SC2APIProtocol.Action;
 
-namespace SargeBot.Features.Macro.ProductionQueue
+namespace SargeBot.Features.Macro.ProductionQueues
 {
   /// <summary>
   /// Concrete subject

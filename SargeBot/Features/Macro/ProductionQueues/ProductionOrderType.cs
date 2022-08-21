@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SargeBot.Features.Macro.ProductionQueue { 
-/// <summary>
-/// A combined enum for all types that can be produced
-/// </summary>
-public enum ProductionOrderType
+namespace SargeBot.Features.Macro.ProductionQueues{
+  /// <summary>
+  /// A combined enum for all types that can be produced
+  /// </summary>
+  public enum ProductionOrderType
 {
     Research = 0,
     Unit = 1,
