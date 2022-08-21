@@ -4,7 +4,7 @@ namespace XUnitSargeBot.Tests.Features.Macro.ProductionQueue;
 
 using Google.Protobuf.Collections;
 using SargeBot.Features.GameData;
-using SargeBot.Features.Macro.ProductionQueue;
+using SargeBot.Features.Macro.ProductionQueues;
 using SC2APIProtocol;
 using System.Linq;
 

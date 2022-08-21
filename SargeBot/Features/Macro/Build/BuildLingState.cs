@@ -78,9 +78,18 @@ namespace SargeBot.Features.Macro.Build
     {
       //Lingcheck
       Predicate<ResponseObservation> lingcheck = BuildLingState.GetBuildState();
-      if (lingcheck.Invoke(observation))
+      Predicate<ResponseObservation> poolCheck = BuildPoolState.GetBuildState();
+      Predicate<ResponseObservation> naturalcheck = BuildPoolState.GetBuildState();
+
+      if (poolCheck.Invoke(observation)) {
+        build.State = new BuildPoolState(this);
+      }
+      else if (lingcheck.Invoke(observation))
       {
         //No changes
+      }else if (naturalcheck.Invoke(observation))
+      {
+        build.State = new NaturalExpandBuildState(this);
       }
 
     }

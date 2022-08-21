@@ -73,5 +73,12 @@ namespace SargeBot.Features.Macro.Build
       }
     }
 
+    public static Predicate<ResponseObservation> GetBuildState()
+    {
+      Predicate<ResponseObservation> predicate =
+        (obs) => !obs.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL));
+      return predicate;
+    }
+
   }
 }

@@ -12,7 +12,7 @@ using Action = SC2APIProtocol.Action;
 namespace SargeBot.Features.Macro.ProductionQueues
 {
   /// <summary>
-  /// Concrete subject
+  /// This class is used to produce units
   /// </summary>
   public class UnitProductionQueue : IUnitProductionQueue
   {

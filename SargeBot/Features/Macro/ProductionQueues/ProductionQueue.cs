@@ -22,13 +22,13 @@ public class ProductionQueue
 
   //The queue will then notify the subscribed facilities when a new unit / research is needed
 
-  Queue<PlainAbility> BuildingQueue;
+  
   Queue<PlainUpgrade> UpgradeQueue;
 
   //Order to execute the queues in?
   Queue<IProductionOrder> OrderQueue { get; }
   IUnitProductionQueue UnitQueue;
-
+  IBuildingProductionQueue BuildingQueue;
 
   public ProductionQueue(StaticGameData staticGameData, IUnitProductionQueue UnitQueue)
   {
