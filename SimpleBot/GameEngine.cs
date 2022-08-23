@@ -2,7 +2,7 @@
 using SC2ClientApi;
 using Action = SC2APIProtocol.Action;
 
-namespace ZeroBot;
+namespace SimpleBot;
 
 public class GameEngine : IGameEngine
 {

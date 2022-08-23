@@ -1,6 +1,6 @@
 ﻿using SC2APIProtocol;
 
-namespace ZeroBot.Options;
+namespace SimpleBot.Options;
 
 public class GameOptions
 {

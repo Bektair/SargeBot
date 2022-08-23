@@ -1,4 +1,4 @@
-﻿namespace ZeroBot.Options;
+﻿namespace SimpleBot.Options;
 
 public class Sc2ProcessOptions
 {

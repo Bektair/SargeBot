@@ -2,10 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SC2ClientApi;
-using ZeroBot;
-using ZeroBot.Options;
+using SimpleBot;
+using SimpleBot.Options;
 
-Log.Info("Starting ZeroBot");
+Log.Info("Starting SimpleBot");
 
 var isLadder = args.Length > 0;
 
