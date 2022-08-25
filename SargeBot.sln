@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SargeBot.Tests", "SargeBot.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SC2ClientApi", "SC2ClientApi\SC2ClientApi.csproj", "{E12344A2-DFD6-409F-A081-98D8D1CA7C7F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroBot", "ZeroBot\ZeroBot.csproj", "{E07C8466-9A45-47BB-AE55-8B0544B9C8A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleBot", "SimpleBot\SimpleBot.csproj", "{E07C8466-9A45-47BB-AE55-8B0544B9C8A6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnitSargeBot.Tests", "XUnitSargeBot.Tests\XUnitSargeBot.Tests.csproj", "{DB663FF6-8493-4719-BFBA-FC9BC5135629}"
 EndProject

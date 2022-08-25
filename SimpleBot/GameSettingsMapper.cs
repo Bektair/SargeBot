@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SC2ClientApi;
-using ZeroBot.Options;
+using SimpleBot.Options;
 
-namespace ZeroBot;
+namespace SimpleBot;
 
 public static class GameSettingsMapper
 {
