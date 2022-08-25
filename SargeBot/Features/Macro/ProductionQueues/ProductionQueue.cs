@@ -30,12 +30,13 @@ public class ProductionQueue
   IUnitProductionQueue UnitQueue;
   IBuildingProductionQueue BuildingQueue;
 
-  public ProductionQueue(StaticGameData staticGameData, IUnitProductionQueue UnitQueue)
+  public ProductionQueue(StaticGameData staticGameData, IUnitProductionQueue UnitQueue, IBuildingProductionQueue BuildingQueue)
   {
     //It should accept UnitType, Ability or upgrade
     this.staticGameData = staticGameData;
     OrderQueue = new Queue<IProductionOrder>();
     this.UnitQueue = UnitQueue;
+    this.BuildingQueue = BuildingQueue;
   }
 
   public bool ContainsUnit(UnitType unitType)
@@ -66,18 +67,18 @@ public class ProductionQueue
   /// <param name="unitType"></param>
   public void EnqueueUnit(UnitType unitType)
   {
-    UnitQueue.Enqueue(unitType);
     PlainUnit unit = staticGameData.PlainUnits[unitType];
 
     ProductionOrder order = new(orderType: ProductionOrderType.Structure,
       MineralCost: unit.MineralCost, GasCost: unit.VespeneCost, FoodRequired: unit.FoodRequired
       , UnitQueue);
+    UnitQueue.Enqueue(unitType);
     OrderQueue.Enqueue(order);
-
   }
   /// <summary>
   /// Enqueue must have been run at a earlier point must have been queued first
   /// If you are unable to produce it right now it will be added to the pre-productionqueue
+  /// Called when you have enough resources to buy it
   /// </summary>
   /// <param name="observation"></param>
   /// <returns></returns>
@@ -107,37 +108,21 @@ public class ProductionQueue
     else { return returnAction; }
   }
 
-
-  /// <summary>
-  /// Makes a production order of IProductionOrder
-  /// </summary>
-  /// <param name="item"></param>
-
-
   /// <summary>
   /// Tell the queue to build something
   /// </summary>
-  /// <param name="building"></param>
-/*  public void EnqueueBuilding(UnitType building)
+  /// <param name="buildingType"></param>
+  public void EnqueueBuilding(UnitType buildingType)
   {
-    //I could queue abillity 
-    PlainUnit unit = staticGameData.PlainUnits[building];
-    PlainAbility plainAbility = staticGameData.PlainAbilities[UnitToAbility(unit)];
-
-    IProductionOrder order = new ProductionOrder(orderType: ProductionOrderType.Structure, MineralCost: unit.MineralCost, GasCost: unit.VespeneCost, FoodRequired: unit.FoodRequired);
+    //I could queue abillity
+    PlainUnit building = staticGameData.PlainUnits[buildingType];
+    Ability Ability = (Ability)building.AbilityId;
+    IProductionOrder order = new ProductionOrder(orderType: ProductionOrderType.Structure, MineralCost: building.MineralCost, 
+      GasCost: building.VespeneCost, FoodRequired: building.FoodRequired, queue: BuildingQueue);
     OrderQueue.Enqueue(order);
-    BuildingQueue.Enqueue(plainAbility);
+    BuildingQueue.Enqueue(Ability);
+  }
 
-    if (OrderQueue.Count == 0)
-      QueueIsUpdated();
-
-  }*/
-
-  /// <summary>
-  /// Called when you have enough minerals to buy the unit in front
-  /// The caller needs to remember it has called it allready by storing reference
-  /// </summary>
-  /// <returns></returns>
 
 
 }
