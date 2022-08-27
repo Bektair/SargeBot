@@ -49,6 +49,11 @@ public class ProductionQueue
     return UnitQueue.CountOfUnitType(unitType);
   }
 
+  public void Clear()
+  {
+    OrderQueue.Clear();
+  }
+
 
   public IProductionOrder Peek()
   {
@@ -84,6 +89,8 @@ public class ProductionQueue
   /// <returns></returns>
   public Action ProduceFirstItem(ResponseObservation observation)
   {
+
+
     IProductionOrder order = OrderQueue.Dequeue();
     Action? returnAction = order.queue.Activate(observation);
     if (returnAction == null)
@@ -123,6 +130,16 @@ public class ProductionQueue
     BuildingQueue.Enqueue(Ability);
   }
 
+  public Action? TryProduceOv(ResponseObservation obs)
+  {
+    if (UnitQueue.ShouldMakeOverlord(obs))
+    {
+      return CreateUnitAction(obs, UnitType.ZERG_OVERLORD);
+    }
+    return null;
+  }
+  
+  
 
 
 }

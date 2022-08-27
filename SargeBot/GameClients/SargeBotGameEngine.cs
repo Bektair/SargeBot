@@ -55,7 +55,7 @@ public class SargeBotGameEngine : IGameEngine
   //Context: defines the interface of intrest, maintains an instance of a concretestate subclass that defines the current state
   //State: defines an interface for encapsulating the behavior associated with the particular state of the context
   //Concrete State: each subclass implements a behavior associated with a state of context
-  
+
   //States: ZerglingRush, Droning, MutaMan! Clear the queues when change state maby
 
 
@@ -99,10 +99,9 @@ public class SargeBotGameEngine : IGameEngine
 
     actions.Add(_microManager.OverlordScout(observation));
 
-
     var eggCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_EGG));
     if (eggCount == 0 && !hasSpawningPool) actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_DRONE));
-    if (eggCount == 0 && hasSpawningPool && observation.Observation.PlayerCommon.FoodUsed == 14) actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_OVERLORD));
+    //if (eggCount == 0 && hasSpawningPool && observation.Observation.PlayerCommon.FoodUsed == 14) actions.Add(MacroManager.MorphLarva(observation, Ability.TRAIN_OVERLORD));
 
     var droneCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_DRONE));
     var lingCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_ZERGLING));
@@ -115,11 +114,19 @@ public class SargeBotGameEngine : IGameEngine
       actions.Add(_microManager.AttackWithAll(observation, UnitType.ZERG_ZERGLING, enemyBase.Point));
     }
 
-    _build.State.NewObservations(observation);
-    actions.Add(_build.State.ExecuteBuild(_productionQueue, _larvaQueue));
-
+    Action? shouldMakeOv = _productionQueue.TryProduceOv(observation);
+    if (shouldMakeOv != null)
+    {
+      actions.Add(shouldMakeOv);
+    }
+    else
+    {
+      _build.State.NewObservations(observation);
+      actions.Add(_build.State.ExecuteBuild(_productionQueue, _larvaQueue));
+    }
     return (actions, debugCommands);
   }
+
 
   public void OnEnd(ResponseObservation? observation)
   {

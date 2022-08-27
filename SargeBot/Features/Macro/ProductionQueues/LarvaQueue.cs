@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Action = SC2APIProtocol.Action;
 
 namespace SargeBot.Features.Macro.ProductionQueues
 {
@@ -38,7 +39,7 @@ namespace SargeBot.Features.Macro.ProductionQueues
       return obs.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_LARVA));
     }
 
-    public static int EggsOfAbillityId(ResponseObservation obs, Ability creationId)
+    public int EggsOfAbillityId(ResponseObservation obs, Ability creationId)
     {
       var eggs = obs.Observation.RawData.Units.Where(u => u.UnitType.Is(UnitType.ZERG_EGG));
       int count = 0;
@@ -48,6 +49,8 @@ namespace SargeBot.Features.Macro.ProductionQueues
       }
       return count;
     }
+
+
 
     private bool HasLarvae(ResponseObservation obs)
     {

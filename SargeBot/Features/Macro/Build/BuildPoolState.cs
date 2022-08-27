@@ -31,6 +31,7 @@ namespace SargeBot.Features.Macro.Build
 
     public BuildPoolState(BuildState buildState) : this(buildState.Observation, buildState.Build, buildState.ZergBuildingPlacement) 
     {
+
     }
     
     public override void NewObservations(ResponseObservation observation)
@@ -42,26 +43,20 @@ namespace SargeBot.Features.Macro.Build
     public override Action ExecuteBuild(ProductionQueue _productionQueue, LarvaQueue larvaQueue)
     {
       var hasSpawningPool = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL));
-      var canAffordSpawningPool = observation.Observation.PlayerCommon.Minerals >= 200;
 
-      if (canAffordSpawningPool && !hasSpawningPool) { 
-        foreach (var unit in observation.Observation.RawData.Units)
-        {
-          if (unit.Alliance != Alliance.Self)
-            continue;
-
-          if (!unit.UnitType.Is(UnitType.ZERG_DRONE))
-            continue;
-
-          var command = new ActionRawUnitCommand();
-          command.UnitTags.Add(unit.Tag);
-          command.AbilityId = (int)Ability.BUILD_SPAWNINGPOOL;
-          command.TargetWorldSpacePos = _zergBuildingPlacement.FindPlacement();
-
-          return new() { ActionRaw = new() { UnitCommand = command } };
-        }
+      if (!hasSpawningPool && !_productionQueue.ContainsUnit(UnitType.ZERG_SPAWNINGPOOL))
+      {
+        _productionQueue.Clear();
+        _productionQueue.EnqueueBuilding(UnitType.ZERG_SPAWNINGPOOL);
       }
-      return new() { ActionRaw = new() };
+      if (!_productionQueue.IsEmpty())
+      {
+        var canAffordSpawningPool = IProduceable.CanCreate(observation, _productionQueue.Peek());
+        if(canAffordSpawningPool)
+          return _productionQueue.ProduceFirstItem(observation);
+      }
+
+      return new Action() { };
     }
 
     private void StateChangeCheck()
