@@ -144,6 +144,10 @@ public class ProductionQueue
     return null;
   }
   
+  public HashSet<ulong> getBuilders()
+  {
+    return BuildingQueue.getBuilders();
+  }
   
 
 

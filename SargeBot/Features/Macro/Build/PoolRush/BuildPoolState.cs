@@ -34,7 +34,8 @@ namespace SargeBot.Features.Macro.Build
     public override Action ExecuteBuild()
     {
       var hasSpawningPool = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL));
-      //I still need to find out a way to know if there is a drone with an order >_>
+      //I still need to find out a way to know if there is a drone with an order >_> this must be a candidate for observer pattern
+
       if (!hasSpawningPool && !_productionQueue.ContainsBuilding(Ability.BUILD_SPAWNINGPOOL))
       {
         _productionQueue.Clear();
