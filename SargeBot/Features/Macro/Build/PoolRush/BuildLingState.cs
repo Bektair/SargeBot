@@ -13,25 +13,22 @@ namespace SargeBot.Features.Macro.Build
 {
   public class BuildLingState : BuildState
   {
-    public BuildLingState(ResponseObservation observation, Build build, ZergBuildingPlacement zergBuildingPlacement)
-    {
-      this.observation = observation;
-      this.build = build;
-      this.ZergBuildingPlacement = zergBuildingPlacement;
-    }
-
-    public BuildLingState(BuildState state) : this(state.Observation, state.Build, state.ZergBuildingPlacement)
+    public BuildLingState(BuildState state) : base(state)
     {
     }
 
-    public override Action ExecuteBuild(ProductionQueue _productionQueue, LarvaQueue _larvaQueue)
+    public BuildLingState(Build build) : base(build)
+    {
+    }
+
+    public override Action ExecuteBuild()
     {
       var hasSpawningPoolComplete = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL) && u.BuildProgress > 0.9999999);
       if (hasSpawningPoolComplete)
       {
         var lingCount = observation.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_ZERGLING));
         int lingsInQueues = _productionQueue.CountInstancesOfUnit(UnitType.ZERG_ZERGLING);
-        int lingsInEggs = LarvaQueue.EggsOfAbillityId(observation, Ability.TRAIN_ZERGLING);
+        int lingsInEggs = _larvaQueue.EggsOfAbillityId(observation, Ability.TRAIN_ZERGLING);
         if (lingCount + lingsInQueues * 2 + lingsInEggs * 2 < 6)
         {
           _productionQueue.EnqueueUnit(UnitType.ZERG_ZERGLING);
@@ -67,7 +64,8 @@ namespace SargeBot.Features.Macro.Build
     public override void NewObservations(ResponseObservation observation)
     {
       this.observation = observation;
-      StateChangeCheck();
+      base.currentState = PoolRush.AllBuildStates.BuildLing;
+      base.StateChecker();
     }
 
     /// <summary>
@@ -77,30 +75,30 @@ namespace SargeBot.Features.Macro.Build
     private void StateChangeCheck()
     {
       //Lingcheck
-      Predicate<ResponseObservation> lingcheck = BuildLingState.GetBuildState();
+/*     Predicate<ResponseObservation> lingcheck = BuildLingState.GetBuildState();
       Predicate<ResponseObservation> poolCheck = BuildPoolState.GetBuildState();
-      Predicate<ResponseObservation> naturalcheck = BuildPoolState.GetBuildState();
+      Predicate<ResponseObservation> naturalcheck = NaturalExpandBuildState.GetBuildState();
 
       if (poolCheck.Invoke(observation)) {
         build.State = new BuildPoolState(this);
       }
-      else if (lingcheck.Invoke(observation))
-      {
-        //No changes
-      }else if (naturalcheck.Invoke(observation))
+      else if (naturalcheck.Invoke(observation))
       {
         build.State = new NaturalExpandBuildState(this);
-      }
+      }*/
 
     }
-    public static Predicate<ResponseObservation> GetBuildState()
+
+    /// <summary>
+    /// Goes into this state when the pool is done
+    /// </summary>
+    /// <returns></returns>
+    public static Predicate<ResponseObservation> BuildPrecicate()
     {
-      Predicate<ResponseObservation> predicate = 
-        (obs)=>obs.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL) && u.BuildProgress > 0.9999999);
+      Predicate<ResponseObservation> predicate =
+        (obs) => obs.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL) && u.BuildProgress == 1);
       return predicate;
     }
-
-
 
   }
 }

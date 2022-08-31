@@ -16,64 +16,58 @@ namespace SargeBot.Features.Macro.Build
   /// </summary>
   public class BuildPoolState : BuildState
   {
-    public BuildPoolState(ResponseObservation obs, Build build, ZergBuildingPlacement zergBuildingPlacement)
+    public BuildPoolState(BuildState state) : base(state)
     {
-      this.observation = obs;
-      this.build = build;
-      this.ZergBuildingPlacement = zergBuildingPlacement;
     }
 
-    public BuildPoolState(Build build, ZergBuildingPlacement zergBuildingPlacement)
+    public BuildPoolState(Build build) : base(build)
     {
-      this.build = build;
-      this.ZergBuildingPlacement = zergBuildingPlacement;
     }
 
-    public BuildPoolState(BuildState buildState) : this(buildState.Observation, buildState.Build, buildState.ZergBuildingPlacement) 
-    {
-
-    }
-    
     public override void NewObservations(ResponseObservation observation)
     {
       this.observation = observation;
-      StateChangeCheck();
+      base.currentState = PoolRush.AllBuildStates.BuildPool;
+      base.StateChecker();   
     }
 
-    public override Action ExecuteBuild(ProductionQueue _productionQueue, LarvaQueue larvaQueue)
+    public override Action ExecuteBuild()
     {
       var hasSpawningPool = observation.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL));
-
-      if (!hasSpawningPool && !_productionQueue.ContainsUnit(UnitType.ZERG_SPAWNINGPOOL))
+      //I still need to find out a way to know if there is a drone with an order >_>
+      if (!hasSpawningPool && !_productionQueue.ContainsBuilding(Ability.BUILD_SPAWNINGPOOL))
       {
         _productionQueue.Clear();
         _productionQueue.EnqueueBuilding(UnitType.ZERG_SPAWNINGPOOL);
       }
-      if (!_productionQueue.IsEmpty())
+      if (!_productionQueue.IsEmpty() && !hasSpawningPool)
       {
         var canAffordSpawningPool = IProduceable.CanCreate(observation, _productionQueue.Peek());
         if(canAffordSpawningPool)
           return _productionQueue.ProduceFirstItem(observation);
       }
 
+      if (hasSpawningPool) { 
+        Action? shouldMakeOv = _productionQueue.TryProduceOv(observation);
+        if (shouldMakeOv != null)
+        {
+          return shouldMakeOv;
+        }
+      }
+
       return new Action() { };
     }
 
-    private void StateChangeCheck()
-    {
-      Predicate<ResponseObservation> lingcheck = BuildLingState.GetBuildState();
-      if (lingcheck.Invoke(observation))
-      {
-        build.State = new BuildLingState(this);
-      }
-    }
 
-    public static Predicate<ResponseObservation> GetBuildState()
+    /// <summary>
+    /// Goes into this state if the spawning pool is missing
+    /// </summary>
+    /// <returns></returns>
+    public static Predicate<ResponseObservation> BuildPrecicate()
     {
       Predicate<ResponseObservation> predicate =
         (obs) => !obs.Observation.RawData.Units.Any(u => u.UnitType.Is(UnitType.ZERG_SPAWNINGPOOL));
       return predicate;
     }
-
   }
 }

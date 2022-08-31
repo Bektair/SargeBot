@@ -44,6 +44,11 @@ public class ProductionQueue
     return UnitQueue.Contains(unitType);
   }
 
+  public bool ContainsBuilding(Ability ability)
+  {
+    return BuildingQueue.Contains(ability);
+  }
+
   public int CountInstancesOfUnit(UnitType unitType)
   {
     return UnitQueue.CountOfUnitType(unitType);

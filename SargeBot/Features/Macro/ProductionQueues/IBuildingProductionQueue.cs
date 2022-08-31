@@ -11,6 +11,7 @@ namespace SargeBot.Features.Macro.ProductionQueues
 
     public void Enqueue(Ability ability);
 
+    public bool Contains(Ability ability);
 
 
   }

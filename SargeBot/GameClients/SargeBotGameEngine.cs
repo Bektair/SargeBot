@@ -114,19 +114,12 @@ public class SargeBotGameEngine : IGameEngine
       actions.Add(_microManager.AttackWithAll(observation, UnitType.ZERG_ZERGLING, enemyBase.Point));
     }
 
-    Action? shouldMakeOv = _productionQueue.TryProduceOv(observation);
-    if (shouldMakeOv != null)
-    {
-      actions.Add(shouldMakeOv);
-    }
-    else
-    {
-      _build.State.NewObservations(observation);
-      actions.Add(_build.State.ExecuteBuild(_productionQueue, _larvaQueue));
-    }
+
+    _build.State.NewObservations(observation);
+     actions.Add(_build.State.ExecuteBuild());
+    
     return (actions, debugCommands);
   }
-
 
   public void OnEnd(ResponseObservation? observation)
   {

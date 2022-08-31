@@ -46,6 +46,11 @@ namespace SargeBot.Features.Macro.ProductionQueues
       return new() { ActionRaw = new() };
     }
 
+    public bool Contains(Ability ability)
+    {
+      return _BuildingQueue.Contains(ability);
+    }
+
     public void Enqueue(Ability ability)
     {
       _BuildingQueue.Enqueue(ability);

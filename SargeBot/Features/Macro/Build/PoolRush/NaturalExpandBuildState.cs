@@ -15,29 +15,26 @@ namespace SargeBot.Features.Macro.Build
   /// </summary>
   public class NaturalExpandBuildState : BuildState
   {
-    public NaturalExpandBuildState(BuildState state) : this(state.Observation, state.Build, state.ZergBuildingPlacement)
+    public NaturalExpandBuildState(BuildState state) : base(state.Build, state.Observation)
     {
     }
-    public NaturalExpandBuildState(ResponseObservation observation, Build build, ZergBuildingPlacement zergBuildingPlacement)
+    public NaturalExpandBuildState(Build build) : base(build)
     {
-      this.observation = observation;
-      this.build = build;
-      this.ZergBuildingPlacement = zergBuildingPlacement;
     }
 
-    public override SC2APIProtocol.Action ExecuteBuild(ProductionQueue queue, LarvaQueue larvaQueue)
+    public override SC2APIProtocol.Action ExecuteBuild()
     {
-      if (!queue.ContainsUnit(UnitType.ZERG_DRONE) && larvaQueue.IsEmpty()) queue.EnqueueUnit(UnitType.ZERG_DRONE);
+      if (!_productionQueue.ContainsUnit(UnitType.ZERG_DRONE) && _larvaQueue.IsEmpty()) _productionQueue.EnqueueUnit(UnitType.ZERG_DRONE);
 
-      if (!larvaQueue.IsEmpty()) {
-        if (larvaQueue.CountLarvae(observation) > 0 && IProduceable.CanCreate(observation, larvaQueue.PeekLarva()))
+      if (!_larvaQueue.IsEmpty()) {
+        if (_larvaQueue.CountLarvae(observation) > 0 && IProduceable.CanCreate(observation, _larvaQueue.PeekLarva()))
         {
-          queue.CreateUnitAction(observation, larvaQueue.Dequeue());
+          _productionQueue.CreateUnitAction(observation, _larvaQueue.Dequeue());
         }
       }
-      else if (!queue.IsEmpty() && larvaQueue.IsEmpty()) { 
-        if (IProduceable.CanCreate(observation, queue.Peek())){
-          queue.ProduceFirstItem(observation);
+      else if (!_productionQueue.IsEmpty() && _larvaQueue.IsEmpty()) { 
+        if (IProduceable.CanCreate(observation, _productionQueue.Peek())){
+          _productionQueue.ProduceFirstItem(observation);
         }
       }
 
@@ -64,7 +61,8 @@ namespace SargeBot.Features.Macro.Build
     public override void NewObservations(ResponseObservation observation)
     {
       this.observation = observation;
-      StateChangeCheck();
+      currentState = PoolRush.AllBuildStates.NaturalExpand;
+      base.StateChecker();
     }
 
     private void StateChangeCheck()
@@ -77,12 +75,11 @@ namespace SargeBot.Features.Macro.Build
     /// Changes state when you get 6 lings
     /// </summary>
     /// <returns></returns>
-    public static Predicate<ResponseObservation> GetBuildState()
+    public static Predicate<ResponseObservation> BuildPrecicate()
     {
       Predicate<ResponseObservation> predicate =
         (obs) => obs.Observation.RawData.Units.Count(u => u.UnitType.Is(UnitType.ZERG_ZERGLING)) >= 6;
       return predicate;
     }
-
   }
 }
