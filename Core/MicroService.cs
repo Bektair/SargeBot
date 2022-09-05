@@ -13,7 +13,7 @@ public class MicroService : IMicroService
 
     public void AttackMove(Squad squad, Point2D target, bool queue = false)
     {
-        _messageService.Action(Ability.ATTACK, target, squad.Units.Select(x => x.Tag), queue);
+        _messageService.Action(Ability.ATTACK, squad.Units.Select(x => x.Tag), target, queue);
     }
 }
 

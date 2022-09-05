@@ -2,6 +2,7 @@
 using Core;
 using Core.Bot;
 using Core.Game;
+using Core.Terran;
 using Microsoft.Extensions.DependencyInjection;
 using SC2APIProtocol;
 using SC2ClientApi;

@@ -3,8 +3,11 @@
 public static class UnitTypeExtensions
 {
     public static bool Is(this uint n, UnitType e) => n == (uint) e;
+    
+    // could be abstract and implemented in faction specific data service
     public static bool IsWorker(this uint u) => (UnitType)u is UnitType.TERRAN_SCV or UnitType.PROTOSS_PROBE or UnitType.ZERG_DRONE;
 
+    // could be abstract and implemented in faction specific data service
     public static bool IsMainBuilding(this uint unitType) =>
         (UnitType) unitType is UnitType.PROTOSS_NEXUS or
         UnitType.ZERG_HATCHERY or UnitType.ZERG_LAIR or UnitType.ZERG_HIVE or

@@ -10,33 +10,6 @@ internal class MessageService : IMessageService
     private List<Action> Actions { get; } = new();
     private List<DebugCommand> Debugs { get; } = new();
 
-
-    public void Action(Ability ability, Point2D target, IEnumerable<ulong> unitTags, bool queue = false)
-    {
-        var command = new ActionRawUnitCommand
-        {
-            AbilityId = (int)Ability.ATTACK,
-            TargetWorldSpacePos = target,
-            QueueCommand = queue,
-            UnitTags = { unitTags }
-        };
-
-        Actions.Add(new Action { ActionRaw = new ActionRaw { UnitCommand = command } });
-    }
-
-    public void Action(Ability ability, ulong target, IEnumerable<ulong> unitTags, bool queue = false)
-    {
-        var command = new ActionRawUnitCommand
-        {
-            AbilityId = (int)Ability.ATTACK,
-            TargetUnitTag = target,
-            QueueCommand = queue,
-            UnitTags = { unitTags }
-        };
-
-        Actions.Add(new Action { ActionRaw = new ActionRaw { UnitCommand = command } });
-    }
-
     public void SetConnection(GameConnection connection)
     {
         Connection = connection;
@@ -54,12 +27,53 @@ internal class MessageService : IMessageService
     {
         Debugs.Add(command);
     }
+
+    public void Action(Ability ability, IEnumerable<ulong> unitTags, Point2D target, bool queue = false)
+    {
+        var command = CreateActionCommand(ability, unitTags, queue);
+        command.TargetWorldSpacePos = target;
+
+        AddAction(command);
+    }
+
+    public void Action(Ability ability, IEnumerable<ulong> unitTags, ulong target, bool queue = false)
+    {
+        var command = CreateActionCommand(ability, unitTags, queue);
+        command.TargetUnitTag = target;
+
+        AddAction(command);
+    }
+
+
+    public void Action(Ability ability, IEnumerable<ulong> unitTags, bool queue = false)
+    {
+        var command = CreateActionCommand(ability, unitTags, queue);
+
+        AddAction(command);
+    }
+
+
+    private ActionRawUnitCommand CreateActionCommand(Ability ability, IEnumerable<ulong> unitTags, bool queue = false)
+    {
+        return new ActionRawUnitCommand
+        {
+            AbilityId = (int)ability,
+            QueueCommand = queue,
+            UnitTags = { unitTags }
+        };
+    }
+
+    private void AddAction(ActionRawUnitCommand command)
+    {
+        Actions.Add(new Action { ActionRaw = new ActionRaw { UnitCommand = command } });
+    }
 }
 
 public interface IMessageService
 {
-    public void Action(Ability ability, Point2D target, IEnumerable<ulong> unitTags, bool queue = false);
-    public void Action(Ability ability, ulong target, IEnumerable<ulong> unitTags, bool queue = false);
+    public void Action(Ability ability, IEnumerable<ulong> unitTags, bool queue = false);
+    public void Action(Ability ability, IEnumerable<ulong> unitTags, Point2D target, bool queue = false);
+    public void Action(Ability ability, IEnumerable<ulong> unitTags, ulong target, bool queue = false);
     void Debug(DebugCommand command);
     public void SetConnection(GameConnection connection);
     public Task OnFrame();

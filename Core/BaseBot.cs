@@ -8,7 +8,7 @@ namespace Core.Bot;
 
 public abstract class BaseBot
 {
-    private readonly IDataService Data;
+    protected readonly IDataService Data;
     protected readonly IIntelService Intel;
     protected readonly IMessageService MessageService;
     protected readonly IMicroService MicroService;

@@ -1,6 +1,7 @@
 ﻿using Core;
 using Core.Bot;
 using Core.Game;
+using Core.Terran;
 using Microsoft.Extensions.DependencyInjection;
 using SargeBot.Features.GameData;
 using SargeBot.Features.GameInfo;

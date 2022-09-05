@@ -1,7 +1,7 @@
 ﻿using SC2APIProtocol;
 using SC2ClientApi;
 
-namespace Core.Bot;
+namespace Core.Terran;
 
 public class ScvRushBot : TerranBot
 {

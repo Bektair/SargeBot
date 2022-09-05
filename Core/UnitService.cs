@@ -1,6 +1,6 @@
 ﻿using Core.Extensions;
 using Core.Intel;
-using SC2ClientApi;
+using Core.Terran;
 
 namespace Core;
 
@@ -17,12 +17,14 @@ public class UnitService : IUnitService
 
     public void Train(UnitType unitType)
     {
-        if (!UnitTrainedFrom.Producer.TryGetValue(unitType, out var producers))
+        if (!TerranDataHelpers._producers.TryGetValue(unitType, out var producers))
             throw new NotImplementedException();
 
-        var producer = producers.Single();
+        var producer = producers.First();
 
-        _messageService.Action(producer.ability, 0, _intelService.GetStructures(producer.producerType).Select(x => x.Tag));
+        var structures = _intelService.GetStructures(producer.Type).Select(x => x.Tag);
+
+        _messageService.Action(producer.Ability, structures);
     }
 }
 
