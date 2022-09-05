@@ -22,12 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\GameData\" />
-    <Folder Include="Features\GameInfo\" />
-    <Folder Include="GameClient\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\SargeBot\SargeBot.csproj" />
     <ProjectReference Include="..\SC2ClientApi\SC2ClientApi.csproj" />
     <ProjectReference Include="..\SC2ClientProtocol\SC2ClientProtocol.csproj" />

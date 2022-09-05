@@ -16,12 +16,10 @@
         <Content Include="appsettings.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
-        <Content Include="ladderbots.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\core\Core.csproj" />
         <ProjectReference Include="..\SC2ClientApi\SC2ClientApi.csproj" />
         <ProjectReference Include="..\SC2ClientProtocol\SC2ClientProtocol.csproj" />
     </ItemGroup>

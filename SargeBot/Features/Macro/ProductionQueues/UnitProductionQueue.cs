@@ -113,8 +113,8 @@ public class UnitProductionQueue : IUnitProductionQueue
 
   public int CountOfUnitType(UnitType unit)
   {
-    int count = larvaQueue.larvaQueue.Where(u => u == unit).Count();
-    return count + UnitQueue.Where(u => u == unit).Count();
+    int count = larvaQueue.larvaQueue.Count(u => u == unit);
+    return count + UnitQueue.Count(u => u == unit);
   }
 
   public bool ShouldMakeOverlord(ResponseObservation observation)

@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using SC2ClientApi.Constants;
 
@@ -6,44 +9,63 @@ namespace SC2ClientApi;
 
 public static class Sc2Process
 {
+    public enum ScreenPosition
+    {
+        Left,
+        Right,
+        Center
+    }
+
     private static string? _sc2Directory;
 
-    public static void Start(GameSettings gs, bool isHost)
+    public static Process? Start(string serverAddress, int port, int screenWidth, int screenHeight, ScreenPosition position)
     {
         var sc2Exe = Sc2Exe();
         var workingDirectory = WorkingDirectory();
-        var arguments = Arguments(gs, isHost);
+        var arguments = Arguments(serverAddress, port, screenWidth, screenHeight, position);
 
         Log.Info($"Starting sc2 process {arguments}");
-        Process.Start(new ProcessStartInfo(sc2Exe)
+        return Process.Start(new ProcessStartInfo(sc2Exe)
         {
             Arguments = arguments, WorkingDirectory = workingDirectory
         });
     }
 
-    public static string MapDirectory(string mapName) => @$"{Sc2Directory()}\Maps\{mapName}";
-
-    private static string Arguments(GameSettings gs, bool isHost)
+    public static string MapDirectory(string mapName)
     {
+        return @$"{Sc2Directory()}\Maps\{mapName}";
+    }
+
+    private static string Arguments(string serverAddress, int port, int screenWidth, int screenHeight, ScreenPosition position)
+    {
+        var displayMode = position switch
+        {
+            ScreenPosition.Left =>
+                $"0 {ClientConstants.WindowWidth} {screenWidth / 2} {ClientConstants.WindowHeight} {screenHeight / 2} {ClientConstants.WindowY} 0 {ClientConstants.WindowX} 0",
+            ScreenPosition.Right =>
+                $"0 {ClientConstants.WindowWidth} {screenWidth / 2} {ClientConstants.WindowHeight} {screenHeight / 2} {ClientConstants.WindowY} 0 {ClientConstants.WindowX} {screenWidth / 2}",
+            _ =>
+                $"0 {ClientConstants.WindowWidth} {screenWidth} {ClientConstants.WindowHeight} {screenHeight} {ClientConstants.WindowY} 0 {ClientConstants.WindowX} 0"
+        };
+
         var arguments = new List<string>
         {
             ClientConstants.Address,
-            gs.HostAddress,
+            serverAddress,
             ClientConstants.Port,
-            (isHost ? gs.HostPort : gs.GuestPort).ToString(),
-            ClientConstants.Fullscreen,
-            gs.Fullscreen
-                ? "1"
-                : isHost
-                    ? $"0 {ClientConstants.WindowWidth} {gs.WindowWidth} {ClientConstants.WindowWidth} {gs.WindowWidth} {ClientConstants.WindowY} 0 {ClientConstants.WindowX} 0"
-                    : $"0 {ClientConstants.WindowWidth} {gs.WindowWidth} {ClientConstants.WindowWidth} {gs.WindowWidth} {ClientConstants.WindowY} 0 {ClientConstants.WindowX} {gs.WindowWidth}"
+            port.ToString(),
+            ClientConstants.DisplayMode,
+            displayMode
         };
 
         return string.Join(" ", arguments);
     }
 
 
-    private static string WorkingDirectory() => @$"{Sc2Directory()}\Support64";
+    private static string WorkingDirectory()
+    {
+        return @$"{Sc2Directory()}\Support64";
+    }
 
     private static string Sc2Exe()
     {
@@ -88,11 +110,9 @@ public static class Sc2Process
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
             // implement linux
             return null;
-        }
 
-        throw new("Not using a supported OS");
+        throw new Exception("Not using a supported OS");
     }
 }

@@ -112,7 +112,7 @@ public class ProductionQueueTest
         };
           larvaQueue = new LarvaQueue(staticGameData);
          productionQueue = new UnitProductionQueue(staticGameData, larvaQueue);
-         queue = new ProductionQueue(staticGameData, productionQueue);
+         //queue = new ProductionQueue(staticGameData, productionQueue);
 
 
         responseObservation = new ResponseObservation();

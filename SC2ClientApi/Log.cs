@@ -1,4 +1,6 @@
-﻿namespace SC2ClientApi;
+﻿using System;
+
+namespace SC2ClientApi;
 
 public static class Log
 {

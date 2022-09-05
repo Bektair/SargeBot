@@ -1,6 +1,6 @@
 ﻿using SC2APIProtocol;
 
-namespace SargeBot.Features.Intel;
+namespace Core.Intel;
 
 public class IntelColony
 {

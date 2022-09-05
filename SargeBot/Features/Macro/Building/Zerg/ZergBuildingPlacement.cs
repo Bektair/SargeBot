@@ -1,20 +1,19 @@
-﻿using SargeBot.Features.Intel;
-using SC2APIProtocol;
+﻿using SC2APIProtocol;
 
 namespace SargeBot.Features.Macro.Building.Zerg;
 
 public class ZergBuildingPlacement
 {
-    private readonly IntelService _intelService;
+    private readonly IIntelService _intelService;
 
-    public ZergBuildingPlacement(IntelService intelService)
+    public ZergBuildingPlacement(IIntelService intelService)
     {
         _intelService = intelService;
     }
 
     public Point2D FindPlacement()
     {
-        var mainBase = _intelService.SelfColonies.First(x => x.IsStartingLocation);
+        var mainBase = _intelService.Colonies.First(x => x.IsStartingLocation);
 
         //  consider copy paste Sharkys circle math
 
@@ -23,6 +22,6 @@ public class ZergBuildingPlacement
         var x = mainBase.Point.X + r.Next(-10, 10);
         var y = mainBase.Point.Y + r.Next(-10, 10);
 
-        return new() {X = x, Y = y};
+        return new Point2D { X = x, Y = y };
     }
 }

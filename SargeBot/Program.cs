@@ -1,98 +1,42 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Core;
+using Core.Bot;
+using Core.Game;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using SargeBot;
 using SargeBot.Features.GameData;
 using SargeBot.Features.GameInfo;
-using SargeBot.Features.Intel;
 using SargeBot.Features.Macro;
 using SargeBot.Features.Macro.Build;
 using SargeBot.Features.Macro.Build.PoolRush;
 using SargeBot.Features.Macro.Building.Zerg;
 using SargeBot.Features.Macro.ProductionQueues;
-using SargeBot.Features.Micro;
-using SargeBot.GameClients;
-using SargeBot.Options;
 using SC2APIProtocol;
 using SC2ClientApi;
 
-Log.Info("Starting SargeBot");
+var sp = new ServiceCollection()
+    .AddCoreServices()
+    .AddScoped<MacroManager>()
+    .AddScoped<StaticGameData>()
+    .AddScoped<MapDataService>()
+    .AddScoped<IntelService>()
+    .AddScoped<ZergBuildingPlacement>()
+    .AddScoped<ProductionQueue>()
+    .AddScoped<IUnitProductionQueue, UnitProductionQueue>()
+    .AddScoped<IBuildingProductionQueue, BuildingProductionQueue>()
+    .AddScoped<LarvaQueue>()
+    .AddScoped<Build>()
+    .AddScoped<BuildStateFactory>()
+    .BuildServiceProvider();
 
-var isLadder = args.Length > 0;
+var gameSettings = new GameSettings(args);
+var playerOne = new SargeBot.SargeBot(sp.CreateScope().ServiceProvider);
 
-using var host = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((_, config) => config.AddJsonFile("appsettings.json"))
-    .ConfigureServices((context, services) =>
-    {
-        services.Configure<CacheOptions>(context.Configuration.GetSection(nameof(CacheOptions)));
-        services.Configure<GameOptions>(context.Configuration.GetSection(nameof(GameOptions)));
-        services.Configure<Sc2ProcessOptions>(context.Configuration.GetSection(nameof(Sc2ProcessOptions)));
-        services.Configure<ServerOptions>(context.Configuration.GetSection(nameof(ServerOptions)));
-        if (isLadder)
-            services.PostConfigure<ServerOptions>(options => ArgsToServerOptions(options, args));
-        services
-            .AddScoped<IGameEngine, SargeBotGameEngine>()
-            .AddScoped<MacroManager>()
-            .AddScoped<StaticGameData>()
-            .AddScoped<MapDataService>()
-            .AddScoped<IntelService>()
-            .AddScoped<ZergBuildingPlacement>()
-            .AddScoped<MicroManager>()
-            .AddScoped<ProductionQueue>()
-            .AddScoped<IUnitProductionQueue, UnitProductionQueue>()
-            .AddScoped<IBuildingProductionQueue, BuildingProductionQueue>()
-            .AddScoped<LarvaQueue>()
-            .AddScoped<Build>()
-            .AddScoped<BuildStateFactory>()
-            ;
-    }).Build();
-
-var gameSettings = host.Services.CreateGameSettings();
-
-var hostClient = CreateGameClient(host.Services, gameSettings.PlayerOne, true);
-
-var guestClient = CreateGameClient(host.Services, gameSettings.PlayerTwo);
-
-await Task.WhenAll(hostClient.Connect(), guestClient?.Connect() ?? Task.CompletedTask);
-
-await hostClient.CreateGame();
-
-await Task.WhenAll(hostClient.JoinGame(), guestClient?.JoinGame() ?? Task.CompletedTask);
-
-await Task.WhenAll(hostClient.Run(), guestClient?.Run() ?? Task.CompletedTask);
-
-static GameClient? CreateGameClient(IServiceProvider services, PlayerSetup playerSetup, bool isHost = false)
+Game game = gameSettings.GameMode switch
 {
-    Log.Info($"Creating {playerSetup.Type} {playerSetup.PlayerName}...");
+    GameMode.Singleplayer => new SingleplayerGame(gameSettings, playerOne, Race.Protoss, AIBuild.Air, Difficulty.Easy),
+    GameMode.Ladder => new LadderGame(gameSettings, playerOne),
+    GameMode.Multiplayer or _ => new MultiplayerGame(gameSettings, playerOne, new ScvRushBot(sp.CreateScope().ServiceProvider))
+};
 
-    if (playerSetup.Type != PlayerType.Participant)
-        return null;
+Log.Info($"Starting {game} {gameSettings}");
 
-    var serviceScope = services.CreateScope();
-    var gameEngine = isHost ? serviceScope.ServiceProvider.GetRequiredService<IGameEngine>() : new ZeroBotGameEngine();
-    return new(services.CreateGameSettings(), gameEngine, playerSetup, isHost);
-}
-
-
-void ArgsToServerOptions(ServerOptions options, string[] args)
-{
-    for (var i = 0; i < args.Length; i += 2)
-        switch (args[i])
-        {
-            case "-g":
-            case "--GamePort":
-                options.GamePort = int.Parse(args[i + 1]);
-                break;
-            case "-o":
-            case "--StartPort":
-                options.StartPort = int.Parse(args[i + 1]);
-                break;
-            case "-l":
-            case "--LadderServer":
-                options.ServerAddress = args[i + 1];
-                break;
-            case "--OpponentId":
-                options.OpponentId = args[i + 1];
-                break;
-        }
-}
+await game.Start();

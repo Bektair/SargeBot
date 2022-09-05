@@ -16,7 +16,6 @@ namespace SargeBot.Tests;
 [TestClass]
 public class MapSerivceTests
 {
-    private GameClient? _gameClient;
     private IServiceProvider _serviceProvider;
 
     private ResponseGameInfo createDummyResponse()

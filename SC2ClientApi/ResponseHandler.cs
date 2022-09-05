@@ -1,4 +1,7 @@
-﻿using SC2APIProtocol;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using SC2APIProtocol;
 using RequestType = SC2APIProtocol.Request.RequestOneofCase;
 
 namespace SC2ClientApi;
@@ -23,7 +26,7 @@ public class ResponseHandler
             if (_handlers.ContainsKey(key))
                 _handlers[key].Add(handler);
             else
-                _handlers[key] = new() {handler};
+                _handlers[key] = new List<Action<Response>> { handler };
         }
     }
 
@@ -38,12 +41,6 @@ public class ResponseHandler
 
     public void Handle(RequestType key, Response response)
     {
-        if (key == RequestType.None)
-        {
-            Log.Error($"ResponseHandler error: {response}");
-            return;
-        }
-
         lock (_handlers)
         {
             // returns the same first response of a request type, to all other waiting requests for that type as well :|
