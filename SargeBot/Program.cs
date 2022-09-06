@@ -1,5 +1,4 @@
 ﻿using Core;
-using Core.Bot;
 using Core.Game;
 using Core.Terran;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,5 +38,12 @@ Game game = gameSettings.GameMode switch
 };
 
 Log.Info($"Starting {game} {gameSettings}");
-
-await game.Start();
+try
+{
+    await game.Start();
+}
+catch (Exception e)
+{
+    Log.Error(e.Message);
+    throw;
+}

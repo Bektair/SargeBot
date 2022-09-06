@@ -13,7 +13,7 @@ public class ScvRushBot : TerranBot
     {
         base.OnFrame(observation);
 
-        UnitService.Train(UnitType.TERRAN_SCV);
+        MacroService.Train(UnitType.TERRAN_SCV);
 
         if (Intel.GetWorkers().Count < 14) return;
 

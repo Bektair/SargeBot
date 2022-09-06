@@ -6,7 +6,7 @@ using SC2ClientApi;
 
 namespace Core.Intel;
 
-public class IntelService : IIntelService
+public abstract class IntelService : IIntelService
 {
     private readonly IDataService _dataService;
 
@@ -19,13 +19,14 @@ public class IntelService : IIntelService
         MineralFields = new(),
         VespeneGeysers = new();
 
-    public IntelService(IDataService dataService)
+    public IntelService(IEnumerable<IDataService> dataServices)
     {
-        _dataService = dataService;
+        _dataService = dataServices.First(x => x.Race == Race);
     }
 
     //TODO: remove or internal
     public Observation Observation { get; set; } = new();
+    public abstract Race Race { get; }
 
     public List<IntelColony> Colonies { get; set; } = new();
 
@@ -122,6 +123,7 @@ public class IntelService : IIntelService
 
 public interface IIntelService
 {
+    public Race Race { get; }
     public List<IntelColony> EnemyColonies { get; set; }
     public List<IntelColony> Colonies { get; set; }
 

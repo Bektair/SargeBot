@@ -11,6 +11,11 @@ public class MicroService : IMicroService
         _messageService = messageService;
     }
 
+    public void Move(Squad squad, Point2D target, bool queue = false)
+    {
+        _messageService.Action(Ability.move_Move, squad.Units.Select(x => x.Tag), target, queue);
+    }
+
     public void AttackMove(Squad squad, Point2D target, bool queue = false)
     {
         _messageService.Action(Ability.ATTACK, squad.Units.Select(x => x.Tag), target, queue);
@@ -19,5 +24,6 @@ public class MicroService : IMicroService
 
 public interface IMicroService
 {
+    public void Move(Squad squad, Point2D target, bool queue = false);
     public void AttackMove(Squad squad, Point2D target, bool queue = false);
 }

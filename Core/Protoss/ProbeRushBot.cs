@@ -13,12 +13,12 @@ public class ProbeRushBot : ProtossBot
     {
         base.OnFrame(observation);
 
-        UnitService.Train(UnitType.PROTOSS_PROBE);
+        MacroService.Train(UnitType.PROTOSS_PROBE);
 
         if (Intel.GetWorkers().Count < 14) return;
 
         var enemyBase = Intel.EnemyColonies.First();
-        
+
         Log.Warning($"Attacking with {Intel.GetWorkers().Count} {nameof(UnitType.PROTOSS_PROBE)}");
 
         var workers = new Squad();
