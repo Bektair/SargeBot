@@ -1,13 +1,12 @@
 ﻿using Core.Bot;
 using Core.Debug;
-using Core.Protoss;
 using SC2APIProtocol;
 
 namespace BillyBot;
 
-public class DebugBot : ProtossBot
+public class DebugBot : BaseBot
 {
-    public DebugBot(IServiceProvider services) : base(services)
+    public DebugBot(IServiceProvider services) : base(services, Race.Terran)
     {
     }
 
@@ -24,8 +23,8 @@ public class DebugBot : ProtossBot
         MessageService.Debug(DebugRequest.DrawBox(new Point { X = enemyBase.Point.X, Y = enemyBase.Point.Y, Z = z },
             new Point { X = enemyBase.Point.X + 5, Y = enemyBase.Point.Y + 5, Z = z }, new Color { B = 255 }));
 
-        var naturalBase = Intel.Colonies.First();
-        MessageService.Debug(DebugRequest.DrawSphere(new Point { X = naturalBase.Point.X, Y = naturalBase.Point.Y, Z = z },
+        var firstWorker = Intel.GetWorkers().First();
+        MessageService.Debug(DebugRequest.DrawSphere(new Point { X = firstWorker.Point.X, Y = firstWorker.Point.Y, Z = z },
             color: new Color { G = 255 }));
     }
 }

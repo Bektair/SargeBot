@@ -1,5 +1,4 @@
-﻿using Core.Extensions;
-using Core.Intel;
+﻿using Core.Intel;
 using Core.Terran;
 
 namespace Core;
@@ -17,7 +16,8 @@ public class UnitService : IUnitService
 
     public void Train(UnitType unitType)
     {
-        if (!TerranDataHelpers._producers.TryGetValue(unitType, out var producers))
+        // TODO: zerg + toss
+        if (!TerranDataHelpers.Producers.TryGetValue(unitType, out var producers))
             throw new NotImplementedException();
 
         var producer = producers.First();

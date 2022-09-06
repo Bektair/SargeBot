@@ -12,13 +12,15 @@ public abstract class BaseBot
     protected readonly IIntelService Intel;
     protected readonly IMessageService MessageService;
     protected readonly IMicroService MicroService;
+    protected readonly IUnitService UnitService;
 
     public BaseBot(IServiceProvider services, Race race)
     {
-        Data = services.GetRequiredService<IDataService>();
+        Data = services.GetRequiredService<IEnumerable<IDataService>>().First(x => x.Race == race);
         Intel = services.GetRequiredService<IIntelService>();
         MessageService = services.GetRequiredService<IMessageService>();
         MicroService = services.GetRequiredService<IMicroService>();
+        UnitService = services.GetRequiredService<IUnitService>();
         PlayerSetup = new PlayerSetup { PlayerName = GetType().Name, Race = race, Type = PlayerType.Participant };
     }
 

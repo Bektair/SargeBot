@@ -1,8 +1,8 @@
 ﻿namespace Core.Terran;
 
-public class TerranDataHelpers
+public static class TerranDataHelpers
 {
-    public static Dictionary<UnitType, (UnitType Type, Ability Ability)[]> _producers = new()
+    public static readonly Dictionary<UnitType, (UnitType Type, Ability Ability)[]> Producers = new()
     {
         {
             UnitType.TERRAN_SCV,
@@ -16,7 +16,7 @@ public class TerranDataHelpers
         { UnitType.TERRAN_COMMANDCENTER, new[] { (UnitType.TERRAN_SCV, Ability.BUILD_COMMANDCENTER) } }
     };
 
-    private readonly List<UnitType> _requiresTechLab = new()
+    public static readonly List<UnitType> RequiresTechLab = new()
     {
         UnitType.TERRAN_MARAUDER,
         UnitType.TERRAN_GHOST,
@@ -29,7 +29,7 @@ public class TerranDataHelpers
         UnitType.TERRAN_BANSHEE
     };
 
-    private readonly Dictionary<UnitType, UnitType> _techRequirement = new()
+    public static readonly Dictionary<UnitType, UnitType> TechRequirement = new()
     {
         { UnitType.TERRAN_GHOST, UnitType.TERRAN_GHOSTACADEMY },
         { UnitType.TERRAN_HELLIONTANK, UnitType.TERRAN_ARMORY },
