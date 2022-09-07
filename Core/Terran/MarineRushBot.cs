@@ -9,6 +9,13 @@ public class MarineRushBot : TerranBot
     {
     }
 
+    public override void OnStart(ResponseObservation firstObservation, ResponseData responseData, ResponseGameInfo gameInfo)
+    {
+        base.OnStart(firstObservation, responseData, gameInfo);
+        
+        MessageService.Chat("GL HF");
+    }
+
     public override void OnFrame(ResponseObservation observation)
     {
         base.OnFrame(observation);

@@ -33,7 +33,7 @@ internal class MessageService : IMessageService
         var command = CreateActionCommand(ability, unitTags, queue);
         command.TargetWorldSpacePos = target;
 
-        AddAction(command);
+        AddActionRaw(command);
     }
 
     public void Action(Ability ability, IEnumerable<ulong> unitTags, ulong target, bool queue = false)
@@ -41,7 +41,7 @@ internal class MessageService : IMessageService
         var command = CreateActionCommand(ability, unitTags, queue);
         command.TargetUnitTag = target;
 
-        AddAction(command);
+        AddActionRaw(command);
     }
 
 
@@ -49,7 +49,12 @@ internal class MessageService : IMessageService
     {
         var command = CreateActionCommand(ability, unitTags, queue);
 
-        AddAction(command);
+        AddActionRaw(command);
+    }
+
+    public void Chat(string message)
+    {
+        Actions.Add(new Action { ActionChat = new ActionChat { Message = message } });
     }
 
 
@@ -63,7 +68,7 @@ internal class MessageService : IMessageService
         };
     }
 
-    private void AddAction(ActionRawUnitCommand command)
+    private void AddActionRaw(ActionRawUnitCommand command)
     {
         Actions.Add(new Action { ActionRaw = new ActionRaw { UnitCommand = command } });
     }
@@ -74,6 +79,7 @@ public interface IMessageService
     public void Action(Ability ability, IEnumerable<ulong> unitTags, bool queue = false);
     public void Action(Ability ability, IEnumerable<ulong> unitTags, Point2D target, bool queue = false);
     public void Action(Ability ability, IEnumerable<ulong> unitTags, ulong target, bool queue = false);
+    void Chat(string message);
     void Debug(DebugCommand command);
     public void SetConnection(GameConnection connection);
     public Task OnFrame();
