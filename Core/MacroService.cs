@@ -28,9 +28,32 @@ public abstract class MacroService : IMacroService
 
         var producer = producers.First();
 
-        var structures = IntelService.GetStructures(producer.Type).Select(x => x.Tag);
+        var builders = IntelService.GetStructures(producer.Type)
+            .Where(x => x.BuildProgress == 1)
+            .Where(x => !x.Orders.Any())
+            .Select(x => x.Tag);
 
-        MessageService.Action(producer.Ability, structures);
+        MessageService.Action(producer.Ability, builders);
+    }
+
+    /// <summary>
+    ///     Should be replaced with production queue
+    /// </summary>
+    public virtual void Build(UnitType unitType)
+    {
+        if (!TerranDataHelpers.Producers.TryGetValue(unitType, out var producers) &&
+            !ProtossDataHelpers.Producers.TryGetValue(unitType, out producers))
+            throw new NotImplementedException($"Producer for {unitType} not found");
+
+        var producer = producers.First();
+
+        var builders = IntelService.GetWorkers()
+            .Select(x => x.Tag)
+            .Take(2);
+
+        var location = BuildingPlacement.Random(IntelService.Colonies.First().Point);
+        
+        MessageService.Action(producer.Ability, builders, location);
     }
 }
 
@@ -38,4 +61,5 @@ public interface IMacroService
 {
     Race Race { get; }
     void Train(UnitType unitType);
+    void Build(UnitType unitType);
 }

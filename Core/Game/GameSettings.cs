@@ -7,7 +7,7 @@ public record GameSettings
         UseArgs(args);
     }
 
-    public GameMode GameMode { get; set; } = GameMode.Multiplayer;
+    public GameMode GameMode { get; set; } = GameMode.Singleplayer;
     public string ServerAddress { get; set; } = "127.0.0.1";
     public int GamePort { get; set; } = 8765;
 

@@ -14,7 +14,11 @@ public static class TerranDataHelpers
                 (UnitType.TERRAN_PLANETARYFORTRESS, Ability.TRAIN_SCV)
             }
         },
-        { UnitType.TERRAN_COMMANDCENTER, new[] { (UnitType.TERRAN_SCV, Ability.BUILD_COMMANDCENTER) } }
+        { UnitType.TERRAN_MARINE, new[] { (UnitType.TERRAN_BARRACKS, Ability.TRAIN_MARINE) } },
+        
+        { UnitType.TERRAN_COMMANDCENTER, new[] { (UnitType.TERRAN_SCV, Ability.BUILD_COMMANDCENTER) } },
+        { UnitType.TERRAN_SUPPLYDEPOT, new[] { (UnitType.TERRAN_SCV, Ability.BUILD_SUPPLYDEPOT) } },
+        { UnitType.TERRAN_BARRACKS, new[] { (UnitType.TERRAN_SCV, Ability.BUILD_BARRACKS) } },
     };
 
     public static readonly List<UnitType> RequiresTechLab = new()

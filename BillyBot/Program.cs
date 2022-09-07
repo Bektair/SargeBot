@@ -1,6 +1,7 @@
 ﻿using Core;
 using Core.Game;
 using Core.Protoss;
+using Core.Terran;
 using Core.Zerg;
 using Microsoft.Extensions.DependencyInjection;
 using SC2APIProtocol;
@@ -11,7 +12,7 @@ var sp = new ServiceCollection()
     .BuildServiceProvider();
 
 var gameSettings = new GameSettings(args);
-var playerOne = new DroneRushBot(sp.CreateScope().ServiceProvider);
+var playerOne = new MarineRushBot(sp.CreateScope().ServiceProvider);
 
 Game game = gameSettings.GameMode switch
 {

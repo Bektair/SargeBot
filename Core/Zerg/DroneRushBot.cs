@@ -19,12 +19,12 @@ public class DroneRushBot : ZergBot
 
         var enemyBase = Intel.EnemyColonies.First();
 
-        Log.Warning($"Attacking with {Intel.GetWorkers().Count} {nameof(UnitType.ZERG_DRONE)}");
+        var attackers = new Squad();
+        attackers.AddUnits(Intel.GetWorkers());
 
-        var workers = new Squad();
-        workers.AddUnits(Intel.GetWorkers());
+        MicroService.AttackMove(attackers, enemyBase.Point);
 
-        MicroService.AttackMove(workers, enemyBase.Point);
+        Log.Warning($"Attacking with {attackers.Units.Count} {attackers.Units.FirstOrDefault()?.UnitType}");
 
         var overlords = new Squad();
         overlords.AddUnits(OverlordService.GetOverlords());

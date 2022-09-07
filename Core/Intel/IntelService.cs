@@ -30,9 +30,14 @@ public abstract class IntelService : IIntelService
 
     public List<IntelColony> Colonies { get; set; } = new();
 
+    public List<IntelUnit> GetUnits(UnitType unitType)
+    {
+        return Units.Values.Where(x => x.UnitType.Is(unitType)).ToList();
+    }
+
     public List<IntelUnit> GetStructures(UnitType unitType)
     {
-        return Structures.Values.Where(s => s.UnitType.Is(unitType)).ToList();
+        return Structures.Values.Where(x => x.UnitType.Is(unitType)).ToList();
     }
 
     public List<IntelUnit> GetWorkers()
@@ -47,10 +52,9 @@ public abstract class IntelService : IIntelService
         if (gameInfo != null)
             EnemyColonies.Add(new IntelColony { Point = gameInfo.StartRaw.StartLocations.Last() });
 
-        if (gameInfo != null)
-            Colonies.Add(new IntelColony { Point = gameInfo.StartRaw.StartLocations.First() });
-
         OnFrame(firstObservation);
+
+        Colonies.Add(new IntelColony { Point = Structures.First().Value.Point });
     }
 
     public virtual void OnFrame(ResponseObservation observation)
@@ -96,28 +100,25 @@ public abstract class IntelService : IIntelService
 
     private void AddEnemyUnit(Unit unit)
     {
-        if (EnemyUnits.ContainsKey(unit.Tag))
-            EnemyUnits[unit.Tag].Data = unit;
-        else
-            EnemyUnits.Add(unit.Tag, new IntelUnit(unit));
+        AddOrUpdateIntelUnits(EnemyUnits, unit);
     }
 
     private void AddUnit(Unit unit)
     {
         if (unit.UnitType.IsWorker())
-        {
-            if (Workers.ContainsKey(unit.Tag))
-                Workers[unit.Tag].Data = unit;
-            else
-                Workers.Add(unit.Tag, new IntelUnit(unit));
-        }
+            AddOrUpdateIntelUnits(Workers, unit);
         else if (_dataService.IsStructure(unit.UnitType))
-        {
-            if (Structures.ContainsKey(unit.Tag))
-                Structures[unit.Tag].Data = unit;
-            else
-                Structures.Add(unit.Tag, new IntelUnit(unit));
-        }
+            AddOrUpdateIntelUnits(Structures, unit);
+        else
+            AddOrUpdateIntelUnits(Units, unit);
+    }
+
+    private void AddOrUpdateIntelUnits(Dictionary<ulong, IntelUnit> intelUnits, Unit unit)
+    {
+        if (intelUnits.ContainsKey(unit.Tag))
+            intelUnits[unit.Tag].Data = unit;
+        else
+            intelUnits.Add(unit.Tag, new IntelUnit(unit));
     }
 }
 
@@ -127,6 +128,7 @@ public interface IIntelService
     public List<IntelColony> EnemyColonies { get; set; }
     public List<IntelColony> Colonies { get; set; }
 
+    public List<IntelUnit> GetUnits(UnitType unitType);
     public List<IntelUnit> GetStructures(UnitType unitType);
     public List<IntelUnit> GetWorkers();
     public void OnStart(ResponseObservation firstObservation, ResponseData? responseData = null, ResponseGameInfo? gameInfo = null);
