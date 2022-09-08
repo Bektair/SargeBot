@@ -8,9 +8,8 @@ namespace Core.Intel;
 
 public abstract class IntelService : IIntelService
 {
-    private readonly IDataService _dataService;
-
     private readonly Dictionary<ulong, IntelUnit>
+        _allUnits        = new(),
         _units           = new(),
         _enemyUnits      = new(),
         _workers         = new(),
@@ -22,14 +21,15 @@ public abstract class IntelService : IIntelService
         _mineralFields   = new(),
         _vespeneGeysers  = new();
 
+    private readonly IDataService _dataService;
+
     public IntelService(IEnumerable<IDataService> dataServices)
     {
         _dataService = dataServices.First(x => x.Race == Race);
     }
 
-    //TODO: remove or internal
-    public Observation Observation { get; set; } = new();
     public abstract Race Race { get; }
+    public uint GameLoop { get; private set; }
     public List<IntelColony> Colonies { get; } = new();
     public List<IntelColony> EnemyColonies { get; } = new();
 
@@ -95,7 +95,7 @@ public abstract class IntelService : IIntelService
 
     public virtual void OnFrame(ResponseObservation observation)
     {
-        Observation = observation.Observation;
+        GameLoop = observation.Observation.GameLoop;
 
         HandleUnits(observation.Observation.RawData.Units);
 
@@ -107,17 +107,32 @@ public abstract class IntelService : IIntelService
         if (rawDataEvent == null) return;
 
         foreach (var deadUnit in rawDataEvent.DeadUnits)
-            if (_workers.TryGetValue(deadUnit, out var worker))
-                Log.Error($"{(UnitType)worker.UnitType} died (tag:{deadUnit})");
-            else if (_enemyUnits.TryGetValue(deadUnit, out var enemyUnit))
-                Log.Success($"Enemy {(UnitType)enemyUnit.UnitType} died (tag:{deadUnit})");
+            if (_allUnits.TryGetValue(deadUnit, out var unit))
+            {
+                if (unit.Alliance == Alliance.Ally)
+                {
+                    Log.Error($"{(UnitType)unit.UnitType} died (tag:{deadUnit})");
+                    //TODO: remove from all dictionaries, or just have the _allUnits and filter on retrieval?
+                    _units.Remove(unit.Tag);
+                }
+                else
+                {
+                    Log.Success($"Enemy {(UnitType)unit.UnitType} died (tag:{deadUnit})");
+                }
+
+                _allUnits.Remove(unit.Tag);
+            }
             else
+            {
                 Log.Info($"Unknown unit died (tag:{deadUnit})");
+            }
     }
 
     private void HandleUnits(RepeatedField<Unit> rawDataUnits)
     {
         foreach (var unit in rawDataUnits)
+        {
+            AddOrUpdateIntelUnits(_allUnits, unit);
             switch (unit.Alliance)
             {
                 case Alliance.Self:
@@ -133,6 +148,7 @@ public abstract class IntelService : IIntelService
                 default:
                     throw new NotImplementedException();
             }
+        }
     }
 
     private void AddEnemyUnit(Unit unit)
@@ -179,10 +195,11 @@ public abstract class IntelService : IIntelService
 public interface IIntelService
 {
     public Race Race { get; }
+    public uint GameLoop { get; }
 
     public List<IntelColony> Colonies { get; }
     public List<IntelColony> EnemyColonies { get; }
-    
+
     public List<IntelUnit> GetUnits(UnitType unitType);
     public List<IntelUnit> GetEnemyUnits(UnitType unitType);
     public List<IntelUnit> GetStructures(UnitType unitType);
@@ -193,7 +210,7 @@ public interface IIntelService
     public List<IntelUnit> GetVespeneGeysers();
     public List<IntelUnit> GetDestructibles();
     public List<IntelUnit> GetXelNagaTowers();
-    
+
     public void OnStart(ResponseObservation firstObservation, ResponseData? responseData = null, ResponseGameInfo? gameInfo = null);
     public void OnFrame(ResponseObservation observation);
 }

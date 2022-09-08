@@ -13,7 +13,7 @@ var sp = new ServiceCollection()
     .BuildServiceProvider();
 
 var gameSettings = new GameSettings(args);
-var playerOne = new DebugBot(sp.CreateScope().ServiceProvider);
+var playerOne = new MarineRushBot(sp.CreateScope().ServiceProvider);
 
 Game game = gameSettings.GameMode switch
 {

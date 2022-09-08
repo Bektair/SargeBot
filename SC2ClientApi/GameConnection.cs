@@ -26,9 +26,6 @@ public class GameConnection
         _responseHandler = new ResponseHandler();
     }
 
-    public uint GameLoop { get; set; }
-    public uint PlayerId { get; set; }
-
     private string GameVersion { get; set; } = string.Empty;
 
     public Status Status
@@ -170,7 +167,6 @@ public class GameConnection
             return null;
         }
 
-        GameLoop = response.Observation.Observation.GameLoop;
         return response.Observation;
     }
 
