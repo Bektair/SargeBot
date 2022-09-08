@@ -1,6 +1,4 @@
-﻿using Core.Bot;
-
-namespace Core.Game;
+﻿namespace Core.Game;
 
 public class LadderGame : Game
 {

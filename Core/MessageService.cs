@@ -17,7 +17,13 @@ internal class MessageService : IMessageService
 
     public async Task OnFrame()
     {
-        await Connection.ActionRequest(Actions);
+        var actions = await Connection.ActionRequest(Actions);
+        if (actions.Any(x => x == ActionResult.Success))
+        {
+            // getting some Error results, but that may be due to action spam when we can't afford units ie.
+            // Log.Warning($"{actions.Count(x => x != ActionResult.Success)} non successful actions");
+        }
+
         await Connection.DebugRequest(Debugs);
         Actions.Clear();
         Debugs.Clear();

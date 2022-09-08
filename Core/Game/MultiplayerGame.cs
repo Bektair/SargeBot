@@ -1,5 +1,4 @@
-﻿using Core.Bot;
-using SC2ClientApi;
+﻿using SC2ClientApi;
 
 namespace Core.Game;
 

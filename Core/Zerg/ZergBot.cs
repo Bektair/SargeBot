@@ -1,5 +1,4 @@
-﻿using Core.Bot;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SC2APIProtocol;
 
 namespace Core.Zerg;

@@ -9,13 +9,11 @@ public abstract class DataService : IDataService
     private readonly Dictionary<uint, BuffData> _buffData = new();
     private readonly Dictionary<uint, UnitTypeData> _unitTypeData = new();
     private readonly Dictionary<uint, UpgradeData> _upgradeData = new();
-    
+
     public abstract Race Race { get; }
 
-    public virtual void OnStart(ResponseObservation obs, ResponseData? data, ResponseGameInfo? gameInfo)
+    public virtual void OnStart(ResponseObservation obs, ResponseData data, ResponseGameInfo gameInfo)
     {
-        if (data == null) throw new Exception("Invalid data");
-        
         foreach (var ability in data.Abilities)
             _abilityData.Add(ability.AbilityId, ability);
         foreach (var buff in data.Buffs)
@@ -25,7 +23,7 @@ public abstract class DataService : IDataService
         foreach (var unitType in data.Units)
             _unitTypeData.Add(unitType.UnitId, unitType);
     }
-    
+
     public virtual bool IsStructure(uint unitType)
     {
         return _unitTypeData.TryGetValue(unitType, out var value) && value.Attributes.Contains(Attribute.Structure);
@@ -35,6 +33,6 @@ public abstract class DataService : IDataService
 public interface IDataService
 {
     public Race Race { get; }
-    public void OnStart(ResponseObservation obs, ResponseData? data, ResponseGameInfo? gameInfo);
+    public void OnStart(ResponseObservation obs, ResponseData data, ResponseGameInfo gameInfo);
     public bool IsStructure(uint unitType);
 }

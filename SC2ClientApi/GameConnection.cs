@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.WebSockets;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net.WebSockets;
 using Google.Protobuf;
 using SC2APIProtocol;
 using SC2ClientApi.Constants;
@@ -15,7 +10,7 @@ public class GameConnection
 {
     private const int READ_BUFFER = 1024;
     private const int MAX_CONNECTION_ATTEMPTS = 25;
-    private const int TIMEOUT = 2000; //ms
+    private const int TIMEOUT_MS = 2000;
     private readonly ResponseHandler _responseHandler;
     private readonly CancellationToken _token = CancellationToken.None;
     private ClientWebSocket? _socket;
@@ -63,7 +58,7 @@ public class GameConnection
             }
 
             attempt++;
-            await Task.Delay(TIMEOUT, _token);
+            await Task.Delay(TIMEOUT_MS, _token);
         } while (_socket.State != WebSocketState.Open && attempt <= maxAttempts);
 
         if (_socket.State != WebSocketState.Open)
@@ -73,7 +68,7 @@ public class GameConnection
 
         Task.Factory.StartNew(ReceiveForever, TaskCreationOptions.LongRunning);
 
-        await Task.Delay(TIMEOUT);
+        // await Task.Delay(TIMEOUT_MS);
 
         var pingResponse = await SendAndReceiveAsync(ClientConstants.RequestPing);
         if (pingResponse == null)
@@ -82,13 +77,13 @@ public class GameConnection
             return false;
         }
 
-        Log.Info(
-            $"Ping OK [GameVersion={pingResponse.Ping.GameVersion}] [DataVersion={pingResponse.Ping.DataVersion}] [DataBuild={pingResponse.Ping.DataBuild}] [BaseBuild={pingResponse.Ping.BaseBuild}]");
+        Log.Info(            $"Ping OK [GameVersion={pingResponse.Ping.GameVersion}] [DataVersion={pingResponse.Ping.DataVersion}] [DataBuild={pingResponse.Ping.DataBuild}] [BaseBuild={pingResponse.Ping.BaseBuild}]");
         GameVersion = pingResponse.Ping.GameVersion;
         return pingResponse.Ping.HasGameVersion;
     }
 
-    public async Task<ResponseCreateGame?> CreateGame(PlayerSetup playerOne, PlayerSetup playerTwo, string mapName)
+    public async Task<(bool Success, ResponseCreateGame.Types.Error? Error, string? ErrorDetails)> CreateGame(PlayerSetup playerOne, PlayerSetup playerTwo,
+        string mapName)
     {
         var request = new Request
         {
@@ -108,11 +103,13 @@ public class GameConnection
         Log.Info($"{playerOne.PlayerName} Creating game");
         var response = await SendAndReceiveAsync(request);
         if (response?.CreateGame == null || response.CreateGame.HasError)
+        {
             Log.Error($"Creating game failed {response?.Error} {response?.CreateGame?.Error}");
-        else
-            Log.Success($"{playerOne.PlayerName} Created game");
+            return (false, response?.CreateGame?.Error, response?.CreateGame?.ErrorDetails);
+        }
 
-        return response?.CreateGame;
+        Log.Success($"{playerOne.PlayerName} Created game");
+        return (true, null, null);
     }
 
     public async Task JoinGame(PlayerSetup playerSetup, (int, int, int, int)? multiplayerPorts = null)
@@ -144,16 +141,16 @@ public class GameConnection
         }
 
         Log.Info($"{playerSetup.PlayerName} Joining game");
-        await SendAsync(request);
+        await SendAsync(request); // times out on receive. fix if we need PlayerId for something.
         Log.Success($"{playerSetup.PlayerName} Joined game");
     }
 
-    public async Task<Response?> Step()
+    public async Task Step()
     {
-        return await SendAndReceiveAsync(ClientConstants.RequestStep);
+        await SendAndReceiveAsync(ClientConstants.RequestStep);
     }
 
-    public async Task<ResponseObservation?> Observation(uint? gameLoop = null)
+    public async Task<ResponseObservation> Observation(uint? gameLoop = null)
     {
         var request = ClientConstants.RequestObservation;
 
@@ -161,45 +158,39 @@ public class GameConnection
             request.Observation.GameLoop = gameLoop.Value;
 
         var response = await SendAndReceiveAsync(request);
-        if (response?.Observation == null)
-        {
-            Log.Warning("Observation null. Probably timeout.");
-            return null;
-        }
 
-        return response.Observation;
+        return response?.Observation ?? throw new ArgumentNullException($"Observation null. Probably timeout. Request loop {request.Observation.GameLoop}");
     }
 
-    public async Task<ResponseAction?> ActionRequest(List<Action> actions)
+    public async Task<List<ActionResult>> ActionRequest(List<Action> actions)
     {
-        if (actions.Count == 0) return null;
+        if (actions.Count == 0)
+            return new List<ActionResult>();
 
-        var request = new Request { Action = new RequestAction() };
-        request.Action.Actions.AddRange(actions);
+        var request = new Request { Action = new RequestAction { Actions = { actions } } };
 
         var response = await SendAndReceiveAsync(request);
-        return response?.Action;
+
+        return response?.Action.Result.ToList() ?? throw new ArgumentNullException();
     }
 
-    public async Task<ResponseDebug?> DebugRequest(List<DebugCommand> debugCommands)
+    public async Task DebugRequest(List<DebugCommand> debugCommands)
     {
-        if (debugCommands.Count == 0) return null;
+        if (debugCommands.Count == 0) return;
 
-        var response = await SendAndReceiveAsync(new Request { Debug = new RequestDebug { Debug = { debugCommands } } });
-
-        return response?.Debug;
+        await SendAndReceiveAsync(new Request { Debug = new RequestDebug { Debug = { debugCommands } } });
     }
 
-    public async Task<ResponseGameInfo?> GameInfo()
+    public async Task<ResponseGameInfo> GameInfo()
     {
         var response = await SendAndReceiveAsync(ClientConstants.RequestGameInfo);
-        return response?.GameInfo;
+        return response?.GameInfo ?? throw new ArgumentNullException();
     }
 
-    public async Task<ResponseData?> StaticGameData()
+    public async Task<ResponseData> GameData()
     {
         var response = await SendAndReceiveAsync(ClientConstants.RequestData);
-        return response?.Data;
+        return response?.Data ?? throw new ArgumentNullException();
     }
 
     private async Task<Response?> SendAndReceiveAsync(Request req)
@@ -229,7 +220,7 @@ public class GameConnection
 
         await SendAsync(req);
 
-        if (!handlerResolve.Wait(TIMEOUT) && Status != Status.Ended)
+        if (!handlerResolve.Wait(TIMEOUT_MS) && Status != Status.Ended)
             Log.Error($"Request timed out \n{req}");
 
         _responseHandler.DeregisterHandler(req.RequestCase, handler);

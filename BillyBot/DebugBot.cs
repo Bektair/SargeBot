@@ -1,5 +1,4 @@
 ﻿using Core;
-using Core.Bot;
 using SC2APIProtocol;
 
 namespace BillyBot;
@@ -10,7 +9,7 @@ public class DebugBot : BaseBot
     {
     }
 
-    public override void OnFrame(ResponseObservation observation)
+    protected override void OnFrame(ResponseObservation observation)
     {
         base.OnFrame(observation);
 

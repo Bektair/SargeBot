@@ -1,5 +1,4 @@
-﻿using Core.Bot;
-using Core.Zerg;
+﻿using Core.Zerg;
 using Microsoft.Extensions.DependencyInjection;
 using SargeBot.Features.Macro.Build;
 using SC2APIProtocol;
@@ -23,9 +22,9 @@ public class SargeBot : ZergBot
 
     //States: ZerglingRush, Droning, MutaMan! Clear the queues when change state maby
 
-    public override void OnStart(ResponseObservation firstObservation, ResponseData responseData, ResponseGameInfo gameInfo)
+    protected override void OnStart(ResponseObservation firstObs, ResponseData data, ResponseGameInfo gameInfo)
     {
-        base.OnStart(firstObservation, responseData, gameInfo);
+        base.OnStart(firstObs, data, gameInfo);
         /*
         _staticGameData.PopulateGameData(responseData);
         Task.Run(() => _staticGameData.Save());
@@ -34,7 +33,7 @@ public class SargeBot : ZergBot
         */
     }
 
-    public override void OnFrame(ResponseObservation observation)
+    protected override void OnFrame(ResponseObservation observation)
     {
         base.OnFrame(observation);
 

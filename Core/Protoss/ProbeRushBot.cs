@@ -9,7 +9,7 @@ public class ProbeRushBot : ProtossBot
     {
     }
 
-    public override void OnFrame(ResponseObservation observation)
+    protected override void OnFrame(ResponseObservation observation)
     {
         base.OnFrame(observation);
 
