@@ -10,14 +10,17 @@ public abstract class IntelService : IIntelService
 {
     private readonly IDataService _dataService;
 
-    public Dictionary<ulong, IntelUnit> Workers = new(),
-        Structures = new(),
-        Units = new(),
-        EnemyUnits = new(),
-        Destructibles = new(),
-        XelNagaTowers = new(),
-        MineralFields = new(),
-        VespeneGeysers = new();
+    private readonly Dictionary<ulong, IntelUnit>
+        _units           = new(),
+        _enemyUnits      = new(),
+        _workers         = new(),
+        _enemyWorkers    = new(),
+        _structures      = new(),
+        _enemyStructures = new(),
+        _destructibles   = new(),
+        _xelNagaTowers   = new(),
+        _mineralFields   = new(),
+        _vespeneGeysers  = new();
 
     public IntelService(IEnumerable<IDataService> dataServices)
     {
@@ -27,25 +30,58 @@ public abstract class IntelService : IIntelService
     //TODO: remove or internal
     public Observation Observation { get; set; } = new();
     public abstract Race Race { get; }
-
-    public List<IntelColony> Colonies { get; set; } = new();
+    public List<IntelColony> Colonies { get; } = new();
+    public List<IntelColony> EnemyColonies { get; } = new();
 
     public List<IntelUnit> GetUnits(UnitType unitType)
     {
-        return Units.Values.Where(x => x.UnitType.Is(unitType)).ToList();
+        return _units.Values.Where(x => x.UnitType.Is(unitType)).ToList();
+    }
+
+    public List<IntelUnit> GetEnemyUnits(UnitType unitType)
+    {
+        return _enemyUnits.Values.Where(x => x.UnitType.Is(unitType)).ToList();
     }
 
     public List<IntelUnit> GetStructures(UnitType unitType)
     {
-        return Structures.Values.Where(x => x.UnitType.Is(unitType)).ToList();
+        return _structures.Values.Where(x => x.UnitType.Is(unitType)).ToList();
+    }
+
+    public List<IntelUnit> GetEnemyStructures(UnitType unitType)
+    {
+        return _enemyStructures.Values.Where(x => x.UnitType.Is(unitType)).ToList();
     }
 
     public List<IntelUnit> GetWorkers()
     {
-        return Workers.Values.ToList();
+        return _workers.Values.ToList();
     }
 
-    public List<IntelColony> EnemyColonies { get; set; } = new();
+    public List<IntelUnit> GetEnemyWorkers()
+    {
+        return _enemyWorkers.Values.ToList();
+    }
+
+    public List<IntelUnit> GetMineralFields()
+    {
+        return _mineralFields.Values.ToList();
+    }
+
+    public List<IntelUnit> GetVespeneGeysers()
+    {
+        return _vespeneGeysers.Values.OrderBy(x => x.Point.Distance(Colonies.First().Point)).ToList();
+    }
+
+    public List<IntelUnit> GetDestructibles()
+    {
+        return _destructibles.Values.ToList();
+    }
+
+    public List<IntelUnit> GetXelNagaTowers()
+    {
+        return _xelNagaTowers.Values.ToList();
+    }
 
     public void OnStart(ResponseObservation firstObservation, ResponseData? responseData = null, ResponseGameInfo? gameInfo = null)
     {
@@ -54,7 +90,7 @@ public abstract class IntelService : IIntelService
 
         OnFrame(firstObservation);
 
-        Colonies.Add(new IntelColony { Point = Structures.First().Value.Point });
+        Colonies.Add(new IntelColony { Point = _structures.First().Value.Point });
     }
 
     public virtual void OnFrame(ResponseObservation observation)
@@ -71,9 +107,9 @@ public abstract class IntelService : IIntelService
         if (rawDataEvent == null) return;
 
         foreach (var deadUnit in rawDataEvent.DeadUnits)
-            if (Workers.TryGetValue(deadUnit, out var worker))
+            if (_workers.TryGetValue(deadUnit, out var worker))
                 Log.Error($"{(UnitType)worker.UnitType} died (tag:{deadUnit})");
-            else if (EnemyUnits.TryGetValue(deadUnit, out var enemyUnit))
+            else if (_enemyUnits.TryGetValue(deadUnit, out var enemyUnit))
                 Log.Success($"Enemy {(UnitType)enemyUnit.UnitType} died (tag:{deadUnit})");
             else
                 Log.Info($"Unknown unit died (tag:{deadUnit})");
@@ -91,6 +127,7 @@ public abstract class IntelService : IIntelService
                     AddEnemyUnit(unit);
                     break;
                 case Alliance.Neutral:
+                    AddNeutralUnit(unit);
                     break;
                 case Alliance.Ally:
                 default:
@@ -100,17 +137,34 @@ public abstract class IntelService : IIntelService
 
     private void AddEnemyUnit(Unit unit)
     {
-        AddOrUpdateIntelUnits(EnemyUnits, unit);
+        if (unit.UnitType.IsWorker())
+            AddOrUpdateIntelUnits(_enemyWorkers, unit);
+        else if (_dataService.IsStructure(unit.UnitType))
+            AddOrUpdateIntelUnits(_enemyStructures, unit);
+        else
+            AddOrUpdateIntelUnits(_enemyUnits, unit);
+    }
+
+    private void AddNeutralUnit(Unit unit)
+    {
+        if (unit.UnitType.IsMineralField())
+            AddOrUpdateIntelUnits(_mineralFields, unit);
+        else if (unit.UnitType.IsVepeneGeyser())
+            AddOrUpdateIntelUnits(_vespeneGeysers, unit);
+        else if (unit.UnitType.IsDestructible())
+            AddOrUpdateIntelUnits(_destructibles, unit);
+        else if (unit.UnitType.IsXelNagaTower())
+            AddOrUpdateIntelUnits(_xelNagaTowers, unit);
     }
 
     private void AddUnit(Unit unit)
     {
         if (unit.UnitType.IsWorker())
-            AddOrUpdateIntelUnits(Workers, unit);
+            AddOrUpdateIntelUnits(_workers, unit);
         else if (_dataService.IsStructure(unit.UnitType))
-            AddOrUpdateIntelUnits(Structures, unit);
+            AddOrUpdateIntelUnits(_structures, unit);
         else
-            AddOrUpdateIntelUnits(Units, unit);
+            AddOrUpdateIntelUnits(_units, unit);
     }
 
     private void AddOrUpdateIntelUnits(Dictionary<ulong, IntelUnit> intelUnits, Unit unit)
@@ -125,12 +179,21 @@ public abstract class IntelService : IIntelService
 public interface IIntelService
 {
     public Race Race { get; }
-    public List<IntelColony> EnemyColonies { get; set; }
-    public List<IntelColony> Colonies { get; set; }
 
+    public List<IntelColony> Colonies { get; }
+    public List<IntelColony> EnemyColonies { get; }
+    
     public List<IntelUnit> GetUnits(UnitType unitType);
+    public List<IntelUnit> GetEnemyUnits(UnitType unitType);
     public List<IntelUnit> GetStructures(UnitType unitType);
+    public List<IntelUnit> GetEnemyStructures(UnitType unitType);
     public List<IntelUnit> GetWorkers();
+    public List<IntelUnit> GetEnemyWorkers();
+    public List<IntelUnit> GetMineralFields();
+    public List<IntelUnit> GetVespeneGeysers();
+    public List<IntelUnit> GetDestructibles();
+    public List<IntelUnit> GetXelNagaTowers();
+    
     public void OnStart(ResponseObservation firstObservation, ResponseData? responseData = null, ResponseGameInfo? gameInfo = null);
     public void OnFrame(ResponseObservation observation);
 }
