@@ -39,7 +39,7 @@ public abstract class MacroService : IMacroService
     /// <summary>
     ///     Should be replaced with production queue
     /// </summary>
-    public virtual void Build(UnitType unitType)
+    public virtual void Build(UnitType unitType, int allocatedWorkerCount)
     {
         if (!TerranDataHelpers.Producers.TryGetValue(unitType, out var producers) &&
             !ProtossDataHelpers.Producers.TryGetValue(unitType, out producers))
@@ -49,7 +49,7 @@ public abstract class MacroService : IMacroService
 
         var builders = IntelService.GetWorkers()
             .Select(x => x.Tag)
-            .Take(2);
+            .Take(allocatedWorkerCount);
 
         var location = BuildingPlacement.Random(IntelService.Colonies.First().Point);
         
@@ -61,5 +61,5 @@ public interface IMacroService
 {
     Race Race { get; }
     void Train(UnitType unitType);
-    void Build(UnitType unitType);
+    void Build(UnitType unitType, int allocatedWorkerCount = 1);
 }

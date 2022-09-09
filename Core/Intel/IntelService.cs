@@ -115,9 +115,13 @@ public abstract class IntelService : IIntelService
                     //TODO: remove from all dictionaries, or just have the _allUnits and filter on retrieval?
                     _units.Remove(unit.Tag);
                 }
-                else
+                else if (unit.Alliance == Alliance.Enemy)
                 {
                     Log.Success($"Enemy {(UnitType)unit.UnitType} died (tag:{deadUnit})");
+                }
+                else
+                {
+                    Log.Info($"Neutral {(UnitType)unit.UnitType} died (tag:{deadUnit})");
                 }
 
                 _allUnits.Remove(unit.Tag);
@@ -185,10 +189,15 @@ public abstract class IntelService : IIntelService
 
     private void AddOrUpdateIntelUnits(Dictionary<ulong, IntelUnit> intelUnits, Unit unit)
     {
-        if (intelUnits.ContainsKey(unit.Tag))
-            intelUnits[unit.Tag].Data = unit;
-        else
-            intelUnits.Add(unit.Tag, new IntelUnit(unit));
+        if (unit.Tag == 0) return; // why does this happen?
+        
+        lock (intelUnits)
+        {
+            if (intelUnits.ContainsKey(unit.Tag))
+                intelUnits[unit.Tag].Data = unit;
+            else
+                intelUnits.Add(unit.Tag, new IntelUnit(unit));
+        }
     }
 }
 

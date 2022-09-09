@@ -8,11 +8,11 @@ namespace Core;
 
 public abstract class BaseBot
 {
-    protected readonly IDataService Data;
-    protected readonly IIntelService Intel;
-    protected readonly IMacroService MacroService;
-    protected readonly IMessageService MessageService;
-    protected readonly IMicroService MicroService;
+    public readonly IDataService Data;
+    public readonly IIntelService Intel;
+    public readonly IMacroService MacroService;
+    public readonly IMessageService MessageService;
+    public readonly IMicroService MicroService;
 
     protected BaseBot(IServiceProvider services, Race race)
     {
@@ -24,17 +24,23 @@ public abstract class BaseBot
         PlayerSetup = new PlayerSetup { PlayerName = GetType().Name, Race = race, Type = PlayerType.Participant };
     }
 
+    private BaseBuildState CurrentBuildState { get; set; }
+    protected IEnumerable<BaseBuildState> BuildStates { get; init; }
+
     public PlayerSetup PlayerSetup { get; }
 
     protected virtual void OnStart(ResponseObservation firstObs, ResponseData data, ResponseGameInfo gameInfo)
     {
         Data.OnStart(firstObs, data, gameInfo);
         Intel.OnStart(firstObs, data, gameInfo);
+        CurrentBuildState = BuildStates.First();
     }
 
     protected virtual void OnFrame(ResponseObservation observation)
     {
         Intel.OnFrame(observation);
+        CheckStatePredicates();
+        CurrentBuildState.OnFrame();
         MessageService.OnFrame();
     }
 
@@ -62,12 +68,22 @@ public abstract class BaseBot
         {
             await gameConnection.Step();
 
-            var obs = await gameConnection.Observation();
-            // if (obs == null || gameConnection.Status == Status.Ended) break;
-
-            OnFrame(obs);
+            OnFrame(await gameConnection.Observation());
         }
 
         OnEnd();
+    }
+
+    private void CheckStatePredicates()
+    {
+        foreach (var state in BuildStates.Where(x => x != CurrentBuildState))
+        {
+            if (state.NextState())
+            {
+                Log.Info($"Build state change {CurrentBuildState.GetType()} -> {state.GetType()}");
+                CurrentBuildState = state;
+                break;
+            }
+        }
     }
 }

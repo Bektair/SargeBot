@@ -18,11 +18,21 @@ internal class MessageService : IMessageService
     public async Task OnFrame()
     {
         var actions = await Connection.ActionRequest(Actions);
-        if (actions.Any(x => x == ActionResult.Success))
-        {
+
+        Func<ActionResult, bool> pred = x =>
+            x != ActionResult.Success &&
+            x != ActionResult.Error && // not sure
+            x != ActionResult.NotEnoughMinerals && // macro.build() doesn't check minerals
+            x != ActionResult.CantFindPlacementLocation && // building placement spam
+            x != ActionResult.CantBuildLocationInvalid && // building placement spam 
+            x != ActionResult.NotSupported; // not sure
+
+        if (actions.Any(pred))
             // getting some Error results, but that may be due to action spam when we can't afford units ie.
-            // Log.Warning($"{actions.Count(x => x != ActionResult.Success)} non successful actions");
-        }
+            Log.Warning($"Unhandled actions: {string.Join(", ", actions.Where(pred))}");
+
+        var actionsPerFrameTextCommand = DebugRequest.DrawText($"\nActions per frame {Actions.Count} ({actions.Count(x => x != ActionResult.Success)} errors)");
+        Debugs.Add(actionsPerFrameTextCommand);
 
         await Connection.DebugRequest(Debugs);
         Actions.Clear();
