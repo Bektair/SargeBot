@@ -1,6 +1,7 @@
 ﻿using Core;
 using Core.Game;
 using Core.Terran;
+using Core.Zerg;
 using Microsoft.Extensions.DependencyInjection;
 using SargeBot.Features.GameData;
 using SargeBot.Features.GameInfo;
@@ -34,7 +35,7 @@ Game game = gameSettings.GameMode switch
 {
     GameMode.Singleplayer => new SingleplayerGame(gameSettings, playerOne, Race.Protoss, AIBuild.Air, Difficulty.Easy),
     GameMode.Ladder => new LadderGame(gameSettings, playerOne),
-    GameMode.Multiplayer or _ => new MultiplayerGame(gameSettings, playerOne, new ScvRushBot(sp.CreateScope().ServiceProvider))
+    GameMode.Multiplayer or _ => new MultiplayerGame(gameSettings, playerOne, new DroneRushBot(sp.CreateScope().ServiceProvider))
 };
 
 Log.Info($"Starting {game} {gameSettings}");

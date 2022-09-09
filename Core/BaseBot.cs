@@ -39,7 +39,7 @@ public abstract class BaseBot
     protected virtual void OnFrame(ResponseObservation observation)
     {
         Intel.OnFrame(observation);
-        CheckStatePredicates();
+        CheckStateTriggers();
         CurrentBuildState.OnFrame();
         MessageService.OnFrame();
     }
@@ -74,16 +74,14 @@ public abstract class BaseBot
         OnEnd();
     }
 
-    private void CheckStatePredicates()
+    private void CheckStateTriggers()
     {
         foreach (var state in BuildStates.Where(x => x != CurrentBuildState))
-        {
-            if (state.NextState())
+            if (state.ShouldActivate())
             {
                 Log.Info($"Build state change {CurrentBuildState.GetType()} -> {state.GetType()}");
                 CurrentBuildState = state;
                 break;
             }
-        }
     }
 }

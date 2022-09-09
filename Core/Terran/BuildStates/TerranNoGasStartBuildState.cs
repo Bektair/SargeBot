@@ -2,7 +2,7 @@
 
 public class TerranNoGasStartBuildState : BaseBuildState
 {
-    public TerranNoGasStartBuildState(BaseBot bot) : base(bot)
+    public TerranNoGasStartBuildState(BaseBot bot, params Func<bool>[] activationTriggers) : base(bot, activationTriggers)
     {
     }
 
@@ -17,8 +17,5 @@ public class TerranNoGasStartBuildState : BaseBuildState
             Bot.MacroService.Build(UnitType.TERRAN_BARRACKS);
     }
 
-    public override bool NextState()
-    {
-        return Bot.Intel.GetWorkers().Count < 5;
-    }
+    protected override Func<bool> DefaultTrigger(BaseBot bot) => () => bot.Intel.GetWorkers().Count < 5;
 }

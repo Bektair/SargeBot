@@ -6,7 +6,7 @@ public class MarineRushBuildState : BaseBuildState
 {
     private bool _attacking;
 
-    public MarineRushBuildState(BaseBot bot) : base(bot)
+    public MarineRushBuildState(BaseBot bot, params Func<bool>[] activationTriggers) : base(bot, activationTriggers)
     {
     }
 
@@ -40,8 +40,5 @@ public class MarineRushBuildState : BaseBuildState
         _attacking = true;
     }
 
-    public override bool NextState()
-    {
-        return Bot.Intel.GetStructures(UnitType.TERRAN_BARRACKS).Count > 0;
-    }
+    protected override Func<bool> DefaultTrigger(BaseBot bot) => () => bot.Intel.GetStructures(UnitType.TERRAN_BARRACKS).Any() && bot.Intel.GameLoop < 2000;
 }
