@@ -1,6 +1,4 @@
-﻿using Core.Data;
-using Core.Extensions;
-using Google.Protobuf.Collections;
+﻿using Google.Protobuf.Collections;
 using SC2APIProtocol;
 using SC2ClientApi;
 using Attribute = SC2APIProtocol.Attribute;
@@ -9,7 +7,7 @@ namespace Core.Intel;
 
 public abstract class IntelService : IIntelService
 {
-    private readonly Dictionary<ulong, IntelUnit> _allUnits = new();
+    private readonly Dictionary<ulong, IUnit> _allUnits = new();
 
     private readonly IDataService _dataService;
 
@@ -18,27 +16,20 @@ public abstract class IntelService : IIntelService
         _dataService = dataServices.First(x => x.Race == Race);
     }
 
+    public List<IColony> Colonies { get; } = new();
+    public List<IColony> EnemyColonies { get; } = new();
+
     public abstract Race Race { get; }
     public uint GameLoop { get; private set; }
-    public List<IntelColony> Colonies { get; } = new();
-    public List<IntelColony> EnemyColonies { get; } = new();
-
-    public List<IntelUnit> GetMineralFields() => GetUnits(alliance: Alliance.Neutral).Where(x => x.UnitType.IsMineralField()).ToList();
-
-    public List<IntelUnit> GetVespeneGeysers() => GetUnits(alliance: Alliance.Neutral).Where(x => x.UnitType.IsVepeneGeyser()).ToList();
-
-    public List<IntelUnit> GetDestructibles() => GetUnits(alliance: Alliance.Neutral).Where(x => x.UnitType.IsDestructible()).ToList();
-
-    public List<IntelUnit> GetXelNagaTowers() => GetUnits(alliance: Alliance.Neutral).Where(x => x.UnitType.IsXelNagaTower()).ToList();
 
     public void OnStart(ResponseObservation firstObservation, ResponseData? responseData = null, ResponseGameInfo? gameInfo = null)
     {
         if (gameInfo != null)
-            EnemyColonies.Add(new IntelColony { Point = gameInfo.StartRaw.StartLocations.Last() });
+            EnemyColonies.Add(new IntelColony { Point = gameInfo.StartRaw.StartLocations.Last(), IsStartingLocation = true });
 
         OnFrame(firstObservation);
 
-        Colonies.Add(new IntelColony { Point = GetUnits(attribute: Attribute.Structure).First().Point });
+        Colonies.Add(new IntelColony { Point = GetUnits(attribute: Attribute.Structure).First().Point, IsStartingLocation = true });
     }
 
     public virtual void OnFrame(ResponseObservation observation)
@@ -50,13 +41,21 @@ public abstract class IntelService : IIntelService
         HandleDeadUnits(observation.Observation.RawData.Event);
     }
 
-    public List<IntelUnit> GetUnits(UnitType? unitType = null, Alliance alliance = Alliance.Self, DisplayType displayType = DisplayType.Visible,
+    public List<IUnit> GetMineralFields() => GetUnits(alliance: Alliance.Neutral).Where(x => x.UnitType.IsMineralField()).ToList();
+
+    public List<IUnit> GetVespeneGeysers() => GetUnits(alliance: Alliance.Neutral).Where(x => x.UnitType.IsVepeneGeyser()).ToList();
+
+    public List<IUnit> GetDestructibles() => GetUnits(alliance: Alliance.Neutral).Where(x => x.UnitType.IsDestructible()).ToList();
+
+    public List<IUnit> GetXelNagaTowers() => GetUnits(alliance: Alliance.Neutral).Where(x => x.UnitType.IsXelNagaTower()).ToList();
+
+    public List<IUnit> GetUnits(UnitType? unitType = null, Alliance alliance = Alliance.Self, DisplayType displayType = DisplayType.Visible,
         Attribute? attribute = null)
     {
         return _allUnits.Values
             .Where(x => unitType == null || x.UnitType.Is(unitType.Value))
             .Where(x => x.Alliance == alliance)
-            .Where(x => x.Data.DisplayType == displayType)
+            .Where(x => x.DisplayType == displayType)
             .Where(x => attribute == null || _dataService.HasAttribute(x.UnitType, attribute.Value))
             .ToList();
     }
@@ -94,16 +93,16 @@ public abstract class IntelService : IIntelService
         foreach (var unit in rawDataUnits) AddOrUpdateIntelUnits(_allUnits, unit);
     }
 
-    private void AddOrUpdateIntelUnits(Dictionary<ulong, IntelUnit> intelUnits, Unit unit)
+    private void AddOrUpdateIntelUnits(Dictionary<ulong, IUnit> intelUnits, Unit unit)
     {
         if (unit.Tag == 0) return; // why does this happen?
 
         lock (intelUnits)
         {
             if (intelUnits.ContainsKey(unit.Tag))
-                intelUnits[unit.Tag].Data = unit;
+                intelUnits[unit.Tag].Update(unit, GameLoop);
             else
-                intelUnits.Add(unit.Tag, new IntelUnit(unit));
+                intelUnits.Add(unit.Tag, new IntelUnit(unit, GameLoop));
         }
     }
 }
@@ -113,15 +112,15 @@ public interface IIntelService
     public Race Race { get; }
     public uint GameLoop { get; }
 
-    public List<IntelColony> Colonies { get; }
-    public List<IntelColony> EnemyColonies { get; }
+    public List<IColony> Colonies { get; }
+    public List<IColony> EnemyColonies { get; }
 
-    public List<IntelUnit> GetUnits(UnitType? unitType = null, Alliance alliance = Alliance.Self, DisplayType displayType = DisplayType.Visible, Attribute? attribute = null);
+    public List<IUnit> GetUnits(UnitType? unitType = null, Alliance alliance = Alliance.Self, DisplayType displayType = DisplayType.Visible, Attribute? attribute = null);
 
-    public List<IntelUnit> GetMineralFields();
-    public List<IntelUnit> GetVespeneGeysers();
-    public List<IntelUnit> GetDestructibles();
-    public List<IntelUnit> GetXelNagaTowers();
+    public List<IUnit> GetMineralFields();
+    public List<IUnit> GetVespeneGeysers();
+    public List<IUnit> GetDestructibles();
+    public List<IUnit> GetXelNagaTowers();
 
     public void OnStart(ResponseObservation firstObservation, ResponseData? responseData = null, ResponseGameInfo? gameInfo = null);
     public void OnFrame(ResponseObservation observation);

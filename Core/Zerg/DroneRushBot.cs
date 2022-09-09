@@ -27,7 +27,7 @@ public class DroneRushBot : ZergBot
         Log.Warning($"Attacking with {attackers.Units.Count} {attackers.Units.FirstOrDefault()?.UnitType}");
 
         var overlords = new Squad();
-        overlords.AddUnits(OverlordService.GetOverlords());
+        overlords.AddUnits(Intel.GetUnits(UnitType.ZERG_OVERLORD));
 
         MicroService.Move(overlords, enemyBase.Point);
     }

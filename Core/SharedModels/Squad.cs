@@ -1,8 +1,4 @@
-﻿using Core.Intel;
-using Core.Model;
-using SC2APIProtocol;
-
-namespace Core;
+﻿namespace Core.SharedModels;
 
 public class Squad
 {
@@ -12,17 +8,7 @@ public class Squad
     public ISet<IUnit> Units { get; set; } = new HashSet<IUnit>();
     //public ISquadController SquadController { get; set; }
 
-    public bool AddUnit(Unit unit)
-    {
-        var data = new IntelUnit(unit);
-
-        return Units.Add(data);
-    }
-
-    public bool AddUnit(IUnit unit)
-    {
-        return Units.Add(unit);
-    }
+    public bool AddUnit(IUnit unit) => Units.Add(unit);
 
     public int AddUnits(IEnumerable<IUnit> units)
     {
@@ -33,10 +19,7 @@ public class Squad
         return added;
     }
 
-    public bool RemoveUnit(IUnit unit)
-    {
-        return Units.Remove(unit);
-    }
+    public bool RemoveUnit(IUnit unit) => Units.Remove(unit);
 
     public int RemoveUnits(IEnumerable<IUnit> units)
     {

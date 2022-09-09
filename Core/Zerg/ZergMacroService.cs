@@ -1,16 +1,15 @@
-﻿using Core.Intel;
-using SC2APIProtocol;
+﻿using SC2APIProtocol;
 
 namespace Core.Zerg;
 
 public class ZergMacroService : MacroService
 {
-    private readonly ILarvaService _larvaService;
+    private readonly IZergIntelService _zergIntelService;
 
-    public ZergMacroService(IMessageService messageService, IEnumerable<IIntelService> intelServices, ILarvaService larvaService) : base(
+    public ZergMacroService(IMessageService messageService, IEnumerable<IIntelService> intelServices, IZergIntelService zergIntelService) : base(
         messageService, intelServices)
     {
-        _larvaService = larvaService;
+        _zergIntelService = zergIntelService;
     }
 
     public override Race Race => Race.Zerg;

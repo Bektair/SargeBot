@@ -5,12 +5,10 @@ namespace Core.Zerg;
 
 public abstract class ZergBot : BaseBot
 {
-    protected readonly ILarvaService LarvaService;
-    protected readonly IOverlordService OverlordService;
+    protected readonly IZergIntelService ZergIntelService;
 
     protected ZergBot(IServiceProvider services) : base(services, Race.Zerg)
     {
-        LarvaService = services.GetRequiredService<ILarvaService>();
-        OverlordService = services.GetRequiredService<IOverlordService>();
+        ZergIntelService = services.GetRequiredService<IZergIntelService>();
     }
 }
