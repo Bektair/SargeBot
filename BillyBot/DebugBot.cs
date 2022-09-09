@@ -17,8 +17,8 @@ public class DebugBot : BaseBot
         var mainBase = Intel.Colonies.First();
         var enemyBase = Intel.EnemyColonies.First();
         var firstGas = Intel.GetVespeneGeysers().First();
-        var firstWorker = Intel.GetWorkers().First();
-        var lastWorker = Intel.GetWorkers().Last();
+        var firstWorker = Intel.GetUnits(UnitType.TERRAN_SCV).First();
+        var lastWorker = Intel.GetUnits(UnitType.TERRAN_SCV).Last();
 
         // Color requires all three values
         var color = new Color { G = 0, R = 250, B = 50 };

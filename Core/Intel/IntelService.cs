@@ -3,23 +3,13 @@ using Core.Extensions;
 using Google.Protobuf.Collections;
 using SC2APIProtocol;
 using SC2ClientApi;
+using Attribute = SC2APIProtocol.Attribute;
 
 namespace Core.Intel;
 
 public abstract class IntelService : IIntelService
 {
-    private readonly Dictionary<ulong, IntelUnit>
-        _allUnits        = new(),
-        _units           = new(),
-        _enemyUnits      = new(),
-        _workers         = new(),
-        _enemyWorkers    = new(),
-        _structures      = new(),
-        _enemyStructures = new(),
-        _destructibles   = new(),
-        _xelNagaTowers   = new(),
-        _mineralFields   = new(),
-        _vespeneGeysers  = new();
+    private readonly Dictionary<ulong, IntelUnit> _allUnits = new();
 
     private readonly IDataService _dataService;
 
@@ -33,55 +23,13 @@ public abstract class IntelService : IIntelService
     public List<IntelColony> Colonies { get; } = new();
     public List<IntelColony> EnemyColonies { get; } = new();
 
-    public List<IntelUnit> GetUnits(UnitType unitType)
-    {
-        return _units.Values.Where(x => x.UnitType.Is(unitType)).ToList();
-    }
+    public List<IntelUnit> GetMineralFields() => GetUnits(alliance: Alliance.Neutral).Where(x => x.UnitType.IsMineralField()).ToList();
 
-    public List<IntelUnit> GetEnemyUnits(UnitType unitType)
-    {
-        return _enemyUnits.Values.Where(x => x.UnitType.Is(unitType)).ToList();
-    }
+    public List<IntelUnit> GetVespeneGeysers() => GetUnits(alliance: Alliance.Neutral).Where(x => x.UnitType.IsVepeneGeyser()).ToList();
 
-    public List<IntelUnit> GetStructures(UnitType unitType)
-    {
-        return _structures.Values.Where(x => x.UnitType.Is(unitType)).ToList();
-    }
+    public List<IntelUnit> GetDestructibles() => GetUnits(alliance: Alliance.Neutral).Where(x => x.UnitType.IsDestructible()).ToList();
 
-    public List<IntelUnit> GetEnemyStructures(UnitType unitType)
-    {
-        return _enemyStructures.Values.Where(x => x.UnitType.Is(unitType)).ToList();
-    }
-
-    public List<IntelUnit> GetWorkers()
-    {
-        return _workers.Values.ToList();
-    }
-
-    public List<IntelUnit> GetEnemyWorkers()
-    {
-        return _enemyWorkers.Values.ToList();
-    }
-
-    public List<IntelUnit> GetMineralFields()
-    {
-        return _mineralFields.Values.ToList();
-    }
-
-    public List<IntelUnit> GetVespeneGeysers()
-    {
-        return _vespeneGeysers.Values.OrderBy(x => x.Point.Distance(Colonies.First().Point)).ToList();
-    }
-
-    public List<IntelUnit> GetDestructibles()
-    {
-        return _destructibles.Values.ToList();
-    }
-
-    public List<IntelUnit> GetXelNagaTowers()
-    {
-        return _xelNagaTowers.Values.ToList();
-    }
+    public List<IntelUnit> GetXelNagaTowers() => GetUnits(alliance: Alliance.Neutral).Where(x => x.UnitType.IsXelNagaTower()).ToList();
 
     public void OnStart(ResponseObservation firstObservation, ResponseData? responseData = null, ResponseGameInfo? gameInfo = null)
     {
@@ -90,7 +38,7 @@ public abstract class IntelService : IIntelService
 
         OnFrame(firstObservation);
 
-        Colonies.Add(new IntelColony { Point = _structures.First().Value.Point });
+        Colonies.Add(new IntelColony { Point = GetUnits(attribute: Attribute.Structure).First().Point });
     }
 
     public virtual void OnFrame(ResponseObservation observation)
@@ -102,6 +50,17 @@ public abstract class IntelService : IIntelService
         HandleDeadUnits(observation.Observation.RawData.Event);
     }
 
+    public List<IntelUnit> GetUnits(UnitType? unitType = null, Alliance alliance = Alliance.Self, DisplayType displayType = DisplayType.Visible,
+        Attribute? attribute = null)
+    {
+        return _allUnits.Values
+            .Where(x => unitType == null || x.UnitType.Is(unitType.Value))
+            .Where(x => x.Alliance == alliance)
+            .Where(x => x.Data.DisplayType == displayType)
+            .Where(x => attribute == null || _dataService.HasAttribute(x.UnitType, attribute.Value))
+            .ToList();
+    }
+
     private void HandleDeadUnits(Event? rawDataEvent)
     {
         if (rawDataEvent == null) return;
@@ -109,19 +68,17 @@ public abstract class IntelService : IIntelService
         foreach (var deadUnit in rawDataEvent.DeadUnits)
             if (_allUnits.TryGetValue(deadUnit, out var unit))
             {
-                if (unit.Alliance == Alliance.Ally)
+                switch (unit.Alliance)
                 {
-                    Log.Error($"{(UnitType)unit.UnitType} died (tag:{deadUnit})");
-                    //TODO: remove from all dictionaries, or just have the _allUnits and filter on retrieval?
-                    _units.Remove(unit.Tag);
-                }
-                else if (unit.Alliance == Alliance.Enemy)
-                {
-                    Log.Success($"Enemy {(UnitType)unit.UnitType} died (tag:{deadUnit})");
-                }
-                else
-                {
-                    Log.Info($"Neutral {(UnitType)unit.UnitType} died (tag:{deadUnit})");
+                    case Alliance.Self:
+                        Log.Error($"{(UnitType)unit.UnitType} died (tag:{deadUnit})");
+                        break;
+                    case Alliance.Enemy:
+                        Log.Success($"Enemy {(UnitType)unit.UnitType} died (tag:{deadUnit})");
+                        break;
+                    case Alliance.Neutral:
+                        Log.Info($"Neutral {(UnitType)unit.UnitType} died (tag:{deadUnit})");
+                        break;
                 }
 
                 _allUnits.Remove(unit.Tag);
@@ -134,63 +91,13 @@ public abstract class IntelService : IIntelService
 
     private void HandleUnits(RepeatedField<Unit> rawDataUnits)
     {
-        foreach (var unit in rawDataUnits)
-        {
-            AddOrUpdateIntelUnits(_allUnits, unit);
-            switch (unit.Alliance)
-            {
-                case Alliance.Self:
-                    AddUnit(unit);
-                    break;
-                case Alliance.Enemy:
-                    AddEnemyUnit(unit);
-                    break;
-                case Alliance.Neutral:
-                    AddNeutralUnit(unit);
-                    break;
-                case Alliance.Ally:
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-    }
-
-    private void AddEnemyUnit(Unit unit)
-    {
-        if (unit.UnitType.IsWorker())
-            AddOrUpdateIntelUnits(_enemyWorkers, unit);
-        else if (_dataService.IsStructure(unit.UnitType))
-            AddOrUpdateIntelUnits(_enemyStructures, unit);
-        else
-            AddOrUpdateIntelUnits(_enemyUnits, unit);
-    }
-
-    private void AddNeutralUnit(Unit unit)
-    {
-        if (unit.UnitType.IsMineralField())
-            AddOrUpdateIntelUnits(_mineralFields, unit);
-        else if (unit.UnitType.IsVepeneGeyser())
-            AddOrUpdateIntelUnits(_vespeneGeysers, unit);
-        else if (unit.UnitType.IsDestructible())
-            AddOrUpdateIntelUnits(_destructibles, unit);
-        else if (unit.UnitType.IsXelNagaTower())
-            AddOrUpdateIntelUnits(_xelNagaTowers, unit);
-    }
-
-    private void AddUnit(Unit unit)
-    {
-        if (unit.UnitType.IsWorker())
-            AddOrUpdateIntelUnits(_workers, unit);
-        else if (_dataService.IsStructure(unit.UnitType))
-            AddOrUpdateIntelUnits(_structures, unit);
-        else
-            AddOrUpdateIntelUnits(_units, unit);
+        foreach (var unit in rawDataUnits) AddOrUpdateIntelUnits(_allUnits, unit);
     }
 
     private void AddOrUpdateIntelUnits(Dictionary<ulong, IntelUnit> intelUnits, Unit unit)
     {
         if (unit.Tag == 0) return; // why does this happen?
-        
+
         lock (intelUnits)
         {
             if (intelUnits.ContainsKey(unit.Tag))
@@ -209,12 +116,8 @@ public interface IIntelService
     public List<IntelColony> Colonies { get; }
     public List<IntelColony> EnemyColonies { get; }
 
-    public List<IntelUnit> GetUnits(UnitType unitType);
-    public List<IntelUnit> GetEnemyUnits(UnitType unitType);
-    public List<IntelUnit> GetStructures(UnitType unitType);
-    public List<IntelUnit> GetEnemyStructures(UnitType unitType);
-    public List<IntelUnit> GetWorkers();
-    public List<IntelUnit> GetEnemyWorkers();
+    public List<IntelUnit> GetUnits(UnitType? unitType = null, Alliance alliance = Alliance.Self, DisplayType displayType = DisplayType.Visible, Attribute? attribute = null);
+
     public List<IntelUnit> GetMineralFields();
     public List<IntelUnit> GetVespeneGeysers();
     public List<IntelUnit> GetDestructibles();

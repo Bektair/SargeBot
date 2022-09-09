@@ -12,10 +12,10 @@ public class MarineRushBuildState : BaseBuildState
 
     public override void OnFrame()
     {
-        if (Bot.Intel.GetStructures(UnitType.TERRAN_SUPPLYDEPOT).Count <= Bot.Intel.GetStructures(UnitType.TERRAN_BARRACKS).Count)
+        if (Bot.Intel.GetUnits(UnitType.TERRAN_SUPPLYDEPOT).Count <= Bot.Intel.GetUnits(UnitType.TERRAN_BARRACKS).Count)
             Bot.MacroService.Build(UnitType.TERRAN_SUPPLYDEPOT, 2);
 
-        if (Bot.Intel.GetStructures(UnitType.TERRAN_BARRACKS).Count < 4)
+        if (Bot.Intel.GetUnits(UnitType.TERRAN_BARRACKS).Count < 4)
             Bot.MacroService.Build(UnitType.TERRAN_BARRACKS);
 
         Bot.MacroService.Train(UnitType.TERRAN_MARINE);
@@ -40,5 +40,5 @@ public class MarineRushBuildState : BaseBuildState
         _attacking = true;
     }
 
-    protected override Func<bool> DefaultTrigger(BaseBot bot) => () => bot.Intel.GetStructures(UnitType.TERRAN_BARRACKS).Any() && bot.Intel.GameLoop < 2000;
+    protected override Func<bool> DefaultTrigger(BaseBot bot) => () => bot.Intel.GetUnits(UnitType.TERRAN_BARRACKS).Any() && bot.Intel.GameLoop < 2000;
 }

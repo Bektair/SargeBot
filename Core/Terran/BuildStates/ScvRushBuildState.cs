@@ -15,7 +15,7 @@ public class ScvRushBuildState : BaseBuildState
         var enemyBase = Bot.Intel.EnemyColonies.First();
 
         var attackers = new Squad();
-        attackers.AddUnits(Bot.Intel.GetWorkers());
+        attackers.AddUnits(Bot.Intel.GetUnits(UnitType.TERRAN_SCV));
 
         Bot.MicroService.AttackMove(attackers, enemyBase.Point);
 

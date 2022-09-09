@@ -15,12 +15,12 @@ public class ProbeRushBot : ProtossBot
 
         MacroService.Train(UnitType.PROTOSS_PROBE);
 
-        if (Intel.GetWorkers().Count < 14) return;
+        if (Intel.GetUnits(UnitType.PROTOSS_PROBE).Count < 14) return;
 
         var enemyBase = Intel.EnemyColonies.First();
 
         var attackers = new Squad();
-        attackers.AddUnits(Intel.GetWorkers());
+        attackers.AddUnits(Intel.GetUnits(UnitType.PROTOSS_PROBE));
 
         MicroService.AttackMove(attackers, enemyBase.Point);
 

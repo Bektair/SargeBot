@@ -28,8 +28,8 @@ public abstract class MacroService : IMacroService
 
         var producer = producers.First();
 
-        var builders = IntelService.GetStructures(producer.Type)
-            .Where(x => x.BuildProgress == 1)
+        var builders = IntelService.GetUnits(producer.Type)
+            .Where(x => x.BuildProgress > .99)
             .Where(x => !x.Orders.Any())
             .Select(x => x.Tag);
 
@@ -47,7 +47,7 @@ public abstract class MacroService : IMacroService
 
         var producer = producers.First();
 
-        var builders = IntelService.GetWorkers()
+        var builders = IntelService.GetUnits(producer.Type)
             .Select(x => x.Tag)
             .Take(allocatedWorkerCount);
 

@@ -24,9 +24,9 @@ public abstract class DataService : IDataService
             _unitTypeData.Add(unitType.UnitId, unitType);
     }
 
-    public virtual bool IsStructure(uint unitType)
+    public virtual bool HasAttribute(uint unitType, Attribute attribute)
     {
-        return _unitTypeData.TryGetValue(unitType, out var value) && value.Attributes.Contains(Attribute.Structure);
+        return _unitTypeData.TryGetValue(unitType, out var value) && value.Attributes.Contains(attribute);
     }
 }
 
@@ -34,5 +34,5 @@ public interface IDataService
 {
     public Race Race { get; }
     public void OnStart(ResponseObservation obs, ResponseData data, ResponseGameInfo gameInfo);
-    public bool IsStructure(uint unitType);
+    public bool HasAttribute(uint unitType, Attribute attribute);
 }

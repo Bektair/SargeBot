@@ -15,12 +15,12 @@ public class DroneRushBot : ZergBot
 
         MacroService.Train(UnitType.ZERG_DRONE);
 
-        if (Intel.GetWorkers().Count < 14) return;
+        if (Intel.GetUnits(UnitType.ZERG_DRONE).Count < 14) return;
 
         var enemyBase = Intel.EnemyColonies.First();
 
         var attackers = new Squad();
-        attackers.AddUnits(Intel.GetWorkers());
+        attackers.AddUnits(Intel.GetUnits(UnitType.ZERG_DRONE));
 
         MicroService.AttackMove(attackers, enemyBase.Point);
 

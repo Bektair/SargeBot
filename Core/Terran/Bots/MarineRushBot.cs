@@ -11,7 +11,7 @@ public class MarineRushBot : TerranBot
 
         var main = new MarineRushBuildState(this);
 
-        var counter = new ScvRushBuildState(this, () => Intel.GetEnemyUnits(UnitType.PROTOSS_ZEALOT).Any(), () => Intel.GetEnemyUnits(UnitType.ZERG_ZERGLING).Any());
+        var counter = new ScvRushBuildState(this, () => Intel.GetUnits(UnitType.PROTOSS_ZEALOT, Alliance.Enemy).Any(), () => Intel.GetUnits(UnitType.ZERG_ZERGLING, Alliance.Enemy).Any());
         
         BuildStates = new List<BaseBuildState> { opening, main, counter };
     }

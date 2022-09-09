@@ -22,9 +22,7 @@ public class ZergMacroService : MacroService
 
         var producer = producers.First();
 
-        var producerUnits = producer.Type == UnitType.ZERG_LARVA
-            ? _larvaService.GetLarva()
-            : IntelService.GetStructures(producer.Type);
+        var producerUnits = IntelService.GetUnits(producer.Type);
 
         MessageService.Action(producer.Ability, producerUnits.Select(x => x.Tag));
     }
