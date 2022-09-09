@@ -24,7 +24,7 @@ public class DebugBot : BaseBot
         var color = new Color { G = 0, R = 250, B = 50 };
 
         // Text - fixed on screen
-        MessageService.Debug(DebugRequest.DrawText($"Frame {Intel.GameLoop}", color: color));
+        MessageService.Debug(DebugRequest.DrawText($"Worker count {Intel.GetUnits(UnitType.TERRAN_SCV).Count}", x: .5f, color: color));
 
         // Text - fixed on map
         MessageService.Debug(DebugRequest.DrawText("Main base", x: mainBase.Point.X, y: mainBase.Point.Y, color: color, worldPosition: true));

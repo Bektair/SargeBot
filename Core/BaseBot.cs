@@ -24,8 +24,8 @@ public abstract class BaseBot
         PlayerSetup = new PlayerSetup { PlayerName = GetType().Name, Race = race, Type = PlayerType.Participant };
     }
 
-    private BaseBuildState CurrentBuildState { get; set; }
-    protected IEnumerable<BaseBuildState> BuildStates { get; init; }
+    private BaseBuildState? CurrentBuildState { get; set; }
+    protected IEnumerable<BaseBuildState> BuildStates { get; init; } = new List<BaseBuildState>();
 
     public PlayerSetup PlayerSetup { get; }
 
@@ -33,15 +33,15 @@ public abstract class BaseBot
     {
         Data.OnStart(firstObs, data, gameInfo);
         Intel.OnStart(firstObs, data, gameInfo);
-        CurrentBuildState = BuildStates.First();
+        CurrentBuildState = BuildStates.FirstOrDefault();
     }
 
     protected virtual void OnFrame(ResponseObservation observation)
     {
         Intel.OnFrame(observation);
         CheckStateTriggers();
-        CurrentBuildState.OnFrame();
-        MessageService.OnFrame();
+        CurrentBuildState?.OnFrame();
+        MessageService.OnFrame(observation);
     }
 
     protected virtual void OnEnd()
