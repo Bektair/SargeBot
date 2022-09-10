@@ -15,10 +15,11 @@ internal class MessageService : IMessageService
         Connection = connection;
     }
 
-    public async Task OnFrame()
+    public async Task OnFrame(ResponseObservation obs)
     {
         var actions = await Connection.ActionRequest(Actions);
 
+#if DEBUG
         Func<ActionResult, bool> pred = x =>
             x != ActionResult.Success &&
             x != ActionResult.Error && // not sure
@@ -31,12 +32,15 @@ internal class MessageService : IMessageService
             // getting some Error results, but that may be due to action spam when we can't afford units ie.
             Log.Warning($"Unhandled actions: {string.Join(", ", actions.Where(pred))}");
 
-        var actionsPerFrameTextCommand = DebugRequest.DrawText($"\nActions per frame {Actions.Count} ({actions.Count(x => x != ActionResult.Success)} errors)");
-        Debugs.Add(actionsPerFrameTextCommand);
+        // Debug panel
+        Debugs.Add(DebugRequest.DrawText($"Frame {obs.Observation.GameLoop}"));
+        Debugs.Add(DebugRequest.DrawText($"\nActions per frame {Actions.Count} ({actions.Count(x => x != ActionResult.Success)} errors)"));
 
         await Connection.DebugRequest(Debugs);
-        Actions.Clear();
         Debugs.Clear();
+#endif
+
+        Actions.Clear();
     }
 
     public void Debug(DebugCommand command)
@@ -74,15 +78,13 @@ internal class MessageService : IMessageService
     }
 
 
-    private ActionRawUnitCommand CreateActionCommand(Ability ability, IEnumerable<ulong> unitTags, bool queue = false)
-    {
-        return new ActionRawUnitCommand
+    private ActionRawUnitCommand CreateActionCommand(Ability ability, IEnumerable<ulong> unitTags, bool queue = false) =>
+        new ActionRawUnitCommand
         {
             AbilityId = (int)ability,
             QueueCommand = queue,
             UnitTags = { unitTags }
         };
-    }
 
     private void AddActionRaw(ActionRawUnitCommand command)
     {
@@ -98,5 +100,5 @@ public interface IMessageService
     void Chat(string message);
     void Debug(DebugCommand command);
     public void SetConnection(GameConnection connection);
-    public Task OnFrame();
+    public Task OnFrame(ResponseObservation responseObservation);
 }

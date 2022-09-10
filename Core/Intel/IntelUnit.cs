@@ -1,6 +1,4 @@
-﻿using Core.Extensions;
-using Core.Model;
-using SC2APIProtocol;
+﻿using SC2APIProtocol;
 
 namespace Core.Intel;
 
@@ -8,11 +6,13 @@ public class IntelUnit : IUnit
 {
     public Unit Data;
 
-    public IntelUnit(Unit unit)
+    public IntelUnit(Unit unit, uint gameLoop)
     {
         Data = unit;
+        FrameLastSeen = gameLoop;
     }
 
+    public uint FrameLastSeen { get; private set; }
     public ulong AddOnTag => Data.AddOnTag;
 
     public Alliance Alliance => Data.Alliance;
@@ -34,6 +34,7 @@ public class IntelUnit : IUnit
     public CloakState Cloak => Data.Cloak;
 
     public float DetectRange => Data.DetectRange;
+    public DisplayType DisplayType => Data.DisplayType;
 
     public float Energy => Data.Energy;
 
@@ -82,17 +83,20 @@ public class IntelUnit : IUnit
 
     public float WeaponCooldown => Data.WeaponCooldown;
 
+    public void Update(Unit unit, uint gameLoop)
+    {
+        Data = unit;
+        FrameLastSeen = gameLoop;
+    }
+
     public Point2D Point => Pos.ConvertTo2D();
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         var unit = obj as IUnit;
         if (unit == null) return false;
         return unit.Tag == Tag;
     }
 
-    public override int GetHashCode()
-    {
-        return (int)Tag;
-    }
+    public override int GetHashCode() => (int)Tag;
 }

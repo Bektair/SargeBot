@@ -1,78 +1,24 @@
-﻿using Core.Data;
-using Core.Intel;
-using Google.Protobuf.Collections;
-using SC2APIProtocol;
+﻿using SC2APIProtocol;
 
 namespace Core.Zerg;
 
-public class ZergIntelService : IntelService, ILarvaService, IOverlordService
+public class ZergIntelService : IntelService, IZergIntelService
 {
-    public Dictionary<ulong, IntelUnit> Larva = new(), Overlords = new();
-
     public ZergIntelService(IEnumerable<IDataService> dataServices) : base(dataServices)
     {
     }
 
     public override Race Race => Race.Zerg;
 
-    public List<IntelUnit> GetLarva()
+    public IList<IUnit> GetHatchesWithoutInject()
     {
-        return Larva.Values.ToList();
-    }
-
-    public List<IntelUnit> GetOverlords()
-    {
-        return Overlords.Values.ToList();
-    }
-
-    public override void OnFrame(ResponseObservation observation)
-    {
-        base.OnFrame(observation);
-        HandleUnits(observation.Observation.RawData.Units);
-    }
-
-    private void HandleUnits(RepeatedField<Unit> rawDataUnits)
-    {
-        foreach (var unit in rawDataUnits)
-            switch (unit.Alliance)
-            {
-                case Alliance.Self:
-                    AddZergUnit(unit);
-                    break;
-                case Alliance.Enemy:
-                    break;
-                case Alliance.Neutral:
-                    break;
-                case Alliance.Ally:
-                default:
-                    throw new NotImplementedException();
-            }
-    }
-
-    private void AddZergUnit(Unit unit)
-    {
-        if (unit.UnitType == (int)UnitType.ZERG_LARVA)
-        {
-            if (Larva.ContainsKey(unit.Tag))
-                Larva[unit.Tag].Data = unit;
-            else
-                Larva.Add(unit.Tag, new IntelUnit(unit));
-        }
-        else if (unit.UnitType == (int)UnitType.ZERG_OVERLORD)
-        {
-            if (Overlords.ContainsKey(unit.Tag))
-                Overlords[unit.Tag].Data = unit;
-            else
-                Overlords.Add(unit.Tag, new IntelUnit(unit));
-        }
+        return GetUnits(UnitType.ZERG_HATCHERY)
+            .Where(x => !x.BuffIds.Contains((uint)Buff.QueenSpawnLarvaTimer))
+            .ToList();
     }
 }
 
-public interface ILarvaService
+public interface IZergIntelService
 {
-    public List<IntelUnit> GetLarva();
-}
-public interface IOverlordService
-{
-    public List<IntelUnit> GetOverlords();
+    public IList<IUnit> GetHatchesWithoutInject();
 }

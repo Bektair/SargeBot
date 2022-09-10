@@ -1,6 +1,4 @@
-﻿using Core.Data;
-using Core.Intel;
-using Core.Protoss;
+﻿using Core.Protoss;
 using Core.Terran;
 using Core.Zerg;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,8 +23,7 @@ public static class ServiceInstaller
         services.AddScoped<IZergBuildingPlacement, ZergBuildingPlacement>();
 
         // find better solution than this >_>
-        services.AddScoped<ILarvaService>(x => x.GetRequiredService<IEnumerable<IIntelService>>().FirstOrDefault(y => y is ZergIntelService) as ZergIntelService);
-        services.AddScoped<IOverlordService>(x => x.GetRequiredService<IEnumerable<IIntelService>>().FirstOrDefault(y => y is ZergIntelService) as ZergIntelService);
+        services.AddScoped(x => x.GetRequiredService<IEnumerable<IIntelService>>().FirstOrDefault(y => y is IZergIntelService) as IZergIntelService);
         return services;
     }
 }
