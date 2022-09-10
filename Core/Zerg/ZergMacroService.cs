@@ -1,19 +1,17 @@
 ﻿using Core.Intel;
 using Core.Macro;
-using Core.Model;
+using Core.SharedModels;
 using SC2APIProtocol;
 
 namespace Core.Zerg;
 
 public class ZergMacroService : MacroService
 {
-    private readonly ILarvaService _larvaService;
     private readonly IZergBuildingPlacement _buildingPlacement;
 
-    public ZergMacroService(IMessageService messageService, IEnumerable<IIntelService> intelServices, ILarvaService larvaService, IZergBuildingPlacement buildingPlacement) : base(
+    public ZergMacroService(IMessageService messageService, IEnumerable<IIntelService> intelServices, IZergBuildingPlacement buildingPlacement) : base(
         messageService, intelServices)
     {
-        _larvaService = larvaService;
         _buildingPlacement = buildingPlacement;
     }
 

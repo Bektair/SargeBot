@@ -1,7 +1,7 @@
 ﻿using Core.Data;
 using Core.Intel;
 using Core.Macro;
-using Core.Model;
+using Core.SharedModels;
 using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
@@ -64,7 +64,7 @@ public class ZergBuildingPlacement : IZergBuildingPlacement
     
     var DroneTargets = BuildDroneOrders.Where(orders => orders != null).Select(orders => orders.TargetUnitTag);
 
-    IntelUnit? closestOpenGeysir = closestGeysirs.FirstOrDefault(c=>!allExtractors.Contains(c.Pos) && !DroneTargets.Contains(c.Tag));
+    var closestOpenGeysir = closestGeysirs.FirstOrDefault(c=>!allExtractors.Contains(c.Pos) && !DroneTargets.Contains(c.Tag));
     if (closestOpenGeysir != null)
     {
       Console.WriteLine(closestOpenGeysir.Point);

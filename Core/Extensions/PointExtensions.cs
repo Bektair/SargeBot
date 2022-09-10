@@ -1,4 +1,4 @@
-﻿using Core.Model;
+﻿using Core.SharedModels;
 using SC2APIProtocol;
 
 namespace Core.Extensions;
