@@ -54,4 +54,20 @@ public static class PointExtensions
         var deltaY = point.Y - y;
         return deltaX * deltaX + deltaY * deltaY;
     }
+
+    /// <summary>
+    ///     Stolen from https://stackoverflow.com/questions/55550198/how-to-get-a-point-between-two-points
+    /// </summary>
+    public static Point2D GetPointBetweenPoints(this Point2D start, Point2D end, double distanceDelta)
+    {
+        var distance = Distance(start, end) + distanceDelta;
+
+        var angle = Math.Atan2(end.Y - start.Y, start.X - end.X);
+
+        return new Point2D
+        {
+            X = (float)(end.X + distance * Math.Cos(angle)),
+            Y = (float)(end.Y - distance * Math.Sin(angle))
+        };
+    }
 }
