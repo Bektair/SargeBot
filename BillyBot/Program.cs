@@ -5,6 +5,7 @@ using Core.Protoss;
 using Core.Terran;
 using Core.Terran.Bots;
 using Core.Zerg;
+using Core.Zerg.Bots;
 using Microsoft.Extensions.DependencyInjection;
 using SC2APIProtocol;
 using SC2ClientApi;
@@ -14,7 +15,7 @@ var sp = new ServiceCollection()
     .BuildServiceProvider();
 
 var gameSettings = new GameSettings(args);
-var playerOne = new MarineRushBot(sp.CreateScope().ServiceProvider);
+var playerOne = new GasRushBot(sp.CreateScope().ServiceProvider);
 
 Game game = gameSettings.GameMode switch
 {

@@ -22,6 +22,8 @@ public static class ServiceInstaller
         services.AddScoped<IMacroService, TerranMacroService>();
         services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<IMicroService, MicroService>();
+        services.AddScoped<IZergBuildingPlacement, ZergBuildingPlacement>();
+
         // find better solution than this >_>
         services.AddScoped<ILarvaService>(x => x.GetRequiredService<IEnumerable<IIntelService>>().FirstOrDefault(y => y is ZergIntelService) as ZergIntelService);
         services.AddScoped<IOverlordService>(x => x.GetRequiredService<IEnumerable<IIntelService>>().FirstOrDefault(y => y is ZergIntelService) as ZergIntelService);

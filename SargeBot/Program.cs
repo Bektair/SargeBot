@@ -12,6 +12,7 @@ using SargeBot.Features.Macro.Building.Zerg;
 using SargeBot.Features.Macro.ProductionQueues;
 using SC2APIProtocol;
 using SC2ClientApi;
+using ZergBuildingPlacement = SargeBot.Features.Macro.Building.Zerg.ZergBuildingPlacement;
 
 var sp = new ServiceCollection()
     .AddCoreServices()

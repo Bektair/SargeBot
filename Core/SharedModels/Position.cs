@@ -6,5 +6,11 @@ namespace Core.Model {
         public Position(float x, float y) {
             Point = new Point2D { X = x, Y = y };
         }
+
+    public Position(Point2D point)
+    {
+      Point = point;
     }
+
+  }
 }

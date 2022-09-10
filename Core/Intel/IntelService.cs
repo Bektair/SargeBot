@@ -38,7 +38,7 @@ public abstract class IntelService : IIntelService
 
         OnFrame(firstObservation);
 
-        Colonies.Add(new IntelColony { Point = GetUnits(attribute: Attribute.Structure).First().Point });
+        Colonies.Add(new IntelColony { Point = GetUnits(attribute: Attribute.Structure).First().Point, IsStartingLocation=true });
     }
 
     public virtual void OnFrame(ResponseObservation observation)
