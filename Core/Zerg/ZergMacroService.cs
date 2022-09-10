@@ -29,15 +29,16 @@ public class ZergMacroService : MacroService
         MessageService.Action(producer.Ability, producerUnits.Select(x => x.Tag));
     }
 
-  public override void Build(UnitType unitType, int allocatedWorkerCount)
+  public override void Build(UnitType unit, int allocatedWorkerCount)
   {
+    uint unitType = (uint)unit;
     var builders = IntelService.GetUnits(UnitType.ZERG_DRONE)
        .Select(x => x.Tag)
        .Take(allocatedWorkerCount);
-    ZergDataHelpers.Producers.TryGetValue(unitType, out var producers);
+    ZergDataHelpers.Producers.TryGetValue(unit, out var producers);
     var producer = producers.First();
 
-    if (unitType == UnitType.ZERG_EXTRACTOR) 
+    if (unitType.IsVespeneCollectingBuilding()) 
     {
       ulong? target = _buildingPlacement.FindPlacementGas();
       if (target != null) {
@@ -45,7 +46,7 @@ public class ZergMacroService : MacroService
       }
 
     }
-    else if(unitType == UnitType.ZERG_SPAWNINGPOOL)
+    else if(unitType.Is(UnitType.ZERG_SPAWNINGPOOL))
     {
       
       

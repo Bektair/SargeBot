@@ -40,10 +40,6 @@ public class ZergBuildingPlacement : IZergBuildingPlacement
     1159 //Zerg build abillities BUILD_*
   };
 
-  public float GetDistance(IPosition pos1, IPosition position)
-  {
-      return Math.Abs(pos1.Point.X - position.Point.X) + Math.Abs(pos1.Point.Y - position.Point.Y);
-  }
 
   public ulong? FindPlacementGas()
   {
@@ -54,13 +50,14 @@ public class ZergBuildingPlacement : IZergBuildingPlacement
     Console.WriteLine(myMain.Point);
 
     //How do I check if the baselocations are occupied
-   
-    var closestGeysirs = IntelService.GetVespeneGeysers().OrderBy(gas=> GetDistance(main, gas));
+    //public List<BaseLocation> BaseLocations { get; set; }
+    //public List<BaseLocation> SelfBases { get; set; }
 
-    IEnumerable<Point> allExtractors = IntelService.GetUnits(UnitType.ZERG_EXTRACTOR).Select(ex => ex.Pos);
-    var BuildDroneOrders = IntelService.GetUnits(UnitType.ZERG_DRONE)
-      .Select(builder => builder.Orders.FirstOrDefault(order => zergBuildAbillities.Contains(order.AbilityId)));
-    if (BuildDroneOrders == null) return null;
+  var closestGeysirs = IntelService.GetVespeneGeysers().OrderBy(gas=> main.Point.Distance(gas.Point));
+  IEnumerable<Point> allExtractors = IntelService.GetUnits(UnitType.ZERG_EXTRACTOR).Select(ex => ex.Pos);
+  var BuildDroneOrders = IntelService.GetUnits(UnitType.ZERG_DRONE)
+    .Select(builder => builder.Orders.FirstOrDefault(order => zergBuildAbillities.Contains(order.AbilityId)));
+  if (BuildDroneOrders == null) return null;
     
     var DroneTargets = BuildDroneOrders.Where(orders => orders != null).Select(orders => orders.TargetUnitTag);
 

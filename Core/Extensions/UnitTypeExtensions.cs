@@ -42,14 +42,20 @@ public static class UnitTypeExtensions
         return id is 342 or 344 or 343 or 880 or 608 or 881;
     }
 
-    /// <summary>
-    ///     All IDs between 362 and 377 is (path) blocking and destructible.
-    ///     IDs ranging from 472 - 474 is (placement) blocking and destructible.
-    ///     IDs ranging from 623 - 658 is (placement) blocking and destructible.
-    /// </summary>
-    /// <param name="id">UnitType ID as defined by Blizzard</param>
-    /// <returns>Returns true if the ID is of the type destructible and blocks pathing.</returns>
-    public static bool IsDestructible(this uint id)
+    public static bool IsVespeneCollectingBuilding(this uint id)
+    {
+      return id is 88 or 20 or 61;
+    }
+
+
+  /// <summary>
+  ///     All IDs between 362 and 377 is (path) blocking and destructible.
+  ///     IDs ranging from 472 - 474 is (placement) blocking and destructible.
+  ///     IDs ranging from 623 - 658 is (placement) blocking and destructible.
+  /// </summary>
+  /// <param name="id">UnitType ID as defined by Blizzard</param>
+  /// <returns>Returns true if the ID is of the type destructible and blocks pathing.</returns>
+  public static bool IsDestructible(this uint id)
     {
         return id is > 361 and < 378 or >= 472 and <= 474 or >= 623 and <= 658;
     }

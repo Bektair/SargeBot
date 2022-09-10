@@ -16,10 +16,9 @@ public class GasRushBuildState : BaseBuildState
 
   public override void OnFrame()
   {
-    if (_attacking) { 
-        service.Build(UnitType.ZERG_EXTRACTOR, 1);
-      _attacking = false;
-    }
+
+      service.Build(UnitType.ZERG_EXTRACTOR, 1);
+
 /*
     if(Bot.Intel.)
     service.Build(UnitType.ZERG_SPAWNINGPOOL, 1);*/

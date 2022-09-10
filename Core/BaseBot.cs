@@ -32,7 +32,7 @@ public abstract class BaseBot
     protected virtual void OnStart(ResponseObservation firstObs, ResponseData data, ResponseGameInfo gameInfo)
     {
         Data.OnStart(firstObs, data, gameInfo);
-        Intel.OnStart(firstObs, data, gameInfo);
+        Intel.OnStart(firstObs, data, gameInfo, MessageService);
         CurrentBuildState = BuildStates.FirstOrDefault();
     }
 

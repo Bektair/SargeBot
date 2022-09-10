@@ -90,6 +90,17 @@ internal class MessageService : IMessageService
     {
         Actions.Add(new Action { ActionRaw = new ActionRaw { UnitCommand = command } });
     }
+
+    public async Task<ResponseQuery> Query(Point2D start, Point2D end)
+  {
+
+    RequestQuery requestQuery = new RequestQuery();
+    RequestQueryPathing queryPathing = new RequestQueryPathing(){ StartPos = start, EndPos = end };
+    requestQuery.Pathing.Add(queryPathing);
+    var task = await Connection.SendQuery(requestQuery);
+
+    return task.Query;
+  }
 }
 
 public interface IMessageService
@@ -97,6 +108,7 @@ public interface IMessageService
     public void Action(Ability ability, IEnumerable<ulong> unitTags, bool queue = false);
     public void Action(Ability ability, IEnumerable<ulong> unitTags, Point2D target, bool queue = false);
     public void Action(Ability ability, IEnumerable<ulong> unitTags, ulong target, bool queue = false);
+    public Task<ResponseQuery> Query(Point2D start, Point2D end);
     void Chat(string message);
     void Debug(DebugCommand command);
     public void SetConnection(GameConnection connection);
