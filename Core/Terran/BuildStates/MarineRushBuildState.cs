@@ -18,8 +18,11 @@ public class MarineRushBuildState : BaseBuildState
         if (Bot.Intel.GetUnits(UnitType.TERRAN_BARRACKS).Count < 4)
             Bot.MacroService.Build(UnitType.TERRAN_BARRACKS);
 
-        Bot.MacroService.Train(UnitType.TERRAN_MARINE);
+        var simpleRamp = Bot.Intel.Colonies.First().Point
+            .GetPointBetweenPoints(Bot.Intel.EnemyColonies.First().Point, -7);
 
+        Bot.MacroService.Train(UnitType.TERRAN_MARINE, simpleRamp);
+        
         if (Bot.Intel.GetUnits(UnitType.TERRAN_MARINE).Count <= 10)
         {
             if (_attacking)

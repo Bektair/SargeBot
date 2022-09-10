@@ -17,7 +17,7 @@ public class ZergMacroService : MacroService
 
     public override Race Race => Race.Zerg;
 
-    public override void Train(UnitType unitType)
+    public override void Train(UnitType unitType, Point2D? rallyPoint = null)
     {
         if (!ZergDataHelpers.Producers.TryGetValue(unitType, out var producers))
             throw new NotImplementedException($"Producer for {unitType} not found");

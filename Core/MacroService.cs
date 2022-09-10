@@ -1,5 +1,4 @@
-﻿using Core.Intel;
-using Core.Terran;
+﻿using Core.Terran;
 using SC2APIProtocol;
 
 namespace Core;
@@ -20,7 +19,7 @@ public abstract class MacroService : IMacroService
     /// <summary>
     ///     Should be replaced with production queue
     /// </summary>
-    public virtual void Train(UnitType unitType)
+    public virtual void Train(UnitType unitType, Point2D? rallyPoint = null)
     {
         if (!TerranDataHelpers.Producers.TryGetValue(unitType, out var producers) &&
             !ProtossDataHelpers.Producers.TryGetValue(unitType, out producers))
@@ -28,12 +27,15 @@ public abstract class MacroService : IMacroService
 
         var producer = producers.First();
 
-        var builders = IntelService.GetUnits(producer.Type)
+        var eligibleBuilders = IntelService.GetUnits(producer.Type)
             .Where(x => x.BuildProgress > .99)
             .Where(x => !x.Orders.Any())
-            .Select(x => x.Tag);
+            .Select(x => x.Tag)
+            .ToList();
 
-        MessageService.Action(producer.Ability, builders);
+        MessageService.Action(producer.Ability, eligibleBuilders);
+
+        if (rallyPoint != null) MessageService.Action(Ability.Rally_Building, eligibleBuilders, rallyPoint);
     }
 
     /// <summary>
@@ -52,7 +54,7 @@ public abstract class MacroService : IMacroService
             .Take(allocatedWorkerCount);
 
         var location = BuildingPlacement.Random(IntelService.Colonies.First().Point);
-        
+
         MessageService.Action(producer.Ability, builders, location);
     }
 }
@@ -60,6 +62,6 @@ public abstract class MacroService : IMacroService
 public interface IMacroService
 {
     Race Race { get; }
-    void Train(UnitType unitType);
+    void Train(UnitType unitType, Point2D? rallyPoint = null);
     void Build(UnitType unitType, int allocatedWorkerCount = 1);
 }
