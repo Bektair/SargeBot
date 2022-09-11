@@ -2,6 +2,7 @@
 using Core.Terran;
 using Core.Zerg;
 using Microsoft.Extensions.DependencyInjection;
+using Core.Intel;
 
 namespace Core;
 
@@ -21,6 +22,7 @@ public static class ServiceInstaller
         services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<IMicroService, MicroService>();
         services.AddScoped<IZergBuildingPlacement, ZergBuildingPlacement>();
+        services.AddScoped<MapDataService>();
 
         // find better solution than this >_>
         services.AddScoped(x => x.GetRequiredService<IEnumerable<IIntelService>>().FirstOrDefault(y => y is IZergIntelService) as IZergIntelService);

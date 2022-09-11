@@ -33,6 +33,29 @@ public static class PointExtensions
         return (T)result;
     }
 
+    public static T GetFurthest<T>(this IPosition point, IEnumerable<T> enumerable) where T : IPosition
+    {
+        return GetFurthest(point.Point, enumerable);
+    }
+
+    public static T GetFurthest<T>(this Point2D point, IEnumerable<T> enumerable) where T : IPosition
+    {
+        IPosition result = null;
+        var maxValue = double.MinValue;
+        double value;
+        foreach (var position in enumerable)
+        {
+            value = FastDistance(point, position.Point);
+            if (value > maxValue)
+            {
+                maxValue = value;
+                result = position;
+            }
+        }
+
+        return (T)result;
+    }
+
     public static double Distance(this Point2D point, float x, float y)
     {
         return Math.Sqrt(FastDistance(point, x, y));

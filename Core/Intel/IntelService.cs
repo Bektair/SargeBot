@@ -20,7 +20,7 @@ public abstract class IntelService : IIntelService
 
     public List<IColony> Colonies { get; } = new();
     public List<IColony> EnemyColonies { get; } = new();
-    public List<Point2D> BaseLocations { get;  } = new List<Point2D>();
+    public List<Point2D> BaseLocations { get; private set; } = new List<Point2D>();
 
 
     public abstract Race Race { get; }
@@ -56,26 +56,23 @@ public abstract class IntelService : IIntelService
 
 
         OnFrame(firstObservation);
+        Colonies.Add(new IntelColony { Point = GetUnits(attribute: Attribute.Structure).First().Point, IsStartingLocation = true });
 
         populateBases();
 
-        Colonies.Add(new IntelColony { Point = GetUnits(attribute: Attribute.Structure).First().Point, IsStartingLocation = true });
 
     }
-
-    // MARKERCLUSTERER config
-    // box area i.e. cluster size
-
-    //As the last step in the algorithm all the points are iterated and compared to the existing cluster points. They are assigned to the nearest cluster. This takes O(k*n). The cluster points are located at the center of the boxes.
 
     private void populateBases()
     {
         var mineralGroups = new Dictionary<uint, int>();
-        var minerals = GetMineralFields();
+        
+        
+        var resources = GetMineralFields();
         //https://kunuk.wordpress.com/2011/09/20/markerclusterer-with-c-example-and-html-canvas-part-3/
         //The MarkerClusterer algorithm is simple
 
-        var buckets = new AlgorithmClusterBundle(minerals.Select(unit => new XY(unit.Point.X, unit.Point.Y)).ToList()).markClusterResult.BaseBucketsLookup;
+        var buckets = new AlgorithmClusterBundle(resources.Select(unit => new XY(unit.Point.X, unit.Point.Y)).ToList()).markClusterResult.BaseBucketsLookup;
         //Each
 
         foreach(var bucket in buckets)
@@ -87,23 +84,55 @@ public abstract class IntelService : IIntelService
             //Console.WriteLine();
             BaseLocations.Add(baseLocation);
         }
+        BaseLocations = BaseLocations.OrderBy(point => point.Distance(Colonies.First().Point)).ToList();
     }
 
 
+    int BaseCount = 0;
     //I am trying to find the center of part of a circle
     //The middle mineralfield go towards
     //Another is to take a bounding box of the mineral line including gas, and taking the middle, offsetting that into open space.
     private Point2D getBaseLocation(IEnumerable<Position> mineralPositions)
     {
-        var A = mineralPositions.First().Point;
+        //Need to find a better way to get one of the endpoints
+        //TODO: Find the point that has the most distance to another point
+       
+
+        var maxValue = double.MinValue;
+        Position result = mineralPositions.First();
+        foreach (var mineral in mineralPositions)
+        {
+            var furthest = mineral.GetFurthest(mineralPositions);
+            var distance = mineral.Point.Distance(furthest.Point);
+            if (distance > maxValue)
+            {
+                maxValue = distance;
+                result = mineral;
+            }
+        }
+
+        var A = result.Point;
+
         mineralPositions = mineralPositions.OrderBy(pos => A.Distance(pos.Point));
 
+
         //Furthest away point, as having a larger span of points is important for its correctness.
-        var B = mineralPositions.Skip(2).First().Point;
-        mineralPositions.GetEnumerator().MoveNext();
+        int count = mineralPositions.Count();
+        var B = mineralPositions.Skip(count/2).First().Point;
         var C = mineralPositions.Last().Point;
 
-        return findCircle(A.X, A.Y, B.X, B.Y, C.X, C.Y);
+        var circleCentre = findCircle(A.X, A.Y, B.X, B.Y, C.X, C.Y);
+
+        var adjustedCenter = circleCentre;
+        //Do something that is on the angle of the center but closer
+        //I think it's possible to calculate a point on a line
+
+        Console.WriteLine($"Basenumber: {BaseCount}");
+        Console.WriteLine($"DistanceFromA: {A.Distance(circleCentre)}");
+        Console.WriteLine($"DistanceFromB: {B.Distance(circleCentre)}");
+        Console.WriteLine($"DistanceFromC: {C.Distance(circleCentre)}");
+
+        return adjustedCenter;
     }
 
 
@@ -120,6 +149,10 @@ public abstract class IntelService : IIntelService
         HandleDeadUnits(observation.Observation.RawData.Event);
 
         playerMinerals = (int)observation.Observation.PlayerCommon.Minerals;
+        
+        
+        //Draw attempted bases
+
     }
 
 
