@@ -23,22 +23,7 @@ public class ZergBuildingPlacement : IZergBuildingPlacement
     IntelService = intelServices.First(x => x.Race == race);
     DataService = dataService;
   }
-  public static HashSet<uint> zergBuildAbillities = new()
-  {
-    1162,
-    1156,
-    1154,
-    1152,
-    1157,
-    1160,
-    1161,
-    1165,
-    1155,
-    1166,
-    1158,
-    1167,
-    1159 //Zerg build abillities BUILD_*
-  };
+
 
 
   public ulong? FindPlacementGas()
@@ -53,10 +38,12 @@ public class ZergBuildingPlacement : IZergBuildingPlacement
     //public List<BaseLocation> BaseLocations { get; set; }
     //public List<BaseLocation> SelfBases { get; set; }
 
-  var closestGeysirs = IntelService.GetVespeneGeysers().OrderBy(gas=> main.Point.Distance(gas.Point));
+    //zergBuildAbillities.Contains(order.AbilityId)
+
+    var closestGeysirs = IntelService.GetVespeneGeysers().OrderBy(gas=> main.Point.Distance(gas.Point));
   IEnumerable<Point> allExtractors = IntelService.GetUnits(UnitType.ZERG_EXTRACTOR).Select(ex => ex.Pos);
   var BuildDroneOrders = IntelService.GetUnits(UnitType.ZERG_DRONE)
-    .Select(builder => builder.Orders.FirstOrDefault(order => zergBuildAbillities.Contains(order.AbilityId)));
+    .Select(builder => builder.Orders.FirstOrDefault(order => order.AbilityId.IsWorkerBuildAbillity()));
   if (BuildDroneOrders == null) return null;
     
     var DroneTargets = BuildDroneOrders.Where(orders => orders != null).Select(orders => orders.TargetUnitTag);

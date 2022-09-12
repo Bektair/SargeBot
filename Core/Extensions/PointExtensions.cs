@@ -32,7 +32,30 @@ public static class PointExtensions
 
         return (T)result;
     }
-    
+
+    public static T GetFurthest<T>(this IPosition point, IEnumerable<T> enumerable) where T : IPosition
+    {
+        return GetFurthest(point.Point, enumerable);
+    }
+
+    public static T GetFurthest<T>(this Point2D point, IEnumerable<T> enumerable) where T : IPosition
+    {
+        IPosition result = null;
+        var maxValue = double.MinValue;
+        double value;
+        foreach (var position in enumerable)
+        {
+            value = FastDistance(point, position.Point);
+            if (value > maxValue)
+            {
+                maxValue = value;
+                result = position;
+            }
+        }
+
+        return (T)result;
+    }
+
     public static double Distance(this Point2D point, float x, float y)
     {
         return Math.Sqrt(FastDistance(point, x, y));
@@ -70,4 +93,33 @@ public static class PointExtensions
             Y = (float)(end.Y - distance * Math.Sin(angle))
         };
     }
+
+    public static Point2D MidPoint(this Point2D A, Point2D B)
+    {
+        return new Point2D
+        {
+            X = (float)((A.X + B.X) / 2),
+            Y = (float)((A.Y + B.Y) / 2),
+        };
+    }
+
+    public static double Slope(this Point2D A, Point2D B)
+    {
+        //Change in Y / Change in X
+        var diffY = Math.Abs(A.Y - B.Y);
+        var diffX = Math.Abs(A.X - B.X);
+        if(A.X > B.X)
+            diffX *= -1;
+        if (A.Y > B.Y)
+            diffY *= -1;
+
+        return diffY/diffX;
+    }
+
+    public static double PerpindicularSlope(this Point2D A, Point2D B)
+    {
+        //Change in Y / Change in X
+        return Slope(A, B) * -1;
+    }
+
 }

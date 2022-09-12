@@ -13,6 +13,7 @@ public abstract class BaseBot
     public readonly IMacroService MacroService;
     public readonly IMessageService MessageService;
     public readonly IMicroService MicroService;
+    public readonly MapDataService MapDataService;
 
     protected BaseBot(IServiceProvider services, Race race)
     {
@@ -21,6 +22,8 @@ public abstract class BaseBot
         MacroService = services.GetRequiredService<IEnumerable<IMacroService>>().First(x => x.Race == race);
         MessageService = services.GetRequiredService<IMessageService>();
         MicroService = services.GetRequiredService<IMicroService>();
+        MapDataService = services.GetRequiredService<MapDataService>();
+
         PlayerSetup = new PlayerSetup { PlayerName = GetType().Name, Race = race, Type = PlayerType.Participant };
     }
 
@@ -29,11 +32,14 @@ public abstract class BaseBot
 
     public PlayerSetup PlayerSetup { get; }
 
+
     protected virtual void OnStart(ResponseObservation firstObs, ResponseData data, ResponseGameInfo gameInfo)
     {
         Data.OnStart(firstObs, data, gameInfo);
         Intel.OnStart(firstObs, data, gameInfo, MessageService);
         CurrentBuildState = BuildStates.FirstOrDefault();
+        MapDataService.OnStart(gameInfo);
+
     }
 
     protected virtual void OnFrame(ResponseObservation observation)
@@ -42,6 +48,20 @@ public abstract class BaseBot
         CheckStateTriggers();
         CurrentBuildState?.OnFrame();
         MessageService.OnFrame(observation);
+
+        var bases = Intel.BaseLocations;
+        var color = new Color { G = 0, R = 250, B = 50 };
+        foreach (var expansion in bases)
+        {
+            //You can get the Z - height of terrain return -16 + 32 * self.game_info.terrain_height[pos] / 255
+            //Get data from map
+            var Zpoint = new Point2D() { X = (int)Math.Round(expansion.X), Y = (int)Math.Round(expansion.Y) };
+
+            MessageService.Debug(DebugRequest.DrawSphere(
+              new Point { X = expansion.X, Y = expansion.Y, Z = MapDataService.MapData.Map[Zpoint].ZHegith },
+              color: color));
+        }
+
     }
 
     protected virtual void OnEnd()
