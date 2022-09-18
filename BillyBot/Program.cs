@@ -2,9 +2,6 @@
 using Core;
 using Core.Game;
 using Core.Protoss;
-using Core.Terran;
-using Core.Terran.Bots;
-using Core.Zerg;
 using Core.Zerg.Bots;
 using Microsoft.Extensions.DependencyInjection;
 using SC2APIProtocol;
@@ -15,13 +12,13 @@ var sp = new ServiceCollection()
     .BuildServiceProvider();
 
 var gameSettings = new GameSettings(args);
-var playerOne = new GasRushBot(sp.CreateScope().ServiceProvider);
+var playerOne = new QueenRushBot(sp.CreateScope().ServiceProvider);
 
 Game game = gameSettings.GameMode switch
 {
     GameMode.Singleplayer => new SingleplayerGame(gameSettings, playerOne, Race.Protoss, AIBuild.Rush, Difficulty.Easy),
     GameMode.Ladder => new LadderGame(gameSettings, playerOne),
-    GameMode.Multiplayer or _ => new MultiplayerGame(gameSettings, playerOne, new ProbeRushBot(sp.CreateScope().ServiceProvider))
+    GameMode.Multiplayer or _ => new MultiplayerGame(gameSettings, playerOne, new DebugBot(sp.CreateScope().ServiceProvider))
 };
 
 Log.Info($"Starting {game} {gameSettings}");

@@ -58,7 +58,8 @@ public abstract class IntelService : IIntelService
         OnFrame(firstObservation);
         Colonies.Add(new IntelColony { Point = GetUnits(attribute: Attribute.Structure).First().Point, IsStartingLocation = true });
 
-        populateBases();
+        // commented out because of file write error
+        //populateBases();
 
 
     }
@@ -137,7 +138,8 @@ public abstract class IntelService : IIntelService
 
 
   
-    public int playerMinerals { get; private set; }
+    public int PlayerMinerals { get; private set; }
+    public uint SupplyAvailable { get; private set; }
 
 
     public virtual void OnFrame(ResponseObservation observation)
@@ -148,8 +150,8 @@ public abstract class IntelService : IIntelService
 
         HandleDeadUnits(observation.Observation.RawData.Event);
 
-        playerMinerals = (int)observation.Observation.PlayerCommon.Minerals;
-        
+        PlayerMinerals = (int)observation.Observation.PlayerCommon.Minerals;
+        SupplyAvailable = observation.Observation.PlayerCommon.FoodCap - observation.Observation.PlayerCommon.FoodUsed;
         
         //Draw attempted bases
 
@@ -300,7 +302,8 @@ public interface IIntelService
 {
     public Race Race { get; }
     public uint GameLoop { get; }
-    public int playerMinerals { get;  }
+    public int PlayerMinerals { get;  }
+    public uint SupplyAvailable { get; }
 
     public List<IColony> Colonies { get; }
     public List<IColony> EnemyColonies { get; }

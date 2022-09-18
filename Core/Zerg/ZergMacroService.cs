@@ -53,9 +53,10 @@ public class ZergMacroService : MacroService
             }
 
         }
-        else if (unitType.Is(UnitType.ZERG_HATCHERY))
+        // index out of bounds error
+        else if (false && unitType.Is(UnitType.ZERG_HATCHERY))
         {
-            if (IntelService.playerMinerals >= 300)
+            if (IntelService.PlayerMinerals >= 300)
             {
                 count++;
                 var newPoint = IntelService.BaseLocations[count % 16];
@@ -64,6 +65,11 @@ public class ZergMacroService : MacroService
                     _BaseLocations.Add(newPoint);
                 }
             }
+        }
+        else
+        {
+            var location = BuildingPlacement.Random(IntelService.Colonies.First().Point);
+            MessageService.Action(producer.Ability, builders, location);
         }
     }
 }
